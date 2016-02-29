@@ -47,4 +47,14 @@ public abstract class PshapeImpl implements Pshape
 		return label;
 	}
 
+	public void setVisibility(int visibility)
+	{
+		this.visibility = visibility;
+	}
+
+	public void setLabel(String label)
+	{
+		this.label = label;
+	}
+
 }

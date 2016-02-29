@@ -10,4 +10,8 @@ public interface Pshape extends Gshape
 
 	int getPseudoHash();
 
+	void setVisibility(int visibility);
+
+	void setLabel(String label);
+
 }

@@ -1,3 +1,15 @@
-de\fabianmeier\seventeengon\shapes\Gshape.class
+de\fabianmeier\seventeengon\shapes\PshapeImpl.class
+de\fabianmeier\seventeengon\intersection\EquationSolver.class
 de\fabianmeier\seventeengon\shapes\Pshape.class
-de\fabianmeier\seventeengon\App.class
+de\fabianmeier\seventeengon\shapes\GshapeImpl.class
+de\fabianmeier\seventeengon\shapes\XYpoint.class
+de\fabianmeier\seventeengon\shapes\Circle.class
+de\fabianmeier\seventeengon\shapes\FilledCircle.class
+de\fabianmeier\seventeengon\shapes\Gshape.class
+de\fabianmeier\seventeengon\intersection\DMan.class
+de\fabianmeier\seventeengon\shapes\Triangle.class
+de\fabianmeier\seventeengon\intersection\IntersectionManager.class
+de\fabianmeier\seventeengon\shapes\XYvector.class
+de\fabianmeier\seventeengon\intersection\IntersectionManager$1.class
+de\fabianmeier\seventeengon\shapes\Line.class
+de\fabianmeier\seventeengon\util\Angle.class

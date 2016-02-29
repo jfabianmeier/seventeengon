@@ -16,7 +16,7 @@ import de.fabianmeier.seventeengon.shapes.Pshape;
 import de.fabianmeier.seventeengon.shapes.Triangle;
 import de.fabianmeier.seventeengon.shapes.XYpoint;
 
-public class IntersectionTest1
+public class IntersectionTest
 {
 
 	@Test
@@ -282,7 +282,7 @@ public class IntersectionTest1
 		{
 			if (pshape instanceof FilledCircle)
 			{
-				FilledCircle fcirc2 = fcirc;
+				FilledCircle fcirc2 = (FilledCircle) pshape;
 				assertFalse(fcirc.intersectWith(new XYpoint(3, 3)).isEmpty());
 			}
 		}
