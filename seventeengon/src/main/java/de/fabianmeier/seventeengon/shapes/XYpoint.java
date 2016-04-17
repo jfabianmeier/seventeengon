@@ -1,5 +1,7 @@
 package de.fabianmeier.seventeengon.shapes;
 
+import java.awt.Graphics2D;
+import java.awt.geom.Ellipse2D;
 import java.util.Set;
 
 import de.fabianmeier.seventeengon.intersection.DMan;
@@ -135,7 +137,7 @@ public class XYpoint extends PshapeImpl
 	{
 		String localLabel = getLabel();
 
-		String farOffS = farOff ? "" : "INF";
+		String farOffS = farOff ? "INF" : "";
 
 		if (localLabel == null)
 			localLabel = "P";
@@ -146,6 +148,13 @@ public class XYpoint extends PshapeImpl
 	public int getPseudoHash()
 	{
 		return (int) Math.round(1000 * x + 10000 * y);
+	}
+
+	public void paint(Graphics2D g2d)
+	{
+		setColourAndStroke(g2d);
+
+		g2d.fill(new Ellipse2D.Double(x - 1, y - 1, 2, 2));
 	}
 
 }

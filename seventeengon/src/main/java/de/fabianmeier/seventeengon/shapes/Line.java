@@ -1,5 +1,7 @@
 package de.fabianmeier.seventeengon.shapes;
 
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
 import java.util.Random;
 import java.util.Set;
 
@@ -245,6 +247,16 @@ public class Line extends PshapeImpl
 			return getLabel() + ": " + getStartPoint().toString() + " -> "
 					+ getEndPoint().toString();
 		}
+	}
+
+	public void paint(Graphics2D g2d)
+	{
+		setColourAndStroke(g2d);
+
+		g2d.draw(new Line2D.Double(getStartPoint().getX(),
+				getStartPoint().getY(), getEndPoint().getX(),
+				getEndPoint().getY()));
+
 	}
 
 }

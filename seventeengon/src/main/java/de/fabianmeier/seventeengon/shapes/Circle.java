@@ -1,5 +1,8 @@
 package de.fabianmeier.seventeengon.shapes;
 
+import java.awt.Graphics2D;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
 import java.util.Random;
 import java.util.Set;
 
@@ -150,8 +153,15 @@ public class Circle extends PshapeImpl
 		if (localLabel == null)
 			localLabel = "Circle";
 
-		return localLabel + ": " + centre.toString() + " >> "
+		String back = localLabel + ": " + centre.toString() + " >> "
 				+ showValue(radius);
+
+		if (!startAngle.equals(endAngle))
+		{
+			back += " from " + startAngle + " to " + endAngle;
+		}
+
+		return back;
 	}
 
 	@Override
@@ -205,6 +215,28 @@ public class Circle extends PshapeImpl
 		} else if (!startAngle.equals(other.startAngle))
 			return false;
 		return true;
+	}
+
+	public void paint(Graphics2D g2d)
+	{
+		setColourAndStroke(g2d);
+
+		if (!startAngle.equals(endAngle))
+		{
+
+			g2d.draw(new Arc2D.Double(centre.getX() - radius,
+					centre.getY() - radius, 2 * radius, 2 * radius,
+					-startAngle.asDouble() * 180 / Math.PI,
+					-Angle.AngleDifference(startAngle, endAngle) * 180
+							/ Math.PI,
+					Arc2D.OPEN));
+		} else
+		{
+
+			g2d.draw(new Ellipse2D.Double(centre.getX() - radius,
+					centre.getY() - radius, 2 * radius, 2 * radius));
+		}
+
 	}
 
 }

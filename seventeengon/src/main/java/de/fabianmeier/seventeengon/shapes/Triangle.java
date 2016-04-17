@@ -1,5 +1,7 @@
 package de.fabianmeier.seventeengon.shapes;
 
+import java.awt.Graphics2D;
+import java.awt.geom.Path2D;
 import java.util.Random;
 import java.util.Set;
 
@@ -156,6 +158,21 @@ public class Triangle extends PshapeImpl
 		} else if (!pointC.equals(other.pointC))
 			return false;
 		return true;
+	}
+
+	public void paint(Graphics2D g2d)
+	{
+		setColourAndStroke(g2d);
+
+		Path2D path = new Path2D.Double();
+
+		path.moveTo(pointA.getX(), pointA.getY());
+		path.lineTo(pointB.getX(), pointB.getY());
+		path.lineTo(pointC.getX(), pointC.getY());
+
+		path.closePath();
+
+		g2d.draw(path);
 	}
 
 }

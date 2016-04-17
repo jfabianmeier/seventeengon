@@ -283,7 +283,7 @@ public class IntersectionTest
 			if (pshape instanceof FilledCircle)
 			{
 				FilledCircle fcirc2 = (FilledCircle) pshape;
-				assertFalse(fcirc.intersectWith(new XYpoint(3, 3)).isEmpty());
+				assertFalse(fcirc2.intersectWith(new XYpoint(3, 3)).isEmpty());
 			}
 		}
 

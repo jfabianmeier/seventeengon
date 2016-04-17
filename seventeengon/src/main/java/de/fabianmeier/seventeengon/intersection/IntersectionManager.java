@@ -251,7 +251,7 @@ public class IntersectionManager
 
 		Set<Double> lambdaSet = EquationSolver.solveQuadraticEquation(
 				lineVector.getLength() * lineVector.getLength(),
-				2 * lineVector.scalarProduct(circleVector),
+				-2 * lineVector.scalarProduct(circleVector),
 				circleVector.getLength() * circleVector.getLength()
 						- circle.getRadius() * circle.getRadius());
 
@@ -421,13 +421,14 @@ public class IntersectionManager
 		for (int i = 0; i < n; i++)
 		{
 			betweenAngleDoubeList.add(angleDoubleList.get(i) / 2
-					+ angleDoubleList.get((i + 1) % n) / 2);
+					+ angleDoubleList.get((i + 1) % n) / 2
+					+ ((i + 1) / n) * Math.PI);
 		}
 
 		for (int i = 0; i < n; i++)
 		{
 			XYpoint point = circle
-					.getAnglePoint(new Angle(betweenAngleDoubeList.get(0)));
+					.getAnglePoint(new Angle(betweenAngleDoubeList.get(i)));
 
 			if (containedInAll(intersectionShapes, point))
 			{
@@ -750,12 +751,16 @@ public class IntersectionManager
 
 		Set<Pshape> intersectionShapes = new HashSet<Pshape>();
 
-		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB());
-		Line lineBC = new Line(triangle.getPointB(), triangle.getPointC());
-		Line lineCA = new Line(triangle.getPointC(), triangle.getPointA());
+		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB(), 0, 1,
+				0, null);
+		Line lineBC = new Line(triangle.getPointB(), triangle.getPointC(), 0, 1,
+				0, null);
+		Line lineCA = new Line(triangle.getPointC(), triangle.getPointA(), 0, 1,
+				0, null);
 		if (!fcirc.getStartPoint().equals(fcirc.getEndPoint()))
 		{
-			Line line = new Line(fcirc.getStartPoint(), fcirc.getEndPoint());
+			Line line = new Line(fcirc.getStartPoint(), fcirc.getEndPoint(), 0,
+					1, 0, null);
 			intersectionShapes.addAll(lineBC.intersectWith(line));
 
 			intersectionShapes.addAll(lineCA.intersectWith(line));
@@ -804,7 +809,7 @@ public class IntersectionManager
 				onCircle.add(point);
 		}
 
-		Set<Pshape> preCircles = circlePieces(circle, onCircle, circle,
+		Set<Pshape> preCircles = circlePieces(circle, onCircle, fcirc,
 				triangle);
 
 		for (Pshape pshape : preCircles)

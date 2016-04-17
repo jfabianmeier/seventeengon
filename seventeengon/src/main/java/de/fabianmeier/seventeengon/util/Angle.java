@@ -105,7 +105,7 @@ public class Angle
 	@Override
 	public String toString()
 	{
-		return PshapeImpl.showValue(normalizedAngle / Math.PI) + " pi";
+		return PshapeImpl.showValue(normalizedAngle / Math.PI) + "pi";
 	}
 
 }
