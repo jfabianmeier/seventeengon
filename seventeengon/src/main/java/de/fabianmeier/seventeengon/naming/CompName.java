@@ -5,14 +5,48 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CompositeName
+public class CompName
 {
 
 	private List<GeoName> geoNames = new ArrayList<>();
 
 	private String compName;
 
-	public CompositeName(String compName)
+	public CompName(GeoName geoName)
+	{
+		this(geoName.toString());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((compName == null) ? 0 : compName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CompName other = (CompName) obj;
+		if (compName == null)
+		{
+			if (other.compName != null)
+				return false;
+		} else if (!compName.equals(other.compName))
+			return false;
+		return true;
+	}
+
+	public CompName(String compName)
 	{
 
 		this.compName = compName;

@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.fabianmeier.seventeengon.naming.CompositeName;
+import de.fabianmeier.seventeengon.naming.CompName;
 import de.fabianmeier.seventeengon.naming.GeoName;
 import de.fabianmeier.seventeengon.naming.SentencePattern;
 
@@ -21,7 +21,7 @@ public class CompositeNameTest
 	@Test
 	public void test()
 	{
-		CompositeName compName = new CompositeName("<A_1alpha||BC_a");
+		CompName compName = new CompName("<A_1alpha||BC_a");
 
 		List<GeoName> geoNames = compName.getGeoNames();
 

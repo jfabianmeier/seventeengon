@@ -7,8 +7,6 @@ public class SentencePattern
 {
 	private List<String> words = new ArrayList<String>();
 
-	// private List<CompositeName> compositeNames = new ArrayList<>();
-
 	public SentencePattern(String sentence)
 	{
 
@@ -16,16 +14,37 @@ public class SentencePattern
 
 		for (String part : parts)
 		{
-			if (!BasicName.isBasicName(part) && part.matches("[A-Z]?[a-z]+"))
+			if (isSentenceWord(part))
 			{
 				words.add(part);
 			} else
 			{
 				words.add(null);
-				// compositeNames.add(new CompositeName(part));
 			}
 		}
 
+	}
+
+	public static List<CompName> getCompositeNames(String sentence)
+	{
+		List<CompName> compNameList = new ArrayList<CompName>();
+
+		String[] parts = sentence.split("\\s+");
+
+		for (String part : parts)
+		{
+			if (!isSentenceWord(part))
+			{
+				compNameList.add(new CompName(part));
+			}
+		}
+
+		return compNameList;
+	}
+
+	private static boolean isSentenceWord(String part)
+	{
+		return !BasicName.isBasicName(part) && part.matches("[A-Z]?[a-z]+,?");
 	}
 
 	@Override
