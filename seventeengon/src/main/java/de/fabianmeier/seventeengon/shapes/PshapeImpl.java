@@ -5,8 +5,13 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import de.fabianmeier.seventeengon.geoobjects.CompositeGeoObject;
+import de.fabianmeier.seventeengon.geoobjects.GeoObject;
 
 public abstract class PshapeImpl implements Pshape
 {
@@ -27,6 +32,7 @@ public abstract class PshapeImpl implements Pshape
 		return pShapeSet;
 	}
 
+	@Override
 	public int getVisibility()
 	{
 		return visibility;
@@ -67,14 +73,61 @@ public abstract class PshapeImpl implements Pshape
 		return label;
 	}
 
+	@Override
 	public void setVisibility(int visibility)
 	{
 		this.visibility = visibility;
 	}
 
+	@Override
 	public void setLabel(String label)
 	{
 		this.label = label;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.geoobjects.GeoObject#getSubObjects()
+	 */
+	@Override
+	public List<GeoObject> getSubObjects()
+	{
+		return new ArrayList<GeoObject>();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.geoobjects.GeoObject#intersectWith(de.
+	 * fabianmeier.seventeengon.geoobjects.GeoObject)
+	 */
+	@Override
+	public GeoObject intersectWith(GeoObject other)
+	{
+		if (other.getSubObjects().isEmpty())
+		{
+			Pshape pShape = (Pshape) other;
+
+			Set<Pshape> shapeSet = this.intersectWith(pShape);
+			Set<GeoObject> geoSet = new HashSet<GeoObject>();
+			for (Pshape p : shapeSet)
+			{
+				geoSet.add(p);
+			}
+
+			return new CompositeGeoObject(geoSet);
+		} else
+		{
+			Set<GeoObject> geoSet = new HashSet<GeoObject>();
+			for (GeoObject geo : other.getSubObjects())
+			{
+				geoSet.add(this.intersectWith(geo));
+			}
+
+			return new CompositeGeoObject(geoSet);
+		}
+
 	}
 
 }

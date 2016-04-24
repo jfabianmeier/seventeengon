@@ -89,7 +89,6 @@ public class GeoGeneratorTest
 	@Test
 	public void testAddStringListOfString2()
 	{
-		List<String> replacement = new ArrayList<String>();
 
 		TextualCanvas textCanvas = new TextualCanvas();
 

@@ -3,6 +3,9 @@ package de.fabianmeier.seventeengon.geoobjects;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
+
+import de.fabianmeier.seventeengon.shapes.XYpoint;
 
 public class CompositeGeoObject implements GeoObject
 {
@@ -37,16 +40,81 @@ public class CompositeGeoObject implements GeoObject
 	}
 
 	@Override
-	public void setDrawingStrength(int strength)
+	public void setVisibility(int visibility)
 	{
-		drawingStrength = strength;
+		drawingStrength = visibility;
 
 	}
 
 	@Override
-	public int getDrawingStrength()
+	public int getVisibility()
 	{
 		return drawingStrength;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.geoobjects.GeoObject#getSamplePoint(int)
+	 */
+	@Override
+	public XYpoint getSamplePoint(int sampleNumber)
+	{
+		List<GeoObject> maxDimObjects = new ArrayList<GeoObject>();
+
+		for (GeoObject geo : this.getSubObjects())
+		{
+			if (geo.getDimension() == getDimension())
+			{
+				maxDimObjects.add(geo);
+			}
+		}
+
+		Random rand = new Random(
+				sampleNumber + getDimension() + getSubObjects().size());
+
+		GeoObject chosen = maxDimObjects
+				.get(rand.nextInt(maxDimObjects.size()));
+		return chosen.getSamplePoint(sampleNumber);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.geoobjects.GeoObject#intersectWith(de.
+	 * fabianmeier.seventeengon.geoobjects.GeoObject)
+	 */
+	@Override
+	public GeoObject intersectWith(GeoObject other)
+	{
+		List<GeoObject> intersectionList = new ArrayList<GeoObject>();
+
+		for (GeoObject geo : this.getSubObjects())
+		{
+			intersectionList.add(geo.intersectWith(other));
+		}
+
+		return new CompositeGeoObject(intersectionList);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.geoobjects.GeoObject#getDimension()
+	 */
+	@Override
+	public int getDimension()
+	{
+		int maxDim = 0;
+
+		for (GeoObject geo : this.getSubObjects())
+		{
+			if (geo.getDimension() > maxDim)
+				maxDim = geo.getDimension();
+		}
+		return maxDim;
 	}
 
 }

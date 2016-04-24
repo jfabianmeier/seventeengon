@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
-import de.fabianmeier.seventeengon.geoobjects.GeoPoint;
-import de.fabianmeier.seventeengon.geoobjects.GeoTriangle;
 import de.fabianmeier.seventeengon.naming.CompName;
 import de.fabianmeier.seventeengon.naming.CompNamePattern;
 import de.fabianmeier.seventeengon.naming.GeoName;
 import de.fabianmeier.seventeengon.naming.SentencePattern;
+import de.fabianmeier.seventeengon.shapes.Triangle;
+import de.fabianmeier.seventeengon.shapes.XYpoint;
 
 /**
  * @author JFM
@@ -59,14 +59,15 @@ public class TriangleGenerator implements GeoGenerator
 		for (CompName point : points)
 			if (!geoHolder.contains(point))
 			{
-				geoHolder.add(point, new GeoPoint());
+				GeoGeneratorLookup.generateAndAdd(geoHolder,
+						"Sei " + point.toString() + " ein Punkt");
 			}
 
-		GeoPoint a = ((GeoPoint) geoHolder.get(points.get(0)));
-		GeoPoint b = ((GeoPoint) geoHolder.get(points.get(1)));
-		GeoPoint c = ((GeoPoint) geoHolder.get(points.get(2)));
+		XYpoint a = (XYpoint) geoHolder.get(points.get(0));
+		XYpoint b = (XYpoint) geoHolder.get(points.get(1));
+		XYpoint c = (XYpoint) geoHolder.get(points.get(2));
 
-		geoHolder.add(compName, new GeoTriangle(a, b, c));
+		geoHolder.add(compName, new Triangle(a, b, c));
 
 	}
 

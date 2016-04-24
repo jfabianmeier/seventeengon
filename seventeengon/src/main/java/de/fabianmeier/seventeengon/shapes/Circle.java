@@ -6,6 +6,7 @@ import java.awt.geom.Ellipse2D;
 import java.util.Random;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.Angle;
@@ -75,6 +76,7 @@ public class Circle extends PshapeImpl
 
 	}
 
+	@Override
 	public XYpoint getSamplePoint(int sampleNumber)
 	{
 		Random rand = new Random(sampleNumber + getPseudoHash());
@@ -92,11 +94,13 @@ public class Circle extends PshapeImpl
 		return radVector.shift(centre);
 	}
 
+	@Override
 	public int getDimension()
 	{
 		return 1;
 	}
 
+	@Override
 	public Set<Pshape> intersectWith(Pshape pshape)
 	{
 		if (pshape instanceof XYpoint)
@@ -124,6 +128,7 @@ public class Circle extends PshapeImpl
 
 	}
 
+	@Override
 	public int getPseudoHash()
 	{
 		double didu = 1000 * startAngle.asDouble() + 100 * endAngle.asDouble()
@@ -217,6 +222,7 @@ public class Circle extends PshapeImpl
 		return true;
 	}
 
+	@Override
 	public void paint(Graphics2D g2d)
 	{
 		setColourAndStroke(g2d);
@@ -236,6 +242,21 @@ public class Circle extends PshapeImpl
 			g2d.draw(new Ellipse2D.Double(centre.getX() - radius,
 					centre.getY() - radius, 2 * radius, 2 * radius));
 		}
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
+	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
+	 */
+	@Override
+	public void draw(GeoCanvas canvas, String label)
+	{
+		canvas.drawArc(getCentre(), getStartAngle(), getEndAngle(),
+				getVisibility(), label);
 
 	}
 

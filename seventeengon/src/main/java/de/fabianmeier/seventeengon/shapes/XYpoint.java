@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 
@@ -95,11 +96,13 @@ public class XYpoint extends PshapeImpl
 		return y;
 	}
 
+	@Override
 	public int getDimension()
 	{
 		return 0;
 	}
 
+	@Override
 	public Set<Pshape> intersectWith(Pshape pshape)
 	{
 		if (pshape instanceof XYpoint)
@@ -127,6 +130,7 @@ public class XYpoint extends PshapeImpl
 
 	}
 
+	@Override
 	public XYpoint getSamplePoint(int sampleNumber)
 	{
 		return this;
@@ -145,16 +149,32 @@ public class XYpoint extends PshapeImpl
 				+ farOffS;
 	}
 
+	@Override
 	public int getPseudoHash()
 	{
 		return (int) Math.round(1000 * x + 10000 * y);
 	}
 
+	@Override
 	public void paint(Graphics2D g2d)
 	{
 		setColourAndStroke(g2d);
 
 		g2d.fill(new Ellipse2D.Double(x - 1, y - 1, 2, 2));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
+	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
+	 */
+	@Override
+	public void draw(GeoCanvas canvas, String label)
+	{
+		canvas.drawPoint(this, getVisibility(), label);
+
 	}
 
 }

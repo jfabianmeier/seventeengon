@@ -1,4 +1,7 @@
-de\fabianmeier\seventeengon\IntersectionTest.class
 de\fabianmeier\seventeengon\EquationTest.class
+de\fabianmeier\seventeengon\GeoGeneratorTest.class
+de\fabianmeier\seventeengon\IntersectionTest.class
+de\fabianmeier\seventeengon\CompositeNameTest.class
+de\fabianmeier\seventeengon\SequentialNameMappingTest.class
 de\fabianmeier\seventeengon\DManTest.class
 de\fabianmeier\seventeengon\AppTest.class

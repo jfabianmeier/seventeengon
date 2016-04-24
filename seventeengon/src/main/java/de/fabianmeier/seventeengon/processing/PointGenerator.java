@@ -6,9 +6,11 @@ package de.fabianmeier.seventeengon.processing;
 import java.util.List;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
-import de.fabianmeier.seventeengon.geoobjects.GeoPoint;
+import de.fabianmeier.seventeengon.geoobjects.SampleGenerator;
 import de.fabianmeier.seventeengon.naming.CompName;
 import de.fabianmeier.seventeengon.naming.SentencePattern;
+import de.fabianmeier.seventeengon.shapes.Triangle;
+import de.fabianmeier.seventeengon.shapes.XYpoint;
 
 /**
  * @author JFM
@@ -38,7 +40,15 @@ public class PointGenerator implements GeoGenerator
 
 		CompName point = compNames.get(0);
 
-		geoHolder.add(point, new GeoPoint());
+		Triangle area = new Triangle(new XYpoint(0, 0),
+				new XYpoint(0, SampleGenerator.getHeight()),
+				new XYpoint(SampleGenerator.getWidth(), 0), 0, null);
+
+		XYpoint xy = area.getSamplePoint(SampleGenerator.nextSampling());
+
+		xy.setVisibility(1);
+
+		geoHolder.add(point, xy);
 
 	}
 

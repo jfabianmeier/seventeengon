@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
 import de.fabianmeier.seventeengon.naming.CompName;
 import de.fabianmeier.seventeengon.naming.CompNamePattern;
 import de.fabianmeier.seventeengon.naming.SentencePattern;
@@ -17,6 +18,12 @@ public class GeoGeneratorLookup
 	{
 		add("Sei P ein Punkt", new PointGenerator());
 		add("Sei ABC ein Dreieck", new TriangleGenerator());
+	}
+
+	public static void generateAndAdd(GeoHolder geoHolder, String input)
+	{
+		GeoGenerator generator = get(input);
+		generator.generateAndAdd(geoHolder, input);
 	}
 
 	public static GeoGenerator get(SentencePattern pattern)

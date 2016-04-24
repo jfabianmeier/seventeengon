@@ -5,6 +5,7 @@ import java.awt.geom.Path2D;
 import java.util.Random;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 
 public class Triangle extends PshapeImpl
@@ -24,6 +25,7 @@ public class Triangle extends PshapeImpl
 		return pointB;
 	}
 
+	@Override
 	public int getPseudoHash()
 	{
 		final int prime = 31;
@@ -42,6 +44,11 @@ public class Triangle extends PshapeImpl
 		return pointC;
 	}
 
+	public Triangle(XYpoint a, XYpoint b, XYpoint c)
+	{
+		this(a, b, c, 1, null);
+	}
+
 	public Triangle(XYpoint a, XYpoint b, XYpoint c, int visibility,
 			String label)
 	{
@@ -51,11 +58,13 @@ public class Triangle extends PshapeImpl
 		pointC = c;
 	}
 
+	@Override
 	public int getDimension()
 	{
 		return 2;
 	}
 
+	@Override
 	public Set<Pshape> intersectWith(Pshape pshape)
 	{
 		if (pshape instanceof XYpoint)
@@ -83,6 +92,7 @@ public class Triangle extends PshapeImpl
 
 	}
 
+	@Override
 	public XYpoint getSamplePoint(int sampleNumber)
 	{
 		Random rand = new Random(sampleNumber + getPseudoHash());
@@ -160,6 +170,7 @@ public class Triangle extends PshapeImpl
 		return true;
 	}
 
+	@Override
 	public void paint(Graphics2D g2d)
 	{
 		setColourAndStroke(g2d);
@@ -173,6 +184,22 @@ public class Triangle extends PshapeImpl
 		path.closePath();
 
 		g2d.draw(path);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
+	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
+	 */
+	@Override
+	public void draw(GeoCanvas canvas, String label)
+	{
+		canvas.drawLine(pointA, pointB, getVisibility(), label);
+		canvas.drawLine(pointB, pointC, getVisibility(), null);
+		canvas.drawLine(pointC, pointA, getVisibility(), null);
+
 	}
 
 }

@@ -33,7 +33,7 @@ public abstract class GeoDrawingObject implements GeoObject
 	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#setDrawingStrength(int)
 	 */
 	@Override
-	public void setDrawingStrength(int strength)
+	public void setVisibility(int strength)
 	{
 		drawingStrength = strength;
 
@@ -46,7 +46,7 @@ public abstract class GeoDrawingObject implements GeoObject
 	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#getDrawingStrength()
 	 */
 	@Override
-	public int getDrawingStrength()
+	public int getVisibility()
 	{
 		return drawingStrength;
 	}

@@ -5,6 +5,7 @@ import java.awt.geom.Line2D;
 import java.util.Random;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 
@@ -73,6 +74,7 @@ public class Line extends PshapeImpl
 
 	}
 
+	@Override
 	public int getPseudoHash()
 	{
 		final int prime = 31;
@@ -178,11 +180,13 @@ public class Line extends PshapeImpl
 		return endLambda;
 	}
 
+	@Override
 	public int getDimension()
 	{
 		return 1;
 	}
 
+	@Override
 	public Set<Pshape> intersectWith(Pshape pshape)
 	{
 		if (pshape instanceof XYpoint)
@@ -210,6 +214,7 @@ public class Line extends PshapeImpl
 
 	}
 
+	@Override
 	public XYpoint getSamplePoint(int sampleNumber)
 	{
 		Random rand = new Random(sampleNumber + getPseudoHash());
@@ -249,6 +254,7 @@ public class Line extends PshapeImpl
 		}
 	}
 
+	@Override
 	public void paint(Graphics2D g2d)
 	{
 		setColourAndStroke(g2d);
@@ -256,6 +262,20 @@ public class Line extends PshapeImpl
 		g2d.draw(new Line2D.Double(getStartPoint().getX(),
 				getStartPoint().getY(), getEndPoint().getX(),
 				getEndPoint().getY()));
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
+	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
+	 */
+	@Override
+	public void draw(GeoCanvas canvas, String label)
+	{
+		canvas.drawLine(getStartPoint(), getEndPoint(), getVisibility(), label);
 
 	}
 
