@@ -12,25 +12,30 @@ import java.util.List;
  */
 public class CompNamePattern
 {
-	List<String> separation = new ArrayList<String>();
+	private final List<String> separation = new ArrayList<String>();
 
+	public List<String> getSeparation()
+	{
+		return separation;
+	}
+
+	/**
+	 * Creates a pattern (i.e. a list of paddings) for a compName
+	 * 
+	 * @param compName
+	 *            CompName
+	 */
 	public CompNamePattern(CompName compName)
 	{
-		String stringRep = compName.toString();
+		List<String> pieces = CompName.getCompNamePieces(compName.toString());
 
-		List<GeoName> geoNameList = compName.getGeoNames();
+		if (pieces.size() % 2 != 1)
+			throw new IllegalStateException("Size of list is " + pieces.size());
 
-		String runningString = stringRep;
-		for (int i = 0; i < geoNameList.size() - 1; i++)
+		for (int i = 0; i < pieces.size() / 2 + 1; i++)
 		{
-			GeoName geoName = geoNameList.get(i);
-			GeoName nextGeoName = geoNameList.get(i + 1);
-			runningString = runningString
-					.substring(geoName.toString().length());
-			int index = runningString.indexOf(nextGeoName.toString());
-			separation.add(runningString.substring(0, index));
+			separation.add(pieces.get(2 * i));
 		}
-
 	}
 
 	@Override
@@ -57,7 +62,8 @@ public class CompNamePattern
 		{
 			if (other.separation != null)
 				return false;
-		} else if (!separation.equals(other.separation))
+		}
+		else if (!separation.equals(other.separation))
 			return false;
 		return true;
 	}

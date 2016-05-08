@@ -1,14 +1,15 @@
-/**s
+/**
+ * s
  * 
  */
 package de.fabianmeier.seventeengon.processing;
 
+import java.io.IOException;
 import java.util.List;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
 import de.fabianmeier.seventeengon.naming.CompName;
-import de.fabianmeier.seventeengon.naming.CompNamePattern;
-import de.fabianmeier.seventeengon.naming.SentencePattern;
+import de.fabianmeier.seventeengon.naming.Sentence;
 import de.fabianmeier.seventeengon.naming.SequentialNameMapping;
 
 /**
@@ -18,13 +19,29 @@ import de.fabianmeier.seventeengon.naming.SequentialNameMapping;
 public class RecursiveGeoGenerator implements GeoGenerator
 {
 
-	private String sinkSentence;
-	private List<String> replacement;
+	private List<Sentence> replacement;
+	private Sentence sinkSentence;
 
-	public RecursiveGeoGenerator(String sentence, List<String> replacement)
+	public RecursiveGeoGenerator(Sentence sentence, List<Sentence> replacement)
 	{
 		this.sinkSentence = sentence;
 		this.replacement = replacement;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.processing.GeoGenerator#generateAndAdd(de.
+	 * fabianmeier.seventeengon.geoobjects.GeoHolder,
+	 * de.fabianmeier.seventeengon.naming.CompName)
+	 */
+	@Override
+	public boolean generateAndAdd(GeoHolder geoHolder, CompName sentence)
+			throws IOException
+	{
+		// TODO Auto-generated method stub
+		throw new IllegalStateException();
 	}
 
 	/*
@@ -35,25 +52,28 @@ public class RecursiveGeoGenerator implements GeoGenerator
 	 * seventeengon.geoobjects.GeoHolder)
 	 */
 	@Override
-	public void generateAndAdd(GeoHolder geoHolder, String sourceSentence)
+	public boolean generateAndAdd(GeoHolder geoHolder, Sentence sourceSentence)
+			throws IOException
 	{
 
-		generateCompNames(geoHolder, sourceSentence);
+		geoHolder.generateCompNames(sourceSentence);
 
 		GeoHolder localHolder = new GeoHolder();
-
 		SequentialNameMapping nameMapping = new SequentialNameMapping(
 				sourceSentence, sinkSentence);
 
 		transferToLocal(geoHolder, localHolder, nameMapping);
 
-		for (String rep : replacement)
+		for (Sentence rep : replacement)
 		{
 			GeoGenerator localGeo = GeoGeneratorLookup.get(rep);
-			localGeo.generateAndAdd(localHolder, rep);
+			boolean created = localGeo.generateAndAdd(localHolder, rep);
+			if (!created)
+				return false;
 		}
 
 		transferToGlobal(geoHolder, localHolder, nameMapping);
+		return true;
 
 	}
 
@@ -79,25 +99,6 @@ public class RecursiveGeoGenerator implements GeoGenerator
 			if (geoHolder.contains(sourceName))
 			{
 				localHolder.add(sinkName, geoHolder.get(sourceName));
-			}
-		}
-	}
-
-	private void generateCompNames(GeoHolder geoHolder, String sourceSentence)
-	{
-		List<CompName> compNameList = SentencePattern
-				.getCompositeNames(sourceSentence);
-
-		for (CompName compName : compNameList)
-		{
-			if (!geoHolder.contains(compName)
-					&& compName.getGeoNames().size() > 1)
-			{
-				GeoGenerator geoGen = GeoGeneratorLookup
-						.get(new CompNamePattern(compName));
-
-				geoGen.generateAndAdd(geoHolder, compName.toString());
-
 			}
 		}
 	}

@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.shapes.Arc;
 import de.fabianmeier.seventeengon.shapes.Circle;
-import de.fabianmeier.seventeengon.shapes.FilledCircle;
 import de.fabianmeier.seventeengon.shapes.Line;
 import de.fabianmeier.seventeengon.shapes.Pshape;
 import de.fabianmeier.seventeengon.shapes.Triangle;
@@ -18,368 +18,7 @@ import de.fabianmeier.seventeengon.util.Angle;
 
 public class IntersectionManager
 {
-	public static Set<Pshape> intersect(XYpoint point1, XYpoint point2)
-	{
-		Set<Pshape> back = new HashSet<Pshape>();
-
-		if (point1.equals(point2))
-			back.add(point1);
-
-		return back;
-	}
-
-	public static Set<Pshape> intersect(XYpoint point, Line line)
-	{
-		// // TODO: Check if x- or y- coordinates coincide.
-		// double lambdaX = (point.getX() - line.getPointA().getX())
-		// / (point.getX() - line.getPointB().getX());
-		//
-		// double lambdaY = (point.getY() - line.getPointA().getY())
-		// / (point.getY() - line.getPointB().getY());
-
-		Set<Pshape> back = new HashSet<Pshape>();
-
-		XYvector BA = new XYvector(line.getPointA(), line.getPointB());
-		XYvector BAorth = new XYvector(BA.getyMove(), -BA.getxMove());
-
-		XYvector PA = new XYvector(line.getPointA(), point);
-
-		double[][] coefficients = new double[2][2];
-
-		coefficients[0][0] = BA.getxMove();
-		coefficients[0][1] = BAorth.getxMove();
-		coefficients[1][0] = BA.getyMove();
-		coefficients[1][1] = BAorth.getyMove();
-
-		double[] rhs = new double[2];
-
-		rhs[0] = PA.getxMove();
-		rhs[1] = PA.getyMove();
-
-		double[] lambda = EquationSolver.solveLinearSystem(coefficients, rhs);
-
-		if (DMan.same(lambda[1], 0))
-		{
-			if (DMan.LessOrEqual(line.getStartLambda(), lambda[0])
-
-			&& DMan.LessOrEqual(lambda[0], line.getEndLambda()))
-			{
-				back.add(point);
-			}
-
-		}
-
-		// if (DMan.same(lambdaX, lambdaY))
-		// if (DMan.LessOrEqual(line.getStartLambda(), lambdaX)
-		// && DMan.LessOrEqual(lambdaX, line.getEndLambda()))
-		// {
-		// back.add(point);
-		// }
-
-		return back;
-
-	}
-
-	public static Set<Pshape> intersect(XYpoint point, Circle circle)
-	{
-		XYvector shiftVector = new XYvector(circle.getCentre(), point);
-
-		Set<Pshape> back = new HashSet<Pshape>();
-
-		if (DMan.same(shiftVector.getLength(), circle.getRadius()))
-		{
-			Angle angle = shiftVector.getAngle();
-			if (circle.containsAngle(angle))
-				back.add(point);
-
-		}
-
-		return back;
-	}
-
-	public static Set<Pshape> intersect(XYpoint point, Triangle triangle)
-	{
-		Set<Pshape> back = new HashSet<Pshape>();
-
-		double[][] coefficients = new double[2][2];
-
-		coefficients[0][0] = triangle.getPointB().getX()
-				- triangle.getPointA().getX();
-		coefficients[0][1] = triangle.getPointC().getX()
-				- triangle.getPointA().getX();
-		coefficients[1][0] = triangle.getPointB().getY()
-				- triangle.getPointA().getY();
-		coefficients[1][1] = triangle.getPointC().getY()
-				- triangle.getPointA().getY();
-
-		double[] rhs = new double[2];
-		rhs[0] = point.getX() - triangle.getPointA().getX();
-		rhs[1] = point.getY() - triangle.getPointA().getY();
-
-		double[] result = EquationSolver.solveLinearSystem(coefficients, rhs);
-
-		if (DMan.LessOrEqual(0, result[0]) && DMan.LessOrEqual(0, result[1])
-				&& DMan.LessOrEqual(result[0] + result[1], 1))
-		{
-			back.add(point);
-		}
-
-		return back;
-	}
-
-	public static Set<Pshape> intersect(XYpoint point, FilledCircle fcirc)
-	{
-		Set<Pshape> back = new HashSet<Pshape>();
-		XYvector radiusVector = new XYvector(fcirc.getCentre(), point);
-
-		if (!DMan.LessOrEqual(radiusVector.getLength(), fcirc.getRadius()))
-		{
-			return back;
-		} else
-		{
-			if (fcirc.getStartPoint().equals(fcirc.getEndPoint()))
-			{
-				back.add(point);
-			} else
-			{
-				XYvector vector1 = new XYvector(fcirc.getStartPoint(),
-						fcirc.getEndPoint());
-				Angle vectorAngle1 = vector1.getAngle();
-
-				XYvector vector2 = new XYvector(fcirc.getEndPoint(),
-						fcirc.getStartPoint());
-				Angle vectorAngle2 = vector2.getAngle();
-
-				XYvector pointVector = new XYvector(fcirc.getStartPoint(),
-						point);
-				Angle pointAngle = pointVector.getAngle();
-
-				if (pointAngle.inBetween(vectorAngle2, vectorAngle1))
-					back.add(point);
-			}
-
-		}
-
-		return back;
-
-	}
-
-	public static Set<Pshape> intersect(Line line, XYpoint point)
-	{
-		return intersect(point, line);
-	}
-
-	public static Set<Pshape> intersect(Line line1, Line line2)
-	{
-		Set<Pshape> back = new HashSet<Pshape>();
-
-		Line longLine = new Line(line1.getPointA(), line1.getPointB());
-
-		if (!longLine.intersectWith(line2.getPointA()).isEmpty()
-				&& !longLine.intersectWith(line2.getPointB()).isEmpty())
-		{
-			double startLambda2 = line1.getLambda(line2.getStartPoint());
-			double endLambda2 = line1.getLambda(line2.getEndPoint());
-
-			if (startLambda2 > endLambda2)
-			{
-				double temp = startLambda2;
-				startLambda2 = endLambda2;
-				endLambda2 = temp;
-			}
-
-			double startLambda = Math.max(line1.getStartLambda(), startLambda2);
-			double endLambda = Math.min(line1.getEndLambda(), endLambda2);
-
-			if (DMan.LessOrEqual(startLambda, endLambda))
-			{
-				if (DMan.same(startLambda, endLambda))
-				{
-					back.add(line1.getPointByLambda(startLambda));
-				} else
-				{
-					back.add(new Line(line1.getPointA(), line1.getPointB(),
-							startLambda, endLambda, 0, null));
-				}
-			}
-
-			return back;
-		}
-
-		XYvector vector1 = new XYvector(line1.getPointA(), line1.getPointB());
-		XYvector vector2 = new XYvector(line2.getPointA(), line2.getPointB());
-
-		vector1 = vector1.normed();
-		vector2 = vector2.normed();
-
-		if (vector1.equals(vector2) || vector1.equals(vector2.multiplyBy(-1)))
-		{
-			return back;
-		}
-
-		XYvector resultVector = new XYvector(line1.getPointA(),
-				line2.getPointB());
-
-		double[][] coefficients = new double[2][2];
-		double[] rhs = new double[2];
-
-		coefficients[0][0] = vector1.getxMove();
-		coefficients[0][1] = -vector2.getxMove();
-		coefficients[1][0] = vector1.getyMove();
-		coefficients[1][1] = -vector2.getyMove();
-		rhs[0] = resultVector.getxMove();
-		rhs[1] = resultVector.getyMove();
-
-		double[] lhs = EquationSolver.solveLinearSystem(coefficients, rhs);
-
-		XYpoint point = vector1.multiplyBy(lhs[0]).shift(line1.getPointA());
-
-		if (!line1.intersectWith(point).isEmpty()
-				&& !line2.intersectWith(point).isEmpty())
-			back.add(point);
-
-		return back;
-
-	}
-
-	public static Set<Pshape> intersect(Line line, Circle circle)
-	{
-		XYvector lineVector = new XYvector(line.getPointA(), line.getPointB());
-
-		XYvector circleVector = new XYvector(line.getPointA(),
-				circle.getCentre());
-
-		Set<Double> lambdaSet = EquationSolver.solveQuadraticEquation(
-				lineVector.getLength() * lineVector.getLength(),
-				-2 * lineVector.scalarProduct(circleVector),
-				circleVector.getLength() * circleVector.getLength()
-						- circle.getRadius() * circle.getRadius());
-
-		Set<XYpoint> possiblePoints = new HashSet<XYpoint>();
-
-		for (Double d : lambdaSet)
-		{
-			possiblePoints
-					.add(lineVector.multiplyBy(d).shift(line.getPointA()));
-		}
-
-		Set<Pshape> back = new HashSet<Pshape>();
-
-		for (XYpoint point : possiblePoints)
-		{
-			if (!line.intersectWith(point).isEmpty()
-					&& !circle.intersectWith(point).isEmpty())
-			{
-				back.add(point);
-			}
-		}
-		return back;
-
-	}
-
-	public static Set<Pshape> intersect(Line line, Triangle triangle)
-	{
-		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB(), 0, 1,
-				0, null);
-		Line lineBC = new Line(triangle.getPointB(), triangle.getPointC(), 0, 1,
-				0, null);
-		Line lineCA = new Line(triangle.getPointC(), triangle.getPointA(), 0, 1,
-				0, null);
-
-		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
-
-		intersectionPieces.addAll(line.intersectWith(lineAB));
-		intersectionPieces.addAll(line.intersectWith(lineBC));
-		intersectionPieces.addAll(line.intersectWith(lineCA));
-
-		Set<Pshape> back = new HashSet<Pshape>();
-
-		if (intersectionPieces.size() == 0)
-			return back;
-
-		Set<XYpoint> pointSet = new HashSet<XYpoint>();
-
-		for (Pshape pshape : intersectionPieces)
-		{
-			if (pshape instanceof XYpoint)
-			{
-				XYpoint neuPoint = (XYpoint) pshape;
-				pointSet.add(neuPoint);
-			}
-		}
-
-		if (pointSet.size() == 1)
-		{
-			back.addAll(pointSet);
-			return back;
-		}
-
-		List<XYpoint> pointList = new ArrayList<XYpoint>(pointSet);
-
-		back.add(line.subSegment(pointList.get(0), pointList.get(1)));
-
-		return back;
-
-	}
-
-	public static Set<Pshape> intersect(Line line, FilledCircle fcirc)
-	{
-
-		Circle circle = new Circle(fcirc.getCentre(), fcirc.getRadius(), 0,
-				null);
-
-		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
-
-		if (!fcirc.getStartPoint().equals(fcirc.getEndPoint()))
-		{
-			Line lineSE = new Line(fcirc.getStartPoint(), fcirc.getEndPoint(),
-					0, 1, 0, null);
-			intersectionPieces.addAll(line.intersectWith(lineSE));
-		}
-
-		intersectionPieces.addAll(line.intersectWith(circle));
-		Set<Pshape> back = new HashSet<Pshape>();
-
-		if (intersectionPieces.size() == 0)
-			return back;
-
-		Set<XYpoint> pointSet = new HashSet<XYpoint>();
-
-		for (Pshape pshape : intersectionPieces)
-		{
-			if (pshape instanceof XYpoint)
-			{
-				XYpoint neuPoint = (XYpoint) pshape;
-				pointSet.add(neuPoint);
-			}
-		}
-
-		if (pointSet.size() == 1)
-		{
-			back.addAll(pointSet);
-			return back;
-		}
-
-		List<XYpoint> pointList = new ArrayList<XYpoint>(pointSet);
-
-		back.add(line.subSegment(pointList.get(0), pointList.get(1)));
-
-		return back;
-
-	}
-
-	public static Set<Pshape> intersect(Circle circle, XYpoint point)
-	{
-		return intersect(point, circle);
-
-	}
-
-	public static Set<Pshape> intersect(Circle circle, Line line)
-	{
-		return intersect(line, circle);
-	}
-
-	private static Set<Pshape> circlePieces(Circle circle,
+	private static Set<Pshape> circlePieces(Arc circle,
 			Set<XYpoint> pointsOnCircle, Pshape pshape1, Pshape pshape2)
 	{
 		Set<Pshape> pshapeSet = new HashSet<Pshape>();
@@ -392,7 +31,7 @@ public class IntersectionManager
 	// Checks for the pieces of circle separated by pointsOnCircle if they
 	// belong to intersectionShapes, assuming that the whole segment is either
 	// in or out.
-	private static Set<Pshape> circlePieces(Circle circle,
+	private static Set<Pshape> circlePieces(Arc circle,
 			Set<XYpoint> pointsOnCircle, Set<Pshape> intersectionShapes)
 	{
 
@@ -432,9 +71,9 @@ public class IntersectionManager
 
 			if (containedInAll(intersectionShapes, point))
 			{
-				back.add(new Circle(circle.getCentre(), circle.getRadius(),
-						angleDoubleList.get(i),
-						angleDoubleList.get((i + 1) % n), 0, null));
+				back.add(new Arc(circle.getCentre(), circle.getRadius(),
+						new Angle(angleDoubleList.get(i)),
+						new Angle(angleDoubleList.get((i + 1) % n))));
 			}
 
 		}
@@ -456,99 +95,143 @@ public class IntersectionManager
 		return contained;
 	}
 
-	public static Set<Pshape> intersect(Circle circle1, Circle circle2)
+	/**
+	 * 
+	 * @param arc1
+	 *            Arc
+	 * @param arc2
+	 *            Arc
+	 * @return if the arcs intersect
+	 */
+	public static Set<Pshape> intersect(Arc arc1, Arc arc2)
 	{
 
-		if (circle1.getCentre().equals(circle2.getCentre()))
+		if (arc1.getCentre().equals(arc2.getCentre()))
 		{
 			Set<Pshape> back = new HashSet<Pshape>();
 
-			if (DMan.same(circle1.getRadius(), circle2.getRadius()))
+			if (DMan.same(arc1.getRadius(), arc2.getRadius()))
 			{
 
 				Set<XYpoint> pointSet = new HashSet<XYpoint>();
 
-				pointSet.add(circle1.getStartPoint());
-				pointSet.add(circle1.getEndPoint());
-				pointSet.add(circle2.getStartPoint());
-				pointSet.add(circle2.getEndPoint());
+				pointSet.add(arc1.getStartPoint());
+				pointSet.add(arc1.getEndPoint());
+				pointSet.add(arc2.getStartPoint());
+				pointSet.add(arc2.getEndPoint());
 
-				back.addAll(circlePieces(circle1, pointSet, circle1, circle2));
+				back.addAll(circlePieces(arc1, pointSet, arc1, arc2));
 
 				return back;
 
-			} else
+			}
+			else
 			{
 				return back;
 			}
 
-		} else
+		}
+		else
 		{
-			double constant = square(circle1.getRadius())
-					- square(circle2.getRadius())
-					+ square(circle2.getCentre().getX())
-					+ square(circle2.getCentre().getY())
-					- square(circle1.getCentre().getX())
-					- square(circle1.getCentre().getY());
+			double constant = square(arc1.getRadius())
+					- square(arc2.getRadius()) + square(arc2.getCentre().getX())
+					+ square(arc2.getCentre().getY())
+					- square(arc1.getCentre().getX())
+					- square(arc1.getCentre().getY());
 
 			double xFactor = 2
-					* (circle2.getCentre().getX() - circle1.getCentre().getX());
+					* (arc2.getCentre().getX() - arc1.getCentre().getX());
 			double yFactor = 2
-					* (circle2.getCentre().getY() - circle1.getCentre().getY());
+					* (arc2.getCentre().getY() - arc1.getCentre().getY());
 
 			Line pseudoLine = new Line(xFactor, yFactor, constant);
 
-			Set<Pshape> intersections = pseudoLine.intersectWith(circle1);
+			Set<Pshape> intersections = pseudoLine.intersectWith(arc1);
 
 			Set<Pshape> back = new HashSet<Pshape>();
 
 			for (Pshape pshape : intersections)
 			{
-				if (!circle2.intersectWith(pshape).isEmpty())
+				if (!arc2.intersectWith(pshape).isEmpty())
 					back.add(pshape);
 			}
 
 			return back;
 
-			// XYvector centreVector = new XYvector(circle1.getCentre(),
-			// circle2.getCentre());
-			//
-			// double k = centreVector.getLength();
-			//
-			// double k1 = (-square(circle2.getRadius())
-			// + square(circle1.getRadius()) + square(k)) / 2 / k;
-			//
-			// Set<Double> hSet = DMan
-			// .squareRoot(square(circle1.getRadius()) - square(k1));
-			//
-			// Set<Pshape> back = new HashSet<Pshape>();
-			//
-			// XYvector orthVector = new XYvector(centreVector.getyMove(),
-			// -centreVector.getxMove()).normed();
-			//
-			// for (Double h : hSet)
-			// {
-			// XYpoint point = centreVector.multiplyBy(k1 / k)
-			// .addTo(orthVector.multiplyBy(h))
-			// .shift(circle1.getCentre());
-			//
-			// if (!circle1.intersectWith(point).isEmpty()
-			// && !circle2.intersectWith(point).isEmpty())
-			// back.add(point);
-			// }
-			//
-			// return back;
 		}
 	}
 
-	public static Set<Pshape> intersect(Circle circle, Triangle triangle)
+	/**
+	 * 
+	 * @param arc
+	 *            Arc
+	 * @param fcirc
+	 *            Circle
+	 * @return if the arc and the circle intersect
+	 */
+	public static Set<Pshape> intersect(Arc arc, Circle fcirc)
 	{
-		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB(), 0, 1,
-				0, null);
-		Line lineBC = new Line(triangle.getPointB(), triangle.getPointC(), 0, 1,
-				0, null);
-		Line lineCA = new Line(triangle.getPointC(), triangle.getPointA(), 0, 1,
-				0, null);
+		Arc circle2 = new Arc(fcirc.getCentre(), fcirc.getRadius(),
+				fcirc.getStartAngle(), fcirc.getEndAngle());
+
+		Set<Pshape> circleInter = arc.intersectWith(circle2);
+
+		for (Pshape pseudoCircle : circleInter)
+		{
+			if (pseudoCircle instanceof Arc)
+			{
+				return circleInter;
+			}
+		}
+
+		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
+
+		if (!fcirc.getStartPoint().equals(fcirc.getEndPoint()))
+		{
+			Line line = new Line(fcirc.getStartPoint(), fcirc.getEndPoint());
+			intersectionPieces.addAll(arc.intersectWith(line));
+		}
+
+		intersectionPieces.addAll(arc.intersectWith(circle2));
+
+		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
+
+		for (Pshape pshape : intersectionPieces)
+			intersectionPoints.add((XYpoint) pshape);
+
+		return circlePieces(arc, intersectionPoints, arc, fcirc);
+
+	}
+
+	/**
+	 * 
+	 * @param circle
+	 *            Circle
+	 * @param line
+	 *            Line
+	 * @return if the circle and the line intersect
+	 */
+	public static Set<Pshape> intersect(Arc circle, Line line)
+	{
+		return intersect(line, circle);
+	}
+
+	/**
+	 * 
+	 * @param circle
+	 *            Circle
+	 * @param triangle
+	 *            Triangle
+	 * @return if they intersect
+	 */
+	public static Set<Pshape> intersect(Arc circle, Triangle triangle)
+	{
+		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB(), 0,
+				1);
+		Line lineBC = new Line(triangle.getPointB(), triangle.getPointC(), 0,
+				1);
+		Line lineCA = new Line(triangle.getPointC(), triangle.getPointA(), 0,
+				1);
 
 		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
 
@@ -565,302 +248,44 @@ public class IntersectionManager
 
 	}
 
-	public static Set<Pshape> intersect(Circle circle, FilledCircle fcirc)
+	/**
+	 * 
+	 * @param circle
+	 *            Circle
+	 * @param point
+	 *            Point
+	 * @return if the point lies inside or on the Circle
+	 */
+	public static Set<Pshape> intersect(Arc circle, XYpoint point)
 	{
-		Circle circle2 = new Circle(fcirc.getCentre(), fcirc.getRadius(),
-				fcirc.getStartAngle().asDouble(),
-				fcirc.getEndAngle().asDouble(), 0, null);
-
-		Set<Pshape> circleInter = circle.intersectWith(circle2);
-
-		for (Pshape pseudoCircle : circleInter)
-		{
-			if (pseudoCircle instanceof Circle)
-			{
-				return circleInter;
-			}
-		}
-
-		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
-
-		if (!fcirc.getStartPoint().equals(fcirc.getEndPoint()))
-		{
-			Line line = new Line(fcirc.getStartPoint(), fcirc.getEndPoint());
-			intersectionPieces.addAll(circle.intersectWith(line));
-		}
-
-		intersectionPieces.addAll(circle.intersectWith(circle2));
-
-		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
-
-		for (Pshape pshape : intersectionPieces)
-			intersectionPoints.add((XYpoint) pshape);
-
-		return circlePieces(circle, intersectionPoints, circle, fcirc);
+		return intersect(point, circle);
 
 	}
 
-	public static Set<Pshape> intersect(Triangle triangle, XYpoint point)
-	{
-		return intersect(point, triangle);
-
-	}
-
-	public static Set<Pshape> intersect(Triangle triangle, Line line)
-	{
-		return intersect(line, triangle);
-
-	}
-
-	public static Set<Pshape> intersect(Triangle triangle, Circle circle)
-	{
-		return intersect(circle, triangle);
-
-	}
-
-	public static Set<Pshape> intersect(Triangle triangle1, Triangle triangle2)
-	{
-		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
-
-		Set<Pshape> intersectionShapes = new HashSet<Pshape>();
-
-		Line line1AB = new Line(triangle1.getPointA(), triangle1.getPointB(), 0,
-				1, 0, null);
-		Line line1BC = new Line(triangle1.getPointB(), triangle1.getPointC(), 0,
-				1, 0, null);
-		Line line1CA = new Line(triangle1.getPointC(), triangle1.getPointA(), 0,
-				1, 0, null);
-		Line line2AB = new Line(triangle2.getPointA(), triangle2.getPointB(), 0,
-				1, 0, null);
-		Line line2BC = new Line(triangle2.getPointB(), triangle2.getPointC(), 0,
-				1, 0, null);
-		Line line2CA = new Line(triangle2.getPointC(), triangle2.getPointA(), 0,
-				1, 0, null);
-
-		intersectionShapes.addAll(line1AB.intersectWith(line2AB));
-		intersectionShapes.addAll(line1AB.intersectWith(line2BC));
-		intersectionShapes.addAll(line1AB.intersectWith(line2CA));
-
-		intersectionShapes.addAll(line1BC.intersectWith(line2AB));
-		intersectionShapes.addAll(line1BC.intersectWith(line2BC));
-		intersectionShapes.addAll(line1BC.intersectWith(line2CA));
-
-		intersectionShapes.addAll(line1CA.intersectWith(line2AB));
-		intersectionShapes.addAll(line1CA.intersectWith(line2BC));
-		intersectionShapes.addAll(line1CA.intersectWith(line2CA));
-
-		for (Pshape pshape : intersectionShapes)
-		{
-			if (pshape instanceof XYpoint)
-			{
-				intersectionPoints.add((XYpoint) pshape);
-			}
-		}
-
-		if (!triangle1.getPointA().intersectWith(triangle2).isEmpty())
-			intersectionPoints.add(triangle1.getPointA());
-		if (!triangle1.getPointB().intersectWith(triangle2).isEmpty())
-			intersectionPoints.add(triangle1.getPointB());
-		if (!triangle1.getPointC().intersectWith(triangle2).isEmpty())
-			intersectionPoints.add(triangle1.getPointC());
-
-		if (!triangle2.getPointA().intersectWith(triangle1).isEmpty())
-			intersectionPoints.add(triangle2.getPointA());
-		if (!triangle2.getPointB().intersectWith(triangle1).isEmpty())
-			intersectionPoints.add(triangle2.getPointB());
-		if (!triangle2.getPointC().intersectWith(triangle1).isEmpty())
-			intersectionPoints.add(triangle2.getPointC());
-
-		return triangulizeConvexSet(intersectionPoints);
-
-	}
-
-	private static Set<Pshape> triangulizeConvexSet(
-			Set<XYpoint> intersectionPoints)
-	{
-		Set<Pshape> back = new HashSet<Pshape>();
-
-		if (intersectionPoints.size() == 0)
-			return back;
-
-		if (intersectionPoints.size() == 1)
-		{
-			back.addAll(intersectionPoints);
-			return back;
-		}
-
-		if (intersectionPoints.size() == 2)
-		{
-			List<XYpoint> linePoints = new ArrayList<XYpoint>(
-					intersectionPoints);
-
-			back.add(new Line(linePoints.get(0), linePoints.get(1), 0, 1, 0,
-					null));
-
-			return back;
-		}
-
-		XYpoint startPoint = intersectionPoints.iterator().next();
-
-		List<XYvector> vectorList = new ArrayList<XYvector>();
-
-		for (XYpoint point : intersectionPoints)
-		{
-			if (!startPoint.equals(point))
-			{
-				vectorList.add(new XYvector(startPoint, point));
-			}
-		}
-
-		final XYvector firstVector = vectorList.get(0);
-
-		Collections.sort(vectorList, new Comparator<XYvector>() {
-
-			public int compare(XYvector o1, XYvector o2)
-			{
-				if (firstVector.getAngleDifference(o1) < firstVector
-						.getAngleDifference(o2))
-					return -1;
-
-				if (firstVector.getAngleDifference(o1) >= firstVector
-						.getAngleDifference(o2))
-					return 1;
-
-				return 0;
-
-			}
-
-		});
-
-		for (int i = 0; i < vectorList.size() - 1; i++)
-		{
-			// Wenn der Winkel kleiner als 180° ist, füge das Dreieck hinzu.
-
-			back.add(new Triangle(startPoint,
-					vectorList.get(i).shift(startPoint),
-					vectorList.get(i + 1).shift(startPoint), 0, null));
-
-		}
-
-		return back;
-	}
-
-	public static Set<Pshape> intersect(Triangle triangle, FilledCircle fcirc)
-	{
-		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
-
-		Set<Pshape> intersectionShapes = new HashSet<Pshape>();
-
-		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB(), 0, 1,
-				0, null);
-		Line lineBC = new Line(triangle.getPointB(), triangle.getPointC(), 0, 1,
-				0, null);
-		Line lineCA = new Line(triangle.getPointC(), triangle.getPointA(), 0, 1,
-				0, null);
-		if (!fcirc.getStartPoint().equals(fcirc.getEndPoint()))
-		{
-			Line line = new Line(fcirc.getStartPoint(), fcirc.getEndPoint(), 0,
-					1, 0, null);
-			intersectionShapes.addAll(lineBC.intersectWith(line));
-
-			intersectionShapes.addAll(lineCA.intersectWith(line));
-
-			intersectionShapes.addAll(lineAB.intersectWith(line));
-		}
-		Circle circle = new Circle(fcirc.getCentre(), fcirc.getRadius(),
-				fcirc.getStartAngle().asDouble(),
-				fcirc.getEndAngle().asDouble(), 0, null);
-
-		intersectionShapes.addAll(lineAB.intersectWith(circle));
-
-		intersectionShapes.addAll(lineBC.intersectWith(circle));
-
-		intersectionShapes.addAll(lineCA.intersectWith(circle));
-
-		for (Pshape pshape : intersectionShapes)
-		{
-			if (pshape instanceof XYpoint)
-			{
-				intersectionPoints.add((XYpoint) pshape);
-			}
-		}
-
-		if (!triangle.getPointA().intersectWith(fcirc).isEmpty())
-			intersectionPoints.add(triangle.getPointA());
-		if (!triangle.getPointB().intersectWith(fcirc).isEmpty())
-			intersectionPoints.add(triangle.getPointB());
-		if (!triangle.getPointC().intersectWith(fcirc).isEmpty())
-			intersectionPoints.add(triangle.getPointC());
-
-		if (!fcirc.getStartPoint().intersectWith(triangle).isEmpty())
-			intersectionPoints.add(fcirc.getStartPoint());
-		if (!fcirc.getEndPoint().intersectWith(triangle).isEmpty())
-			intersectionPoints.add(fcirc.getEndPoint());
-
-		Set<Pshape> back = new HashSet<Pshape>();
-
-		back.addAll(triangulizeConvexSet(intersectionPoints));
-
-		Set<XYpoint> onCircle = new HashSet<XYpoint>();
-
-		for (XYpoint point : intersectionPoints)
-		{
-			if (!point.intersectWith(circle).isEmpty())
-				onCircle.add(point);
-		}
-
-		Set<Pshape> preCircles = circlePieces(circle, onCircle, fcirc,
-				triangle);
-
-		for (Pshape pshape : preCircles)
-		{
-			if (pshape instanceof Circle)
-			{
-				Circle preCircle = (Circle) pshape;
-				back.add(new FilledCircle(preCircle.getCentre(),
-						preCircle.getRadius(),
-						preCircle.getStartAngle().asDouble(),
-						preCircle.getEndAngle().asDouble(), 0, null));
-			}
-		}
-
-		return back;
-	}
-
-	public static Set<Pshape> intersect(FilledCircle fcirc, XYpoint point)
-	{
-		return intersect(point, fcirc);
-	}
-
-	public static Set<Pshape> intersect(FilledCircle fcirc, Line line)
-	{
-		return intersect(line, fcirc);
-	}
-
-	public static Set<Pshape> intersect(FilledCircle fcirc, Circle circle)
+	public static Set<Pshape> intersect(Circle fcirc, Arc circle)
 	{
 		return intersect(circle, fcirc);
 	}
 
-	public static Set<Pshape> intersect(FilledCircle fcirc, Triangle triangle)
-	{
-		return intersect(triangle, fcirc);
-	}
-
-	public static Set<Pshape> intersect(FilledCircle fcirc1,
-			FilledCircle fcirc2)
+	/**
+	 * 
+	 * @param fcirc1
+	 *            Circle
+	 * @param fcirc2
+	 *            Circle
+	 * @return if the two circles intersect
+	 */
+	public static Set<Pshape> intersect(Circle fcirc1, Circle fcirc2)
 	{
 		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
 
 		Set<Pshape> intersectionShapes = new HashSet<Pshape>();
 
-		Circle circle1 = new Circle(fcirc1.getCentre(), fcirc1.getRadius(),
-				fcirc1.getStartAngle().asDouble(),
-				fcirc1.getEndAngle().asDouble(), 0, null);
+		Arc circle1 = new Arc(fcirc1.getCentre(), fcirc1.getRadius(),
+				fcirc1.getStartAngle(), fcirc1.getEndAngle());
 
-		Circle circle2 = new Circle(fcirc2.getCentre(), fcirc2.getRadius(),
-				fcirc2.getStartAngle().asDouble(),
-				fcirc2.getEndAngle().asDouble(), 0, null);
+		Arc circle2 = new Arc(fcirc2.getCentre(), fcirc2.getRadius(),
+				fcirc2.getStartAngle(), fcirc2.getEndAngle());
 
 		if (!fcirc2.getStartPoint().equals(fcirc2.getEndPoint()))
 		{
@@ -919,13 +344,12 @@ public class IntersectionManager
 
 		for (Pshape pshape : preCircles)
 		{
-			if (pshape instanceof Circle)
+			if (pshape instanceof Arc)
 			{
-				Circle preCircle = (Circle) pshape;
-				back.add(new FilledCircle(preCircle.getCentre(),
-						preCircle.getRadius(),
-						preCircle.getStartAngle().asDouble(),
-						preCircle.getEndAngle().asDouble(), 0, null));
+				Arc preCircle = (Arc) pshape;
+				back.add(new Circle(preCircle.getCentre(),
+						preCircle.getRadius(), preCircle.getStartAngle(),
+						preCircle.getEndAngle()));
 			}
 		}
 
@@ -933,9 +357,683 @@ public class IntersectionManager
 
 	}
 
+	public static Set<Pshape> intersect(Circle fcirc, Line line)
+	{
+		return intersect(line, fcirc);
+	}
+
+	public static Set<Pshape> intersect(Circle fcirc, Triangle triangle)
+	{
+		return intersect(triangle, fcirc);
+	}
+
+	public static Set<Pshape> intersect(Circle fcirc, XYpoint point)
+	{
+		return intersect(point, fcirc);
+	}
+
+	/**
+	 * 
+	 * @param line
+	 *            Line
+	 * @param circle
+	 *            Circle
+	 * @return intersection of line and circle
+	 */
+	public static Set<Pshape> intersect(Line line, Arc circle)
+	{
+		XYvector lineVector = new XYvector(line.getPointA(), line.getPointB());
+
+		XYvector circleVector = new XYvector(line.getPointA(),
+				circle.getCentre());
+
+		Set<Double> lambdaSet = EquationSolver.solveQuadraticEquation(
+				lineVector.getLength() * lineVector.getLength(),
+				-2 * lineVector.scalarProduct(circleVector),
+				circleVector.getLength() * circleVector.getLength()
+						- circle.getRadius() * circle.getRadius());
+
+		Set<XYpoint> possiblePoints = new HashSet<XYpoint>();
+
+		for (Double d : lambdaSet)
+		{
+			possiblePoints
+					.add(lineVector.multiplyBy(d).shift(line.getPointA()));
+		}
+
+		Set<Pshape> back = new HashSet<Pshape>();
+
+		for (XYpoint point : possiblePoints)
+		{
+			if (!line.intersectWith(point).isEmpty()
+					&& !circle.intersectWith(point).isEmpty())
+			{
+				back.add(point);
+			}
+		}
+		return back;
+
+	}
+
+	/**
+	 * 
+	 * @param line
+	 *            Line
+	 * @param fcirc
+	 *            Circle
+	 * @return if the line and the circle intersect
+	 */
+	public static Set<Pshape> intersect(Line line, Circle fcirc)
+	{
+
+		Arc circle = new Arc(fcirc.getCentre(), fcirc.getRadius());
+
+		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
+
+		if (!fcirc.getStartPoint().equals(fcirc.getEndPoint()))
+		{
+			Line lineSE = new Line(fcirc.getStartPoint(), fcirc.getEndPoint(),
+					0, 1);
+			intersectionPieces.addAll(line.intersectWith(lineSE));
+		}
+
+		intersectionPieces.addAll(line.intersectWith(circle));
+		Set<Pshape> back = new HashSet<Pshape>();
+
+		if (intersectionPieces.size() == 0)
+			return back;
+
+		Set<XYpoint> pointSet = new HashSet<XYpoint>();
+
+		for (Pshape pshape : intersectionPieces)
+		{
+			if (pshape instanceof XYpoint)
+			{
+				XYpoint neuPoint = (XYpoint) pshape;
+				pointSet.add(neuPoint);
+			}
+		}
+
+		if (pointSet.size() == 1)
+		{
+			back.addAll(pointSet);
+			return back;
+		}
+
+		List<XYpoint> pointList = new ArrayList<XYpoint>(pointSet);
+
+		back.add(line.subSegment(pointList.get(0), pointList.get(1)));
+
+		return back;
+
+	}
+
+	/**
+	 * 
+	 * @param line1
+	 *            Line
+	 * @param line2
+	 *            Line
+	 * @return if both lines intersect
+	 */
+	public static Set<Pshape> intersect(Line line1, Line line2)
+	{
+		Set<Pshape> back = new HashSet<Pshape>();
+
+		Line longLine = new Line(line1.getPointA(), line1.getPointB());
+
+		if (!longLine.intersectWith(line2.getPointA()).isEmpty()
+				&& !longLine.intersectWith(line2.getPointB()).isEmpty())
+		{
+			double startLambda2 = line1.getLambda(line2.getStartPoint());
+			double endLambda2 = line1.getLambda(line2.getEndPoint());
+
+			if (startLambda2 > endLambda2)
+			{
+				double temp = startLambda2;
+				startLambda2 = endLambda2;
+				endLambda2 = temp;
+			}
+
+			double startLambda = Math.max(line1.getStartLambda(), startLambda2);
+			double endLambda = Math.min(line1.getEndLambda(), endLambda2);
+
+			if (DMan.lessOrEqual(startLambda, endLambda))
+			{
+				if (DMan.same(startLambda, endLambda))
+				{
+					back.add(line1.getPointByLambda(startLambda));
+				}
+				else
+				{
+					back.add(new Line(line1.getPointA(), line1.getPointB(),
+							startLambda, endLambda));
+				}
+			}
+
+			return back;
+		}
+
+		XYvector vector1 = new XYvector(line1.getPointA(), line1.getPointB());
+		XYvector vector2 = new XYvector(line2.getPointA(), line2.getPointB());
+
+		vector1 = vector1.normed();
+		vector2 = vector2.normed();
+
+		if (vector1.equals(vector2) || vector1.equals(vector2.multiplyBy(-1)))
+		{
+			return back;
+		}
+
+		double[][] coefficients = new double[2][2];
+
+		coefficients[0][0] = vector1.getxMove();
+		coefficients[0][1] = -vector2.getxMove();
+		coefficients[1][0] = vector1.getyMove();
+		coefficients[1][1] = -vector2.getyMove();
+
+		double[] rhs = new double[2];
+
+		XYvector resultVector = new XYvector(line1.getPointA(),
+				line2.getPointB());
+		rhs[0] = resultVector.getxMove();
+		rhs[1] = resultVector.getyMove();
+
+		double[] lhs = EquationSolver.solveLinearSystem(coefficients, rhs);
+
+		XYpoint point = vector1.multiplyBy(lhs[0]).shift(line1.getPointA());
+
+		if (!line1.intersectWith(point).isEmpty()
+				&& !line2.intersectWith(point).isEmpty())
+			back.add(point);
+
+		return back;
+
+	}
+
+	/**
+	 * 
+	 * @param line
+	 *            Line
+	 * @param triangle
+	 *            Triangle
+	 * @return if the line and the triangle intersect.
+	 */
+	public static Set<Pshape> intersect(Line line, Triangle triangle)
+	{
+		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB(), 0,
+				1);
+		Line lineBC = new Line(triangle.getPointB(), triangle.getPointC(), 0,
+				1);
+		Line lineCA = new Line(triangle.getPointC(), triangle.getPointA(), 0,
+				1);
+
+		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
+
+		intersectionPieces.addAll(line.intersectWith(lineAB));
+		intersectionPieces.addAll(line.intersectWith(lineBC));
+		intersectionPieces.addAll(line.intersectWith(lineCA));
+
+		Set<Pshape> back = new HashSet<Pshape>();
+
+		if (intersectionPieces.size() == 0)
+			return back;
+
+		Set<XYpoint> pointSet = new HashSet<XYpoint>();
+
+		for (Pshape pshape : intersectionPieces)
+		{
+			if (pshape instanceof XYpoint)
+			{
+				XYpoint neuPoint = (XYpoint) pshape;
+				pointSet.add(neuPoint);
+			}
+		}
+
+		if (pointSet.size() == 1)
+		{
+			back.addAll(pointSet);
+			return back;
+		}
+
+		List<XYpoint> pointList = new ArrayList<XYpoint>(pointSet);
+
+		back.add(line.subSegment(pointList.get(0), pointList.get(1)));
+
+		return back;
+
+	}
+
+	/**
+	 * 
+	 * @param line
+	 *            Line
+	 * @param point
+	 *            Point
+	 * @return if the Point lies on the line
+	 */
+	public static Set<Pshape> intersect(Line line, XYpoint point)
+	{
+		return intersect(point, line);
+	}
+
+	public static Set<Pshape> intersect(Triangle triangle, Arc circle)
+	{
+		return intersect(circle, triangle);
+
+	}
+
+	/**
+	 * 
+	 * @param triangle
+	 *            Triangle
+	 * @param fcirc
+	 *            Circle
+	 * @return if the triangle and the circle intersect
+	 */
+	public static Set<Pshape> intersect(Triangle triangle, Circle fcirc)
+	{
+		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
+
+		Set<Pshape> intersectionShapes = new HashSet<Pshape>();
+
+		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB(), 0,
+				1);
+		Line lineBC = new Line(triangle.getPointB(), triangle.getPointC(), 0,
+				1);
+		Line lineCA = new Line(triangle.getPointC(), triangle.getPointA(), 0,
+				1);
+		if (!fcirc.getStartPoint().equals(fcirc.getEndPoint()))
+		{
+			Line line = new Line(fcirc.getStartPoint(), fcirc.getEndPoint(), 0,
+					1);
+			intersectionShapes.addAll(lineBC.intersectWith(line));
+
+			intersectionShapes.addAll(lineCA.intersectWith(line));
+
+			intersectionShapes.addAll(lineAB.intersectWith(line));
+		}
+		Arc circle = new Arc(fcirc.getCentre(), fcirc.getRadius(),
+				fcirc.getStartAngle(), fcirc.getEndAngle());
+
+		intersectionShapes.addAll(lineAB.intersectWith(circle));
+
+		intersectionShapes.addAll(lineBC.intersectWith(circle));
+
+		intersectionShapes.addAll(lineCA.intersectWith(circle));
+
+		for (Pshape pshape : intersectionShapes)
+		{
+			if (pshape instanceof XYpoint)
+			{
+				intersectionPoints.add((XYpoint) pshape);
+			}
+		}
+
+		if (!triangle.getPointA().intersectWith(fcirc).isEmpty())
+			intersectionPoints.add(triangle.getPointA());
+		if (!triangle.getPointB().intersectWith(fcirc).isEmpty())
+			intersectionPoints.add(triangle.getPointB());
+		if (!triangle.getPointC().intersectWith(fcirc).isEmpty())
+			intersectionPoints.add(triangle.getPointC());
+
+		if (!fcirc.getStartPoint().intersectWith(triangle).isEmpty())
+			intersectionPoints.add(fcirc.getStartPoint());
+		if (!fcirc.getEndPoint().intersectWith(triangle).isEmpty())
+			intersectionPoints.add(fcirc.getEndPoint());
+
+		Set<Pshape> back = new HashSet<Pshape>();
+
+		back.addAll(triangulizeConvexSet(intersectionPoints));
+
+		Set<XYpoint> onCircle = new HashSet<XYpoint>();
+
+		for (XYpoint point : intersectionPoints)
+		{
+			if (!point.intersectWith(circle).isEmpty())
+				onCircle.add(point);
+		}
+
+		Set<Pshape> preCircles = circlePieces(circle, onCircle, fcirc,
+				triangle);
+
+		for (Pshape pshape : preCircles)
+		{
+			if (pshape instanceof Arc)
+			{
+				Arc preCircle = (Arc) pshape;
+				back.add(new Circle(preCircle.getCentre(),
+						preCircle.getRadius(), preCircle.getStartAngle(),
+						preCircle.getEndAngle()));
+			}
+		}
+
+		return back;
+	}
+
+	public static Set<Pshape> intersect(Triangle triangle, Line line)
+	{
+		return intersect(line, triangle);
+
+	}
+
+	/**
+	 * 
+	 * @param triangle1
+	 *            Triangle
+	 * @param triangle2
+	 *            Triangle
+	 * @return The intersection of the triangles
+	 */
+	public static Set<Pshape> intersect(Triangle triangle1, Triangle triangle2)
+	{
+		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
+
+		Set<Pshape> intersectionShapes = new HashSet<Pshape>();
+
+		Line line1AB = new Line(triangle1.getPointA(), triangle1.getPointB(), 0,
+				1);
+		Line line1BC = new Line(triangle1.getPointB(), triangle1.getPointC(), 0,
+				1);
+		Line line1CA = new Line(triangle1.getPointC(), triangle1.getPointA(), 0,
+				1);
+		Line line2AB = new Line(triangle2.getPointA(), triangle2.getPointB(), 0,
+				1);
+		Line line2BC = new Line(triangle2.getPointB(), triangle2.getPointC(), 0,
+				1);
+		Line line2CA = new Line(triangle2.getPointC(), triangle2.getPointA(), 0,
+				1);
+
+		intersectionShapes.addAll(line1AB.intersectWith(line2AB));
+		intersectionShapes.addAll(line1AB.intersectWith(line2BC));
+		intersectionShapes.addAll(line1AB.intersectWith(line2CA));
+
+		intersectionShapes.addAll(line1BC.intersectWith(line2AB));
+		intersectionShapes.addAll(line1BC.intersectWith(line2BC));
+		intersectionShapes.addAll(line1BC.intersectWith(line2CA));
+
+		intersectionShapes.addAll(line1CA.intersectWith(line2AB));
+		intersectionShapes.addAll(line1CA.intersectWith(line2BC));
+		intersectionShapes.addAll(line1CA.intersectWith(line2CA));
+
+		for (Pshape pshape : intersectionShapes)
+		{
+			if (pshape instanceof XYpoint)
+			{
+				intersectionPoints.add((XYpoint) pshape);
+			}
+		}
+
+		if (!triangle1.getPointA().intersectWith(triangle2).isEmpty())
+			intersectionPoints.add(triangle1.getPointA());
+		if (!triangle1.getPointB().intersectWith(triangle2).isEmpty())
+			intersectionPoints.add(triangle1.getPointB());
+		if (!triangle1.getPointC().intersectWith(triangle2).isEmpty())
+			intersectionPoints.add(triangle1.getPointC());
+
+		if (!triangle2.getPointA().intersectWith(triangle1).isEmpty())
+			intersectionPoints.add(triangle2.getPointA());
+		if (!triangle2.getPointB().intersectWith(triangle1).isEmpty())
+			intersectionPoints.add(triangle2.getPointB());
+		if (!triangle2.getPointC().intersectWith(triangle1).isEmpty())
+			intersectionPoints.add(triangle2.getPointC());
+
+		return triangulizeConvexSet(intersectionPoints);
+
+	}
+
+	public static Set<Pshape> intersect(Triangle triangle, XYpoint point)
+	{
+		return intersect(point, triangle);
+
+	}
+
+	/**
+	 * 
+	 * @param point
+	 *            Point
+	 * @param circle
+	 *            Circle
+	 * @return if both objects intersect
+	 */
+	public static Set<Pshape> intersect(XYpoint point, Arc circle)
+	{
+		XYvector shiftVector = new XYvector(circle.getCentre(), point);
+
+		Set<Pshape> back = new HashSet<Pshape>();
+
+		if (DMan.same(shiftVector.getLength(), circle.getRadius()))
+		{
+			Angle angle = shiftVector.getAngle();
+			if (circle.containsAngle(angle))
+				back.add(point);
+
+		}
+
+		return back;
+	}
+
+	/**
+	 * 
+	 * @param point
+	 *            Point
+	 * @param fcirc
+	 *            Circle
+	 * @return if the point lies inside or on the circle
+	 */
+	public static Set<Pshape> intersect(XYpoint point, Circle fcirc)
+	{
+		Set<Pshape> back = new HashSet<Pshape>();
+		XYvector radiusVector = new XYvector(fcirc.getCentre(), point);
+
+		if (!DMan.lessOrEqual(radiusVector.getLength(), fcirc.getRadius()))
+		{
+			return back;
+		}
+		else
+		{
+			if (fcirc.getStartPoint().equals(fcirc.getEndPoint()))
+			{
+				back.add(point);
+			}
+			else
+			{
+				XYvector vector1 = new XYvector(fcirc.getStartPoint(),
+						fcirc.getEndPoint());
+				Angle vectorAngle1 = vector1.getAngle();
+
+				XYvector vector2 = new XYvector(fcirc.getEndPoint(),
+						fcirc.getStartPoint());
+				Angle vectorAngle2 = vector2.getAngle();
+
+				XYvector pointVector = new XYvector(fcirc.getStartPoint(),
+						point);
+				Angle pointAngle = pointVector.getAngle();
+
+				if (pointAngle.inBetween(vectorAngle2, vectorAngle1))
+					back.add(point);
+			}
+
+		}
+
+		return back;
+
+	}
+
+	/**
+	 * 
+	 * @param point
+	 *            Point
+	 * @param line
+	 *            Line
+	 * @return if both objects intersect
+	 */
+	public static Set<Pshape> intersect(XYpoint point, Line line)
+	{
+
+		Set<Pshape> back = new HashSet<Pshape>();
+
+		XYvector BA = new XYvector(line.getPointA(), line.getPointB());
+		XYvector BAorth = new XYvector(BA.getyMove(), -BA.getxMove());
+
+		double[][] coefficients = new double[2][2];
+
+		coefficients[0][0] = BA.getxMove();
+		coefficients[0][1] = BAorth.getxMove();
+		coefficients[1][0] = BA.getyMove();
+		coefficients[1][1] = BAorth.getyMove();
+
+		double[] rhs = new double[2];
+
+		XYvector PA = new XYvector(line.getPointA(), point);
+		rhs[0] = PA.getxMove();
+		rhs[1] = PA.getyMove();
+
+		double[] lambda = EquationSolver.solveLinearSystem(coefficients, rhs);
+
+		if (DMan.same(lambda[1], 0))
+		{
+			if (DMan.lessOrEqual(line.getStartLambda(), lambda[0])
+
+			&& DMan.lessOrEqual(lambda[0], line.getEndLambda()))
+			{
+				back.add(point);
+			}
+
+		}
+
+		return back;
+	}
+
+	/**
+	 * 
+	 * @param point
+	 *            Point
+	 * @param triangle
+	 *            Triangle
+	 * @return if point lies inside or on the triangle
+	 */
+	public static Set<Pshape> intersect(XYpoint point, Triangle triangle)
+	{
+		Set<Pshape> back = new HashSet<Pshape>();
+
+		double[][] coefficients = new double[2][2];
+
+		coefficients[0][0] = triangle.getPointB().getX()
+				- triangle.getPointA().getX();
+		coefficients[0][1] = triangle.getPointC().getX()
+				- triangle.getPointA().getX();
+		coefficients[1][0] = triangle.getPointB().getY()
+				- triangle.getPointA().getY();
+		coefficients[1][1] = triangle.getPointC().getY()
+				- triangle.getPointA().getY();
+
+		double[] rhs = new double[2];
+		rhs[0] = point.getX() - triangle.getPointA().getX();
+		rhs[1] = point.getY() - triangle.getPointA().getY();
+
+		double[] result = EquationSolver.solveLinearSystem(coefficients, rhs);
+
+		if (DMan.lessOrEqual(0, result[0]) && DMan.lessOrEqual(0, result[1])
+				&& DMan.lessOrEqual(result[0] + result[1], 1))
+		{
+			back.add(point);
+		}
+
+		return back;
+	}
+
+	/**
+	 * 
+	 * @param point1
+	 *            Point
+	 * @param point2
+	 *            Point
+	 * @return if objects intersect
+	 */
+	public static Set<Pshape> intersect(XYpoint point1, XYpoint point2)
+	{
+		Set<Pshape> back = new HashSet<Pshape>();
+
+		if (point1.equals(point2))
+			back.add(point1);
+
+		return back;
+	}
+
 	private static double square(double x)
 	{
 		return x * x;
+	}
+
+	private static Set<Pshape> triangulizeConvexSet(
+			Set<XYpoint> intersectionPoints)
+	{
+		Set<Pshape> back = new HashSet<Pshape>();
+
+		if (intersectionPoints.size() == 0)
+			return back;
+
+		if (intersectionPoints.size() == 1)
+		{
+			back.addAll(intersectionPoints);
+			return back;
+		}
+
+		if (intersectionPoints.size() == 2)
+		{
+			List<XYpoint> linePoints = new ArrayList<XYpoint>(
+					intersectionPoints);
+
+			back.add(new Line(linePoints.get(0), linePoints.get(1), 0, 1));
+
+			return back;
+		}
+
+		XYpoint startPoint = intersectionPoints.iterator().next();
+
+		List<XYvector> vectorList = new ArrayList<XYvector>();
+
+		for (XYpoint point : intersectionPoints)
+		{
+			if (!startPoint.equals(point))
+			{
+				vectorList.add(new XYvector(startPoint, point));
+			}
+		}
+
+		final XYvector firstVector = vectorList.get(0);
+
+		Collections.sort(vectorList, new Comparator<XYvector>() {
+
+			@Override
+			public int compare(XYvector o1, XYvector o2)
+			{
+				if (firstVector.getAngleDifference(o1) < firstVector
+						.getAngleDifference(o2))
+					return -1;
+
+				if (firstVector.getAngleDifference(o1) >= firstVector
+						.getAngleDifference(o2))
+					return 1;
+
+				return 0;
+
+			}
+
+		});
+
+		for (int i = 0; i < vectorList.size() - 1; i++)
+		{
+			// Wenn der Winkel kleiner als 180° ist, füge das Dreieck hinzu.
+
+			back.add(new Triangle(startPoint,
+					vectorList.get(i).shift(startPoint),
+					vectorList.get(i + 1).shift(startPoint)));
+
+		}
+
+		return back;
 	}
 
 }

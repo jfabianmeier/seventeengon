@@ -7,11 +7,12 @@ import java.util.Random;
 import java.util.Set;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
+import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.Angle;
 import de.fabianmeier.seventeengon.util.GeoVisible;
 
-public class Circle extends PshapeImpl
+public class Arc extends PshapeImpl
 {
 
 	private final XYpoint centre;
@@ -21,38 +22,48 @@ public class Circle extends PshapeImpl
 	private final Angle startAngle;
 
 	/**
-	 * Creates a full circle part (convex hull of the respective arc)
 	 * 
 	 * @param centre
-	 *            Centre
+	 *            Centre of the Circle
 	 * @param radius
-	 *            Radius
+	 *            Radius of the Circle
 	 * @param startAngle
 	 *            start Angle
 	 * @param endAngle
-	 *            end Angle
+	 *            End Angle
 	 */
-	public Circle(XYpoint centre, double radius, Angle startAngle,
-			Angle endAngle)
+	public Arc(XYpoint centre, double radius, Angle startAngle, Angle endAngle)
 	{
 		this.centre = centre;
 		this.radius = radius;
 		this.startAngle = startAngle;
 		this.endAngle = endAngle;
+
 	}
 
 	/**
-	 * Creates a full circle
+	 * Complete arc (circle)
 	 * 
 	 * @param centre
 	 *            Centre
 	 * @param radius
 	 *            Radius
-	 * 
 	 */
-	public Circle(XYpoint centre, double radius)
+	public Arc(XYpoint centre, double radius)
 	{
 		this(centre, radius, new Angle(0), new Angle(2 * Math.PI));
+	}
+
+	/**
+	 * 
+	 * @param angle
+	 *            Angle
+	 * @return if the angle is part of the arc.
+	 */
+	public boolean containsAngle(Angle angle)
+	{
+		return angle.inBetween(startAngle, endAngle);
+
 	}
 
 	/*
@@ -70,6 +81,53 @@ public class Circle extends PshapeImpl
 
 	}
 
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Arc other = (Arc) obj;
+		if (centre == null)
+		{
+			if (other.centre != null)
+				return false;
+		}
+		else if (!centre.equals(other.centre))
+			return false;
+		if (DMan.doubleHash(radius) != DMan.doubleHash(other.radius))
+			return false;
+
+		if (startAngle.equals(endAngle)
+				&& other.getStartAngle().equals(other.getEndAngle()))
+			return true;
+		if (endAngle == null)
+		{
+			if (other.endAngle != null)
+				return false;
+		}
+		else if (!endAngle.equals(other.endAngle))
+			return false;
+
+		if (startAngle == null)
+		{
+			if (other.startAngle != null)
+				return false;
+		}
+		else if (!startAngle.equals(other.startAngle))
+			return false;
+		return true;
+	}
+
+	public Angle getAngle(XYpoint point)
+	{
+		XYvector vector = new XYvector(centre, point);
+		return vector.getAngle();
+	}
+
 	public XYpoint getAnglePoint(Angle angle)
 	{
 		XYvector vector = new XYvector(radius, angle);
@@ -84,7 +142,7 @@ public class Circle extends PshapeImpl
 	@Override
 	public int getDimension()
 	{
-		return 2;
+		return 1;
 	}
 
 	public Angle getEndAngle()
@@ -97,22 +155,15 @@ public class Circle extends PshapeImpl
 		return getAnglePoint(endAngle);
 	}
 
-	private XYpoint getPoint(Random rand)
+	private XYpoint getPoint(double nextDouble)
 	{
-		while (true)
-		{
-			Angle angle = startAngle
-					.addtoAngle(Angle.angleDifference(startAngle, endAngle)
-							* rand.nextDouble());
+		Angle angle = startAngle.addtoAngle(
+				Angle.angleDifference(startAngle, endAngle) * nextDouble);
 
-			XYvector radVector = (new XYvector(angle.cos(), angle.sin()))
-					.multiplyBy(radius * rand.nextDouble());
+		XYvector radVector = (new XYvector(angle.cos(), angle.sin()))
+				.multiplyBy(radius);
 
-			XYpoint candidate = radVector.shift(centre);
-			if (!this.intersectWith(candidate).isEmpty())
-				return candidate;
-		}
-
+		return radVector.shift(centre);
 	}
 
 	@Override
@@ -135,7 +186,7 @@ public class Circle extends PshapeImpl
 	public XYpoint getSamplePoint(int sampleNumber)
 	{
 		Random rand = new Random(sampleNumber + getPseudoHash());
-		return getPoint(rand);
+		return getPoint(rand.nextDouble());
 	}
 
 	public Angle getStartAngle()
@@ -146,6 +197,21 @@ public class Circle extends PshapeImpl
 	public XYpoint getStartPoint()
 	{
 		return getAnglePoint(startAngle);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((centre == null) ? 0 : centre.hashCode());
+		result = prime * result + (int) DMan
+				.doubleHash(Angle.angleDifference(startAngle, endAngle));
+		long temp;
+		temp = DMan.doubleHash(radius);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+
+		return result;
 	}
 
 	@Override
@@ -186,9 +252,10 @@ public class Circle extends PshapeImpl
 
 			g2d.draw(new Arc2D.Double(centre.getX() - radius,
 					centre.getY() - radius, 2 * radius, 2 * radius,
-					startAngle.asDouble() * 180 / Math.PI,
-					Angle.angleDifference(startAngle, endAngle) * 180 / Math.PI,
-					Arc2D.CHORD));
+					-startAngle.asDouble() * 180 / Math.PI,
+					-Angle.angleDifference(startAngle, endAngle) * 180
+							/ Math.PI,
+					Arc2D.OPEN));
 		}
 		else
 		{
@@ -202,7 +269,7 @@ public class Circle extends PshapeImpl
 	@Override
 	public String toString()
 	{
-		String localLabel = "Fcirc";
+		String localLabel = "Circle";
 
 		String back = localLabel + ": " + centre.toString() + " >> "
 				+ showValue(radius);
@@ -213,7 +280,6 @@ public class Circle extends PshapeImpl
 		}
 
 		return back;
-
 	}
 
 	/*
@@ -224,8 +290,7 @@ public class Circle extends PshapeImpl
 	@Override
 	public GeoObject getBoundary()
 	{
-		return new Arc(centre, radius, startAngle, endAngle);
-
+		return this;
 	}
 
 	/*
@@ -236,7 +301,8 @@ public class Circle extends PshapeImpl
 	@Override
 	public GeoObject getFilledObject()
 	{
-		return this;
+		return new Circle(getCentre(), getRadius(), getStartAngle(),
+				getEndAngle());
 	}
 
 }

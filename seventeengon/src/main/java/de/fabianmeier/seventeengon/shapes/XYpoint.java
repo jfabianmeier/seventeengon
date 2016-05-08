@@ -7,20 +7,38 @@ import java.util.Set;
 import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
+import de.fabianmeier.seventeengon.util.GeoVisible;
 
+/**
+ * This class describes a point in the plane with x and y coordinate. Points
+ * with large distance to zero are considered to lie on an infinite circle. They
+ * are normed and marked as "far off". Equality is implemented accordingly.
+ * 
+ * @author JFM
+ *
+ */
 public class XYpoint extends PshapeImpl
 {
 
-	private final double x;
-	private final double y;
-
+	private double distanceToZero;
 	private boolean farOff;
 
-	private double distanceToZero;
+	private final double x;
 
-	public XYpoint(double x, double y, int visibility, String label)
+	private final double y;
+
+	/**
+	 * A point (points far away will be considered as lying on the
+	 * "infinite circle"
+	 * 
+	 * @param x
+	 *            x coordinate
+	 * @param y
+	 *            y coordinate
+	 */
+	public XYpoint(double x, double y)
 	{
-		super(visibility, label);
+
 		this.x = x;
 		this.y = y;
 
@@ -34,21 +52,18 @@ public class XYpoint extends PshapeImpl
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
+	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
+	 */
 	@Override
-	public int hashCode()
+	public void draw(GeoCanvas canvas, String label, GeoVisible visi)
 	{
+		canvas.drawPoint(this, label, visi);
 
-		int prime = 31;
-
-		if (farOff)
-			prime = 37;
-		int result = 1;
-		long temp;
-		temp = DMan.DoubleHash(x);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = DMan.DoubleHash(y);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		return result;
 	}
 
 	@Override
@@ -65,25 +80,29 @@ public class XYpoint extends PshapeImpl
 		if (farOff != other.farOff)
 			return false;
 
-		if (DMan.DoubleHash(x) != DMan.DoubleHash(other.x))
+		if (DMan.doubleHash(x) != DMan.doubleHash(other.x))
 			return false;
-		if (DMan.DoubleHash(y) != DMan.DoubleHash(other.y))
+		if (DMan.doubleHash(y) != DMan.doubleHash(other.y))
 			return false;
 		return true;
 	}
 
-	public XYpoint(double x, double y, int visibility)
+	@Override
+	public int getDimension()
 	{
-		super(visibility, null);
-		this.x = x;
-		this.y = y;
+		return 0;
 	}
 
-	public XYpoint(double x, double y)
+	@Override
+	public int getPseudoHash()
 	{
-		super(0, null);
-		this.x = x;
-		this.y = y;
+		return (int) Math.round(1000 * x + 10000 * y);
+	}
+
+	@Override
+	public XYpoint getSamplePoint(int sampleNumber)
+	{
+		return this;
 	}
 
 	public double getX()
@@ -97,9 +116,20 @@ public class XYpoint extends PshapeImpl
 	}
 
 	@Override
-	public int getDimension()
+	public int hashCode()
 	{
-		return 0;
+
+		int prime = 31;
+
+		if (farOff)
+			prime = 37;
+		int result = 1;
+		long temp;
+		temp = DMan.doubleHash(x);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = DMan.doubleHash(y);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
 	}
 
 	@Override
@@ -113,17 +143,17 @@ public class XYpoint extends PshapeImpl
 		{
 			return IntersectionManager.intersect(this, (Line) pshape);
 		}
-		if (pshape instanceof Circle)
+		if (pshape instanceof Arc)
 		{
-			return IntersectionManager.intersect(this, (Circle) pshape);
+			return IntersectionManager.intersect(this, (Arc) pshape);
 		}
 		if (pshape instanceof Triangle)
 		{
 			return IntersectionManager.intersect(this, (Triangle) pshape);
 		}
-		if (pshape instanceof FilledCircle)
+		if (pshape instanceof Circle)
 		{
-			return IntersectionManager.intersect(this, (FilledCircle) pshape);
+			return IntersectionManager.intersect(this, (Circle) pshape);
 		}
 
 		return null;
@@ -131,50 +161,44 @@ public class XYpoint extends PshapeImpl
 	}
 
 	@Override
-	public XYpoint getSamplePoint(int sampleNumber)
+	public void paint(Graphics2D g2d)
 	{
-		return this;
+		// setColourAndStroke(g2d);
+
+		g2d.fill(new Ellipse2D.Double(x - 1, y - 1, 2, 2));
 	}
 
 	@Override
 	public String toString()
 	{
-		String localLabel = getLabel();
+		String localLabel = "Point";
 
 		String farOffS = farOff ? "INF" : "";
 
-		if (localLabel == null)
-			localLabel = "P";
 		return localLabel + "(" + showValue(x) + ", " + showValue(y) + ")"
 				+ farOffS;
-	}
-
-	@Override
-	public int getPseudoHash()
-	{
-		return (int) Math.round(1000 * x + 10000 * y);
-	}
-
-	@Override
-	public void paint(Graphics2D g2d)
-	{
-		setColourAndStroke(g2d);
-
-		g2d.fill(new Ellipse2D.Double(x - 1, y - 1, 2, 2));
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
-	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getBoundary()
 	 */
 	@Override
-	public void draw(GeoCanvas canvas, String label)
+	public GeoObject getBoundary()
 	{
-		canvas.drawPoint(this, getVisibility(), label);
+		return this;
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getFilledObject()
+	 */
+	@Override
+	public GeoObject getFilledObject()
+	{
+		return this;
 	}
 
 }

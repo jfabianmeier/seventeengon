@@ -5,14 +5,30 @@ import java.util.Set;
 
 public class DMan
 {
-	// private static final double epsilon = 0.00001;
 
+	/**
+	 * if both a and b have the same double hash value
+	 * 
+	 * @param a
+	 *            double
+	 * @param b
+	 *            double
+	 * @return if they have the same doubleHash
+	 */
 	public static boolean same(double a, double b)
 	{
-		return DoubleHash(a) == DoubleHash(b);
+		return doubleHash(a) == doubleHash(b);
 	}
 
-	public static long DoubleHash(double a)
+	/**
+	 * 
+	 * @param a
+	 *            double value
+	 * @return a long value that is either the rounded value of a multiplied
+	 *         with a million or a representative of positive or negative
+	 *         infinity if the absolute value of a exceeds one million
+	 */
+	public static long doubleHash(double a)
 	{
 		if (a > 1000000)
 			return 1000000 * 100000;
@@ -28,20 +44,19 @@ public class DMan
 		return (a > 1000000 || a < -1000000);
 	}
 
-	// public static boolean same(XYpoint point1, XYpoint point2)
-	// {
-	// Set<Pshape> back = IntersectionManager.intersect(point1, point2);
-	//
-	// return (!back.isEmpty());
-	// }
-
+	/**
+	 * 
+	 * @param a
+	 *            double
+	 * @return A multi-valued square root
+	 */
 	public static Set<Double> squareRoot(double a)
 	{
 		Set<Double> back = new HashSet<Double>();
-		if (DoubleHash(a) < 0)
+		if (doubleHash(a) < 0)
 			return back;
 
-		if (DoubleHash(a) == 0)
+		if (doubleHash(a) == 0)
 		{
 			back.add(0.0);
 			return back;
@@ -52,15 +67,9 @@ public class DMan
 		return back;
 	}
 
-	public static boolean LessOrEqual(double a, double b)
+	public static boolean lessOrEqual(double a, double b)
 	{
-		return (DoubleHash(b) >= DoubleHash(a));
+		return (doubleHash(b) >= doubleHash(a));
 	}
-
-	// public static boolean same(XYvector vector1, XYvector vector2)
-	// {
-	// return (same(vector1.getxMove(), vector2.getxMove())
-	// && same(vector1.getyMove(), vector2.getyMove()));
-	// }
 
 }

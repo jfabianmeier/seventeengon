@@ -6,6 +6,11 @@ public class IndexedName implements GeoName
 	private BasicName index;
 	private int numericIndex;
 
+	/**
+	 * 
+	 * @param name
+	 *            A name containing a _
+	 */
 	public IndexedName(String name)
 	{
 
@@ -17,20 +22,10 @@ public class IndexedName implements GeoName
 				index = new BasicName(split[1]);
 			else
 				numericIndex = Integer.parseInt(split[1]);
-		} else
+		}
+		else
 		{
 			throw new IllegalArgumentException("Name does not contain _");
-			// TODO vielleicht wird dies später eingeführt - führt zu zwei
-			// Schreibweisen für den gleichen Namen...
-
-			// Pattern p = Pattern.compile("([A-Za-z]+)\\d+");
-			// Matcher m = p.matcher(name);
-			//
-			// if (m.find())
-			// {
-			// basicName = new BasicName(m.group(1));
-			// numericIndex = Integer.parseInt(m.group(2));
-			// }
 		}
 
 	}
@@ -43,7 +38,8 @@ public class IndexedName implements GeoName
 		if (index != null)
 		{
 			back += index.toString();
-		} else
+		}
+		else
 		{
 			back += numericIndex;
 		}

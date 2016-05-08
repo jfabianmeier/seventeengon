@@ -3,6 +3,7 @@
  */
 package de.fabianmeier.seventeengon.processing;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
 import de.fabianmeier.seventeengon.naming.CompName;
 import de.fabianmeier.seventeengon.naming.CompNamePattern;
 import de.fabianmeier.seventeengon.naming.GeoName;
+import de.fabianmeier.seventeengon.naming.Sentence;
 import de.fabianmeier.seventeengon.naming.SentencePattern;
 import de.fabianmeier.seventeengon.shapes.Triangle;
 import de.fabianmeier.seventeengon.shapes.XYpoint;
@@ -21,9 +23,10 @@ import de.fabianmeier.seventeengon.shapes.XYpoint;
 public class TriangleGenerator implements GeoGenerator
 {
 
-	SentencePattern sentencePattern = new SentencePattern(
+	public static final SentencePattern TRIANGLE = new SentencePattern(
 			"Sei ABC ein Dreieck");
-	CompNamePattern compPattern = new CompNamePattern(new CompName("ABC"));
+	public static final CompNamePattern ABC = new CompNamePattern(
+			new CompName("ABC"));
 
 	/*
 	 * (non-Javadoc)
@@ -33,18 +36,20 @@ public class TriangleGenerator implements GeoGenerator
 	 * fabianmeier.seventeengon.geoobjects.GeoHolder, java.lang.String)
 	 */
 	@Override
-	public void generateAndAdd(GeoHolder geoHolder, String input)
+	public boolean generateAndAdd(GeoHolder geoHolder, Sentence input)
+			throws IOException
 	{
 		List<CompName> points = new ArrayList<CompName>();
 
 		CompName compName;
 
-		if (sentencePattern.equals(new SentencePattern(input)))
+		if (TRIANGLE.equals(new SentencePattern(input)))
 		{
-			compName = SentencePattern.getCompositeNames(input).get(0);
-		} else
+			compName = input.getCompositeNames().get(0);
+		}
+		else
 		{
-			compName = new CompName(input);
+			throw new IOException("Wrong sentence pattern: " + input);
 		}
 		List<GeoName> geoPoints = compName.getGeoNames();
 		for (GeoName geoName : geoPoints)
@@ -59,8 +64,16 @@ public class TriangleGenerator implements GeoGenerator
 		for (CompName point : points)
 			if (!geoHolder.contains(point))
 			{
-				GeoGeneratorLookup.generateAndAdd(geoHolder,
-						"Sei " + point.toString() + " ein Punkt");
+				try
+				{
+					GeoGeneratorLookup.generateAndAdd(geoHolder, new Sentence(
+							"Sei " + point.toString() + " ein Punkt"));
+				}
+				catch (IOException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 
 		XYpoint a = (XYpoint) geoHolder.get(points.get(0));
@@ -69,6 +82,24 @@ public class TriangleGenerator implements GeoGenerator
 
 		geoHolder.add(compName, new Triangle(a, b, c));
 
+		return true;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.processing.GeoGenerator#generateAndAdd(de.
+	 * fabianmeier.seventeengon.geoobjects.GeoHolder,
+	 * de.fabianmeier.seventeengon.naming.CompName)
+	 */
+	@Override
+	public boolean generateAndAdd(GeoHolder geoHolder, CompName sentence)
+			throws IOException
+	{
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

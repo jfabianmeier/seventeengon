@@ -2,13 +2,21 @@ package de.fabianmeier.seventeengon.util;
 
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.shapes.PshapeImpl;
-import de.fabianmeier.seventeengon.shapes.XYvector;
 
 public class Angle
 {
 	private double normalizedAngle;
 
-	public static double AngleDifference(Angle start, Angle end)
+	/**
+	 * 
+	 * @param start
+	 *            Start angle
+	 * @param end
+	 *            End angle
+	 * @return positive difference between these angles (as value between 0 and
+	 *         2pi)
+	 */
+	public static double angleDifference(Angle start, Angle end)
 	{
 		double endAngle = end.normalizedAngle;
 		while (endAngle < start.normalizedAngle)
@@ -38,8 +46,8 @@ public class Angle
 		if (getClass() != obj.getClass())
 			return false;
 		Angle other = (Angle) obj;
-		if (DMan.DoubleHash(normalizedAngle) != DMan
-				.DoubleHash(other.normalizedAngle))
+		if (DMan.doubleHash(normalizedAngle) != DMan
+				.doubleHash(other.normalizedAngle))
 			return false;
 		return true;
 	}
@@ -49,6 +57,12 @@ public class Angle
 		return new Angle(normalizedAngle + shift);
 	}
 
+	/**
+	 * 
+	 * @param angle
+	 *            Double value of an angle (arbitrary positive or negative
+	 *            number).
+	 */
 	public Angle(double angle)
 	{
 		while (angle >= 2 * Math.PI)
@@ -60,17 +74,35 @@ public class Angle
 		normalizedAngle = angle;
 	}
 
-	public Angle(XYvector vector)
-	{
-		double xNormed = vector.getxMove() / vector.getLength();
-		double yNormed = vector.getyMove() / vector.getLength();
+	// /**
+	// * The angle of the vector to the x-axis
+	// *
+	// * @param vector
+	// * A non-zero vector
+	// */
+	// public Angle(XYvector vector)
+	// {
+	// if (vector.equals(XYvector.nullVector()))
+	// throw new IllegalArgumentException(
+	// "Null vector does not describe an angle.");
+	//
+	// double xNormed = vector.getxMove() / vector.getLength();
+	// double yNormed = vector.getyMove() / vector.getLength();
+	//
+	// normalizedAngle = Math.acos(xNormed);
+	// if (yNormed < 0)
+	// normalizedAngle = 2 * Math.PI - normalizedAngle;
+	//
+	// }
 
-		normalizedAngle = Math.acos(xNormed);
-		if (yNormed < 0)
-			normalizedAngle = 2 * Math.PI - normalizedAngle;
-
-	}
-
+	/**
+	 * 
+	 * @param start
+	 *            start Angle
+	 * @param end
+	 *            end Angle
+	 * @return If this angle lies in the angle range described by start and end.
+	 */
 	public boolean inBetween(Angle start, Angle end)
 	{
 		double shiftedAngle = normalizedAngle;
@@ -81,10 +113,10 @@ public class Angle
 		}
 
 		double shiftedEndAngle = end.normalizedAngle;
-		while (DMan.LessOrEqual(shiftedEndAngle, start.normalizedAngle))
+		while (DMan.lessOrEqual(shiftedEndAngle, start.normalizedAngle))
 			shiftedEndAngle += 2 * Math.PI;
 
-		return DMan.LessOrEqual(shiftedAngle, shiftedEndAngle);
+		return DMan.lessOrEqual(shiftedAngle, shiftedEndAngle);
 	}
 
 	public double asDouble()

@@ -29,7 +29,7 @@ public class DManTest
 	{
 		double a = 0.0;
 		double b = 0.00000004;
-		assertEquals(DMan.DoubleHash(a), DMan.DoubleHash(b));
+		assertEquals(DMan.doubleHash(a), DMan.doubleHash(b));
 	}
 
 	@Test
@@ -56,10 +56,10 @@ public class DManTest
 		double b = 1.00000001;
 		double c = 2.4;
 
-		assertTrue(DMan.LessOrEqual(a, b));
-		assertTrue(DMan.LessOrEqual(b, a));
-		assertTrue(DMan.LessOrEqual(a, c));
-		assertFalse(DMan.LessOrEqual(c, b));
+		assertTrue(DMan.lessOrEqual(a, b));
+		assertTrue(DMan.lessOrEqual(b, a));
+		assertTrue(DMan.lessOrEqual(a, c));
+		assertFalse(DMan.lessOrEqual(c, b));
 	}
 
 }

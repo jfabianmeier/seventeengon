@@ -1,8 +1,5 @@
 package de.fabianmeier.seventeengon.shapes;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -10,79 +7,37 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.fabianmeier.seventeengon.geoobjects.CompositeGeoObject;
-import de.fabianmeier.seventeengon.geoobjects.GeoObject;
-
 public abstract class PshapeImpl implements Pshape
 {
 
-	private int visibility;
-	private String label;
+	// protected void setColourAndStroke(Graphics2D g2d)
+	// {
+	// if (visibility == 0)
+	// g2d.setStroke(new BasicStroke(0.5f));
+	// g2d.setPaint(Color.lightGray);
+	//
+	// if (visibility == 1)
+	// g2d.setStroke(new BasicStroke(0.7f));
+	// g2d.setPaint(Color.black);
+	//
+	// if (visibility == 2)
+	// {
+	// g2d.setStroke(new BasicStroke(1));
+	// g2d.setPaint(Color.red);
+	// }
+	// }
 
-	public PshapeImpl(int visibility, String label)
-	{
-		this.visibility = visibility;
-		this.label = label;
-	}
-
-	public Set<Pshape> getPrimitiveShapes()
-	{
-		Set<Pshape> pShapeSet = new HashSet<Pshape>();
-		pShapeSet.add(this);
-		return pShapeSet;
-	}
-
-	@Override
-	public int getVisibility()
-	{
-		return visibility;
-	}
-
-	protected void setColourAndStroke(Graphics2D g2d)
-	{
-		if (visibility == 0)
-			g2d.setStroke(new BasicStroke(0.5f));
-		g2d.setPaint(Color.lightGray);
-
-		if (visibility == 1)
-			g2d.setStroke(new BasicStroke(0.7f));
-		g2d.setPaint(Color.black);
-
-		if (visibility == 2)
-		{
-			g2d.setStroke(new BasicStroke(1));
-			g2d.setPaint(Color.red);
-		}
-	}
-
-	public String getLabel()
-	{
-		return label;
-	}
-
+	/**
+	 * 
+	 * @param x
+	 *            a double value
+	 * @return a formatted double value
+	 */
 	public static String showValue(double x)
 	{
 		DecimalFormat df = new DecimalFormat("#.####");
 		df.setRoundingMode(RoundingMode.CEILING);
 		return df.format(x);
-	}
-
-	@Override
-	public String toString()
-	{
-		return label;
-	}
-
-	@Override
-	public void setVisibility(int visibility)
-	{
-		this.visibility = visibility;
-	}
-
-	@Override
-	public void setLabel(String label)
-	{
-		this.label = label;
 	}
 
 	/*
@@ -117,7 +72,8 @@ public abstract class PshapeImpl implements Pshape
 			}
 
 			return new CompositeGeoObject(geoSet);
-		} else
+		}
+		else
 		{
 			Set<GeoObject> geoSet = new HashSet<GeoObject>();
 			for (GeoObject geo : other.getSubObjects())
@@ -127,6 +83,13 @@ public abstract class PshapeImpl implements Pshape
 
 			return new CompositeGeoObject(geoSet);
 		}
+
+	}
+
+	@Override
+	public boolean containsPoint(XYpoint point)
+	{
+		return (!this.intersectWith(point).isEmpty());
 
 	}
 

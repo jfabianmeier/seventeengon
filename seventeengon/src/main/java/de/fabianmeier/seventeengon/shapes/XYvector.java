@@ -5,6 +5,16 @@ import de.fabianmeier.seventeengon.util.Angle;
 
 public class XYvector
 {
+
+	/**
+	 * 
+	 * @return Gives the vector (0,0)
+	 */
+	public static XYvector nullVector()
+	{
+		return new XYvector(new XYpoint(0, 0), new XYpoint(0, 0));
+	}
+
 	private final double xMove;
 	private final double yMove;
 
@@ -43,8 +53,7 @@ public class XYvector
 
 	public XYpoint shift(XYpoint a)
 	{
-		return new XYpoint(a.getX() + xMove, a.getY() + yMove,
-				a.getVisibility(), a.getLabel());
+		return new XYpoint(a.getX() + xMove, a.getY() + yMove);
 	}
 
 	public XYvector multiplyBy(double factor)
@@ -62,8 +71,14 @@ public class XYvector
 		return Math.sqrt(xMove * xMove + yMove * yMove);
 	}
 
+	/**
+	 * 
+	 * @return the angle of the vector to the positive x-axis.
+	 */
 	public Angle getAngle()
 	{
+		if (DMan.same(0, getLength()))
+			throw new UnsupportedOperationException("No angle for null vector");
 		double angle = Math.acos(xMove / getLength());
 
 		if (yMove > 0)
@@ -78,7 +93,13 @@ public class XYvector
 		return this.multiplyBy(1 / getLength());
 	}
 
-	// Gives the difference as value between -pi and pi.
+	/**
+	 * Gives the difference as value between -pi and pi.
+	 * 
+	 * @param otherVector
+	 *            vector of which the angle will be used
+	 * @return difference of vector angle to this angle
+	 */
 	public double getAngleDifference(XYvector otherVector)
 	{
 		double thisAngle = getAngle().asDouble();
@@ -102,9 +123,9 @@ public class XYvector
 		final int prime = 31;
 		int result = 1;
 		long temp;
-		temp = DMan.DoubleHash(xMove);
+		temp = DMan.doubleHash(xMove);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = DMan.DoubleHash(yMove);
+		temp = DMan.doubleHash(yMove);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
@@ -119,9 +140,9 @@ public class XYvector
 		if (getClass() != obj.getClass())
 			return false;
 		XYvector other = (XYvector) obj;
-		if (DMan.DoubleHash(xMove) != DMan.DoubleHash(other.xMove))
+		if (DMan.doubleHash(xMove) != DMan.doubleHash(other.xMove))
 			return false;
-		if (DMan.DoubleHash(yMove) != DMan.DoubleHash(other.yMove))
+		if (DMan.doubleHash(yMove) != DMan.doubleHash(other.yMove))
 			return false;
 		return true;
 	}

@@ -22,12 +22,19 @@ public class BasicName implements GeoName
 	private static Set<String> greekLetterSet = new HashSet<String>(
 			Arrays.asList(greekLetters));
 
+	/**
+	 * 
+	 * @param name
+	 *            A possible basic name
+	 * @return if name is a basic name.
+	 */
 	public static boolean isBasicName(String name)
 	{
 		if (name.length() == 1)
 		{
 			return Pattern.matches("[a-zA-Z]", name);
-		} else
+		}
+		else
 		{
 			return greekLetterSet.contains(name);
 		}
@@ -35,6 +42,12 @@ public class BasicName implements GeoName
 
 	private String name;
 
+	/**
+	 * 
+	 * @param name
+	 *            A basic name (otherwise, an IllegalArgumentException is
+	 *            thrown).
+	 */
 	public BasicName(String name)
 	{
 		if (isBasicName(name))
@@ -72,7 +85,8 @@ public class BasicName implements GeoName
 		{
 			if (other.name != null)
 				return false;
-		} else if (!name.equals(other.name))
+		}
+		else if (!name.equals(other.name))
 			return false;
 		return true;
 	}

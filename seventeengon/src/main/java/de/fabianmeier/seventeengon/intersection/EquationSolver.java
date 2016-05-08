@@ -5,7 +5,17 @@ import java.util.Set;
 
 public class EquationSolver
 {
-
+	/**
+	 * Solves a quadratic equation for the midnight formula ax^2+bx+c=0
+	 * 
+	 * @param a
+	 *            x^2
+	 * @param b
+	 *            x
+	 * @param c
+	 *            constant
+	 * @return set of solutions (maybe empty)
+	 */
 	public static Set<Double> solveQuadraticEquation(double a, double b,
 			double c)
 	{
@@ -15,13 +25,15 @@ public class EquationSolver
 			{
 				throw new IllegalArgumentException("Gleichung " + a + "x²+" + b
 						+ "x+" + c + " nicht lösbar.");
-			} else
+			}
+			else
 			{
 				Set<Double> result = new HashSet<Double>();
 				result.add(-c / b);
 				return result;
 			}
-		} else
+		}
+		else
 		{
 			double discriminant = b * b - 4 * a * c;
 
@@ -38,6 +50,16 @@ public class EquationSolver
 
 	}
 
+	/**
+	 * Solves a system of linear equations for a quadratic matrix.
+	 * 
+	 * @param coefficients
+	 *            quadratic coefficient matrix
+	 * @param rhs
+	 *            right hand side vector
+	 * @return a solution vector or null if the coefficient matrix is not
+	 *         invertible
+	 */
 	public static double[] solveLinearSystem(double[][] coefficients,
 			double[] rhs)
 	{
@@ -60,7 +82,8 @@ public class EquationSolver
 					if (column == i)
 					{
 						cramerMatrix[row][column] = rhs[row];
-					} else
+					}
+					else
 					{
 						cramerMatrix[row][column] = coefficients[row][column];
 					}
@@ -115,7 +138,8 @@ public class EquationSolver
 		if (n == 1)
 		{
 			return m[0][0];
-		} else
+		}
+		else
 		{
 			double det = 0;
 			for (int j = 0; j < n; j++)
@@ -144,7 +168,8 @@ public class EquationSolver
 		int n = m.length;
 		double[][] minor = new double[n - 1][n - 1];
 		// index for minor matrix position:
-		int r = 0, s = 0;
+		int r = 0;
+		int s = 0;
 		for (int k = 0; k < n; k++)
 		{
 			double[] row = m[k];

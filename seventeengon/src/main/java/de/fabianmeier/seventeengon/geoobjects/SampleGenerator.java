@@ -40,6 +40,11 @@ public class SampleGenerator
 		samplingValue = 0;
 	}
 
+	/**
+	 * Increases the stored sampling value by one and returns it
+	 * 
+	 * @return As said above.
+	 */
 	public static int nextSampling()
 	{
 		samplingValue++;

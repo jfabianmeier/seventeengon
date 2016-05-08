@@ -9,8 +9,10 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import de.fabianmeier.seventeengon.shapes.Arc;
 import de.fabianmeier.seventeengon.shapes.Circle;
-import de.fabianmeier.seventeengon.shapes.FilledCircle;
+import de.fabianmeier.seventeengon.shapes.CompositeGeoObject;
+import de.fabianmeier.seventeengon.shapes.GeoObject;
 import de.fabianmeier.seventeengon.shapes.Line;
 import de.fabianmeier.seventeengon.shapes.Pshape;
 import de.fabianmeier.seventeengon.shapes.Triangle;
@@ -51,7 +53,7 @@ public class IntersectionTest
 	public void testIntersectXYpointCircle()
 	{
 		XYpoint point = new XYpoint(10, 0);
-		Circle circle = new Circle(new XYpoint(0, 0), 10, 0, null);
+		Arc circle = new Arc(new XYpoint(0, 0), 10);
 		XYpoint point2 = new XYpoint(10, 10);
 
 		assertFalse(circle.intersectWith(point).isEmpty());
@@ -65,7 +67,7 @@ public class IntersectionTest
 		XYpoint point2 = new XYpoint(0, 10);
 		XYpoint point3 = new XYpoint(5, 5);
 		Triangle triangle = new Triangle(new XYpoint(0, 10), new XYpoint(0, 0),
-				new XYpoint(10, 0), 0, null);
+				new XYpoint(10, 0));
 		assertTrue(triangle.intersectWith(point).isEmpty());
 		assertFalse(triangle.intersectWith(point2).isEmpty());
 		assertFalse(triangle.intersectWith(point3).isEmpty());
@@ -75,7 +77,7 @@ public class IntersectionTest
 	@Test
 	public void testIntersectXYpointFilledCircle()
 	{
-		FilledCircle fcirc = new FilledCircle(new XYpoint(0, 0), 10, 0, null);
+		Circle fcirc = new Circle(new XYpoint(0, 0), 10);
 
 		XYpoint point1 = new XYpoint(1, 1);
 		XYpoint point2 = new XYpoint(10, 0);
@@ -110,14 +112,19 @@ public class IntersectionTest
 
 		cut = line.intersectWith(line3);
 
-		assertTrue(cut.contains(line3));
+		GeoObject geo = CompositeGeoObject.getCompositeGeoObject(cut);
+
+		assertTrue(geo.containsPoint(new XYpoint(0, 40)));
+		assertTrue(geo.containsPoint(new XYpoint(0, 42)));
+		assertTrue(geo.containsPoint(new XYpoint(0, 43)));
+
 	}
 
 	@Test
 	public void testIntersectLineCircle()
 	{
 		Line line = new Line(new XYpoint(10, 10), new XYpoint(10, 40));
-		Circle circle = new Circle(new XYpoint(10, 10), 10, 0, null);
+		Arc circle = new Arc(new XYpoint(10, 10), 10);
 
 		Set<Pshape> cut = circle.intersectWith(line);
 
@@ -130,7 +137,7 @@ public class IntersectionTest
 	{
 		Line line = new Line(new XYpoint(0, 10), new XYpoint(0, 20));
 		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10),
-				new XYpoint(10, 0), 0, null);
+				new XYpoint(10, 0));
 
 		Set<Pshape> cut = line.intersectWith(triangle);
 
@@ -143,7 +150,7 @@ public class IntersectionTest
 	@Test
 	public void testIntersectLineFilledCircle()
 	{
-		FilledCircle fcirc = new FilledCircle(new XYpoint(0, 0), 10, 0, null);
+		Circle fcirc = new Circle(new XYpoint(0, 0), 10);
 
 		Line line = new Line(new XYpoint(0, 0), new XYpoint(0, 10));
 
@@ -159,7 +166,7 @@ public class IntersectionTest
 	public void testIntersectCircleXYpoint()
 	{
 		XYpoint point = new XYpoint(3, 4);
-		Circle circle = new Circle(new XYpoint(0, 0), 5, 0, null);
+		Arc circle = new Arc(new XYpoint(0, 0), 5);
 
 		assertFalse(point.intersectWith(circle).isEmpty());
 	}
@@ -167,7 +174,7 @@ public class IntersectionTest
 	@Test
 	public void testIntersectCircleLine()
 	{
-		Circle circle = new Circle(new XYpoint(0, 0), 10, 0, null);
+		Arc circle = new Arc(new XYpoint(0, 0), 10);
 		Line line = new Line(new XYpoint(10, 0), new XYpoint(10, 20));
 		Set<Pshape> cut = line.intersectWith(circle);
 
@@ -177,8 +184,8 @@ public class IntersectionTest
 	@Test
 	public void testIntersectCircleCircle()
 	{
-		Circle circle1 = new Circle(new XYpoint(0, 0), 5, 0, null);
-		Circle circle2 = new Circle(new XYpoint(0, 8), 5, 0, null);
+		Arc circle1 = new Arc(new XYpoint(0, 0), 5);
+		Arc circle2 = new Arc(new XYpoint(0, 8), 5);
 
 		Set<Pshape> cut = circle1.intersectWith(circle2);
 
@@ -190,8 +197,8 @@ public class IntersectionTest
 	public void testIntersectCircleTriangle()
 	{
 		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10),
-				new XYpoint(10, 0), 0, null);
-		Circle circle = new Circle(new XYpoint(0, 0), 10, 0, null);
+				new XYpoint(10, 0));
+		Arc circle = new Arc(new XYpoint(0, 0), 10);
 
 		Set<Pshape> cut = triangle.intersectWith(circle);
 
@@ -202,8 +209,8 @@ public class IntersectionTest
 	@Test
 	public void testIntersectCircleFilledCircle()
 	{
-		Circle circle = new Circle(new XYpoint(0, 0), 5, 0, null);
-		FilledCircle fcirc = new FilledCircle(new XYpoint(0, 5), 10, 0, null);
+		Arc circle = new Arc(new XYpoint(0, 0), 5);
+		Circle fcirc = new Circle(new XYpoint(0, 5), 10);
 
 		Set<Pshape> cut = circle.intersectWith(fcirc);
 
@@ -213,8 +220,8 @@ public class IntersectionTest
 	@Test
 	public void testIntersectCircleFilledCircle2()
 	{
-		Circle circle = new Circle(new XYpoint(0, 0), 5, 0, null);
-		FilledCircle fcirc = new FilledCircle(new XYpoint(0, 5), 100, 0, null);
+		Arc circle = new Arc(new XYpoint(0, 0), 5);
+		Circle fcirc = new Circle(new XYpoint(0, 5), 100);
 
 		Set<Pshape> cut = circle.intersectWith(fcirc);
 
@@ -225,7 +232,7 @@ public class IntersectionTest
 	public void testIntersectTriangleXYpoint()
 	{
 		Triangle triangle = new Triangle(new XYpoint(-1, -1),
-				new XYpoint(-1, 10), new XYpoint(10, -1), 0, null);
+				new XYpoint(-1, 10), new XYpoint(10, -1));
 		XYpoint point = new XYpoint(0, 0);
 
 		Set<Pshape> cut = point.intersectWith(triangle);
@@ -237,7 +244,7 @@ public class IntersectionTest
 	{
 		Line line = new Line(new XYpoint(0, 0), new XYpoint(10, 0));
 		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(10, 10),
-				new XYpoint(0, 10), 0, null);
+				new XYpoint(0, 10));
 
 		Set<Pshape> cut = line.intersectWith(triangle);
 
@@ -247,9 +254,9 @@ public class IntersectionTest
 	@Test
 	public void testIntersectTriangleCircle()
 	{
-		Circle circle = new Circle(new XYpoint(0, 0), 5, 0, null);
+		Arc circle = new Arc(new XYpoint(0, 0), 5);
 		Triangle triangle = new Triangle(new XYpoint(10, 10),
-				new XYpoint(10, 20), new XYpoint(20, 20), 0, null);
+				new XYpoint(10, 20), new XYpoint(20, 20));
 
 		Set<Pshape> cut = triangle.intersectWith(circle);
 
@@ -260,9 +267,9 @@ public class IntersectionTest
 	public void testIntersectTriangleTriangle()
 	{
 		Triangle triangle1 = new Triangle(new XYpoint(0, 0), new XYpoint(10, 0),
-				new XYpoint(0, 10), 0, null);
+				new XYpoint(0, 10));
 		Triangle triangle2 = new Triangle(new XYpoint(0, 0),
-				new XYpoint(-10, 0), new XYpoint(0, -10), 0, null);
+				new XYpoint(-10, 0), new XYpoint(0, -10));
 
 		Set<Pshape> cut = triangle1.intersectWith(triangle2);
 
@@ -273,16 +280,16 @@ public class IntersectionTest
 	public void testIntersectTriangleFilledCircle()
 	{
 		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10),
-				new XYpoint(10, 0), 0, null);
-		FilledCircle fcirc = new FilledCircle(new XYpoint(0, 0), 5, 0, null);
+				new XYpoint(10, 0));
+		Circle fcirc = new Circle(new XYpoint(0, 0), 5);
 
 		Set<Pshape> cut = triangle.intersectWith(fcirc);
 
 		for (Pshape pshape : cut)
 		{
-			if (pshape instanceof FilledCircle)
+			if (pshape instanceof Circle)
 			{
-				FilledCircle fcirc2 = (FilledCircle) pshape;
+				Circle fcirc2 = (Circle) pshape;
 				assertFalse(fcirc2.intersectWith(new XYpoint(3, 3)).isEmpty());
 			}
 		}
@@ -292,7 +299,7 @@ public class IntersectionTest
 	@Test
 	public void testIntersectFilledCircleXYpoint()
 	{
-		FilledCircle fcirc = new FilledCircle(new XYpoint(10, 20), 3, 0, null);
+		Circle fcirc = new Circle(new XYpoint(10, 20), 3);
 		XYpoint point = new XYpoint(11, 21);
 
 		Set<Pshape> cut = fcirc.intersectWith(point);
@@ -303,7 +310,7 @@ public class IntersectionTest
 	@Test
 	public void testIntersectFilledCircleLine()
 	{
-		FilledCircle fcirc = new FilledCircle(new XYpoint(0, 0), 5, 0, null);
+		Circle fcirc = new Circle(new XYpoint(0, 0), 5);
 
 		Line line = new Line(new XYpoint(2, 10), new XYpoint(2, 0));
 
@@ -322,16 +329,16 @@ public class IntersectionTest
 	@Test
 	public void testIntersectFilledCircleCircle()
 	{
-		Circle circle = new Circle(new XYpoint(1, 1), 5, 0, null);
-		FilledCircle fcirc = new FilledCircle(new XYpoint(1, 1), 5, 0, null);
+		Arc circle = new Arc(new XYpoint(1, 1), 5);
+		Circle fcirc = new Circle(new XYpoint(1, 1), 5);
 
 		Set<Pshape> cut = circle.intersectWith(fcirc);
 
 		for (Pshape pshape : cut)
 		{
-			if (pshape instanceof Circle)
+			if (pshape instanceof Arc)
 			{
-				Circle circle2 = (Circle) pshape;
+				Arc circle2 = (Arc) pshape;
 				assertFalse(circle2.intersectWith(new XYpoint(6, 1)).isEmpty());
 			}
 		}
@@ -340,9 +347,9 @@ public class IntersectionTest
 	@Test
 	public void testIntersectFilledCircleTriangle()
 	{
-		FilledCircle fcirc = new FilledCircle(new XYpoint(0, 0), 10, 0, null);
+		Circle fcirc = new Circle(new XYpoint(0, 0), 10);
 		Triangle triangle = new Triangle(new XYpoint(-1, -1),
-				new XYpoint(1, -1), new XYpoint(1, 1), 0, null);
+				new XYpoint(1, -1), new XYpoint(1, 1));
 
 		Set<Pshape> cut = fcirc.intersectWith(triangle);
 
@@ -361,14 +368,14 @@ public class IntersectionTest
 	@Test
 	public void testIntersectFilledCircleFilledCircle()
 	{
-		FilledCircle fcirc1 = new FilledCircle(new XYpoint(0, 0), 10, 0, null);
-		FilledCircle fcirc2 = new FilledCircle(new XYpoint(5, 0), 5, 0, null);
+		Circle fcirc1 = new Circle(new XYpoint(0, 0), 10);
+		Circle fcirc2 = new Circle(new XYpoint(5, 0), 5);
 
 		Set<Pshape> cut = fcirc1.intersectWith(fcirc2);
 
 		for (Pshape pshape : cut)
 		{
-			if (pshape instanceof FilledCircle)
+			if (pshape instanceof Circle)
 			{
 				assertFalse(pshape.intersectWith(new XYpoint(6, 1)).isEmpty());
 

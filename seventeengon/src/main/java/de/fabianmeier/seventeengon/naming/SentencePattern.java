@@ -5,47 +5,41 @@ import java.util.List;
 
 public class SentencePattern
 {
-	private List<String> words = new ArrayList<String>();
+	private final List<String> words;
+
+	public List<String> getWords()
+	{
+		return words;
+	}
 
 	public SentencePattern(String sentence)
 	{
+		this(new Sentence(sentence));
+	}
 
-		String[] parts = sentence.split("\\s+");
+	/**
+	 * Creates a pattern from a sentence
+	 * 
+	 * @param sentence
+	 *            Sentence
+	 */
+	public SentencePattern(Sentence sentence)
+	{
+		words = new ArrayList<String>();
 
-		for (String part : parts)
+		for (Object part : sentence.getParts())
 		{
-			if (isSentenceWord(part))
-			{
-				words.add(part);
-			} else
-			{
+			if (part instanceof String)
+				words.add((String) part);
+			else
 				words.add(null);
-			}
 		}
-
 	}
 
-	public static List<CompName> getCompositeNames(String sentence)
-	{
-		List<CompName> compNameList = new ArrayList<CompName>();
-
-		String[] parts = sentence.split("\\s+");
-
-		for (String part : parts)
-		{
-			if (!isSentenceWord(part))
-			{
-				compNameList.add(new CompName(part));
-			}
-		}
-
-		return compNameList;
-	}
-
-	private static boolean isSentenceWord(String part)
-	{
-		return !BasicName.isBasicName(part) && part.matches("[A-Z]?[a-z]+,?");
-	}
+	// private static boolean isSentenceWord(String part)
+	// {
+	// return !BasicName.isBasicName(part) && part.matches("[A-Z]?[a-z]+,?");
+	// }
 
 	@Override
 	public String toString()
@@ -57,7 +51,8 @@ public class SentencePattern
 			if (word != null)
 			{
 				builder.append(word + " ");
-			} else
+			}
+			else
 			{
 				builder.append("X" + " ");
 			}
@@ -89,7 +84,8 @@ public class SentencePattern
 		{
 			if (other.words != null)
 				return false;
-		} else if (!words.equals(other.words))
+		}
+		else if (!words.equals(other.words))
 			return false;
 		return true;
 	}

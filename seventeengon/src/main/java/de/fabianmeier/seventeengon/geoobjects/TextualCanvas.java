@@ -8,6 +8,7 @@ import java.util.List;
 
 import de.fabianmeier.seventeengon.shapes.XYpoint;
 import de.fabianmeier.seventeengon.util.Angle;
+import de.fabianmeier.seventeengon.util.GeoVisible;
 
 /**
  * @author JFM
@@ -41,10 +42,11 @@ public class TextualCanvas implements GeoCanvas
 	 * int, java.lang.String)
 	 */
 	@Override
-	public void drawLine(XYpoint start, XYpoint end, int strength, String label)
+	public void drawLine(XYpoint start, XYpoint end, String label,
+			GeoVisible visi)
 	{
 		writings.add(label + ": " + "Line from " + start.toString() + " to "
-				+ end.toString() + " with strength " + strength);
+				+ end.toString() + " with visibility: " + visi);
 
 	}
 
@@ -58,11 +60,11 @@ public class TextualCanvas implements GeoCanvas
 	 */
 	@Override
 	public void drawArc(XYpoint centre, Angle startAngle, Angle endAngle,
-			int strength, String label)
+			String label, GeoVisible visi)
 	{
 		writings.add(label + ": " + "Arc from " + startAngle.toString() + " to "
-				+ endAngle.toString() + " around " + centre + " with strength "
-				+ strength);
+				+ endAngle.toString() + " around " + centre
+				+ " with visibility: " + visi);
 
 	}
 
@@ -74,10 +76,10 @@ public class TextualCanvas implements GeoCanvas
 	 * .seventeengon.shapes.XYpoint, int, java.lang.String)
 	 */
 	@Override
-	public void drawPoint(XYpoint point, int strength, String label)
+	public void drawPoint(XYpoint point, String label, GeoVisible visi)
 	{
 		writings.add(
-				label + ": " + "Point " + point + " with strength " + strength);
+				label + ": " + "Point " + point + " with visibility " + visi);
 
 	}
 
@@ -90,12 +92,12 @@ public class TextualCanvas implements GeoCanvas
 	 * de.fabianmeier.seventeengon.shapes.XYpoint, int, java.lang.String)
 	 */
 	@Override
-	public void fillTriangle(XYpoint a, XYpoint b, XYpoint c, int strength,
-			String label)
+	public void fillTriangle(XYpoint a, XYpoint b, XYpoint c, String label,
+			GeoVisible visi)
 	{
 		writings.add(label + ": " + "Triangle with " + a.toString() + ", "
-				+ b.toString() + " and " + c.toString() + " with strength "
-				+ strength);
+				+ b.toString() + " and " + c.toString() + " with visibility: "
+				+ visi);
 
 	}
 

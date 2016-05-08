@@ -42,9 +42,11 @@ public class SequentialNameMapping
 	 * is not necessarily a bijection.
 	 * 
 	 * @param source
+	 *            The source sentence
 	 * @param sink
+	 *            The sink sentence
 	 */
-	public SequentialNameMapping(String source, String sink)
+	public SequentialNameMapping(Sentence source, Sentence sink)
 	{
 		SentencePattern pattern1 = new SentencePattern(source);
 		SentencePattern pattern2 = new SentencePattern(sink);
@@ -55,9 +57,8 @@ public class SequentialNameMapping
 
 		pattern = pattern1;
 
-		List<CompName> sourceCompList = SentencePattern
-				.getCompositeNames(source);
-		List<CompName> sinkCompList = SentencePattern.getCompositeNames(sink);
+		List<CompName> sourceCompList = source.getCompositeNames();
+		List<CompName> sinkCompList = sink.getCompositeNames();
 
 		for (int i = 0; i < sourceCompList.size(); i++)
 		{
