@@ -1,24 +1,22 @@
 package de.fabianmeier.seventeengon.shapes;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
-import de.fabianmeier.seventeengon.util.Angle;
 import de.fabianmeier.seventeengon.util.GeoVisible;
+import de.fabianmeier.seventeengon.util.NumericAngle;
 
-public class Circle extends PshapeImpl
+public class Circle extends AtomicGeoObject
 {
 
 	private final XYpoint centre;
-	private final Angle endAngle;
+	private final NumericAngle endAngle;
 
 	private final double radius;
-	private final Angle startAngle;
+	private final NumericAngle startAngle;
 
 	/**
 	 * Creates a full circle part (convex hull of the respective arc)
@@ -32,8 +30,8 @@ public class Circle extends PshapeImpl
 	 * @param endAngle
 	 *            end Angle
 	 */
-	public Circle(XYpoint centre, double radius, Angle startAngle,
-			Angle endAngle)
+	public Circle(XYpoint centre, double radius, NumericAngle startAngle,
+			NumericAngle endAngle)
 	{
 		this.centre = centre;
 		this.radius = radius;
@@ -52,7 +50,8 @@ public class Circle extends PshapeImpl
 	 */
 	public Circle(XYpoint centre, double radius)
 	{
-		this(centre, radius, new Angle(0), new Angle(2 * Math.PI));
+		this(centre, radius, new NumericAngle(0),
+				new NumericAngle(2 * Math.PI));
 	}
 
 	/*
@@ -70,7 +69,7 @@ public class Circle extends PshapeImpl
 
 	}
 
-	public XYpoint getAnglePoint(Angle angle)
+	public XYpoint getAnglePoint(NumericAngle angle)
 	{
 		XYvector vector = new XYvector(radius, angle);
 		return vector.shift(centre);
@@ -87,7 +86,7 @@ public class Circle extends PshapeImpl
 		return 2;
 	}
 
-	public Angle getEndAngle()
+	public NumericAngle getEndAngle()
 	{
 		return endAngle;
 	}
@@ -101,8 +100,8 @@ public class Circle extends PshapeImpl
 	{
 		while (true)
 		{
-			Angle angle = startAngle
-					.addtoAngle(Angle.angleDifference(startAngle, endAngle)
+			NumericAngle angle = startAngle.addtoAngle(
+					NumericAngle.angleDifference(startAngle, endAngle)
 							* rand.nextDouble());
 
 			XYvector radVector = (new XYvector(angle.cos(), angle.sin()))
@@ -115,17 +114,6 @@ public class Circle extends PshapeImpl
 
 	}
 
-	@Override
-	public int getPseudoHash()
-	{
-		double didu = 1000 * startAngle.asDouble() + 100 * endAngle.asDouble()
-				+ 234 * radius;
-
-		int diduInt = (int) Math.round(didu);
-
-		return centre.getPseudoHash() + diduInt;
-	}
-
 	public double getRadius()
 	{
 		return radius;
@@ -134,11 +122,11 @@ public class Circle extends PshapeImpl
 	@Override
 	public XYpoint getSamplePoint(int sampleNumber)
 	{
-		Random rand = new Random(sampleNumber + getPseudoHash());
+		Random rand = new Random(sampleNumber + hashCode());
 		return getPoint(rand);
 	}
 
-	public Angle getStartAngle()
+	public NumericAngle getStartAngle()
 	{
 		return startAngle;
 	}
@@ -149,55 +137,55 @@ public class Circle extends PshapeImpl
 	}
 
 	@Override
-	public Set<Pshape> intersectWith(Pshape pshape)
+	public GeoObject intersectWith(GeoObject geoObject)
 	{
-		if (pshape instanceof XYpoint)
+		if (geoObject instanceof XYpoint)
 		{
-			return IntersectionManager.intersect(this, (XYpoint) pshape);
+			return IntersectionManager.intersect(this, (XYpoint) geoObject);
 		}
-		if (pshape instanceof Line)
+		if (geoObject instanceof Line)
 		{
-			return IntersectionManager.intersect(this, (Line) pshape);
+			return IntersectionManager.intersect(this, (Line) geoObject);
 		}
-		if (pshape instanceof Arc)
+		if (geoObject instanceof Arc)
 		{
-			return IntersectionManager.intersect(this, (Arc) pshape);
+			return IntersectionManager.intersect(this, (Arc) geoObject);
 		}
-		if (pshape instanceof Triangle)
+		if (geoObject instanceof Triangle)
 		{
-			return IntersectionManager.intersect(this, (Triangle) pshape);
+			return IntersectionManager.intersect(this, (Triangle) geoObject);
 		}
-		if (pshape instanceof Circle)
+		if (geoObject instanceof Circle)
 		{
-			return IntersectionManager.intersect(this, (Circle) pshape);
+			return IntersectionManager.intersect(this, (Circle) geoObject);
 		}
 
-		return null;
+		return geoObject.intersectWith(this);
 
 	}
 
-	@Override
-	public void paint(Graphics2D g2d)
-	{
-		// setColourAndStroke(g2d);
-
-		if (!startAngle.equals(endAngle))
-		{
-
-			g2d.draw(new Arc2D.Double(centre.getX() - radius,
-					centre.getY() - radius, 2 * radius, 2 * radius,
-					startAngle.asDouble() * 180 / Math.PI,
-					Angle.angleDifference(startAngle, endAngle) * 180 / Math.PI,
-					Arc2D.CHORD));
-		}
-		else
-		{
-
-			g2d.draw(new Ellipse2D.Double(centre.getX() - radius,
-					centre.getY() - radius, 2 * radius, 2 * radius));
-		}
-
-	}
+	// @Override
+	// public void paint(Graphics2D g2d)
+	// {
+	// // setColourAndStroke(g2d);
+	//
+	// if (!startAngle.equals(endAngle))
+	// {
+	//
+	// g2d.draw(new Arc2D.Double(centre.getX() - radius,
+	// centre.getY() - radius, 2 * radius, 2 * radius,
+	// startAngle.asDouble() * 180 / Math.PI,
+	// NumericAngle.angleDifference(startAngle, endAngle) * 180 / Math.PI,
+	// Arc2D.CHORD));
+	// }
+	// else
+	// {
+	//
+	// g2d.draw(new Ellipse2D.Double(centre.getX() - radius,
+	// centre.getY() - radius, 2 * radius, 2 * radius));
+	// }
+	//
+	// }
 
 	@Override
 	public String toString()
@@ -237,6 +225,18 @@ public class Circle extends PshapeImpl
 	public GeoObject getFilledObject()
 	{
 		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#getZeroDimensionalPart()
+	 */
+	@Override
+	public Set<XYpoint> getZeroDimensionalPart()
+	{
+		return new HashSet<XYpoint>();
 	}
 
 }

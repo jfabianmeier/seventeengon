@@ -1,7 +1,6 @@
 package de.fabianmeier.seventeengon.shapes;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Line2D;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -11,19 +10,20 @@ import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.GeoVisible;
 
 /**
- * Directed line through pointA and pointB. The lambdas indicate the length. If
- * endpoints are infinite, it is infinite.
+ * Directed line through pointA and pointB. The lambdas indicate the length.
  * 
  * @author JFM
  *
  */
-public class Line extends PshapeImpl
+public class Line extends AtomicGeoObject
 {
-	private final double startLambda;
 	private final double endLambda;
 	private final XYpoint pointA;
-
 	private final XYpoint pointB;
+
+	private final XYvector normedDirection;
+
+	private final double startLambda;
 
 	/**
 	 * Creates a line fulfilling the equation xFactor*x + yFactor*y = constant
@@ -51,8 +51,10 @@ public class Line extends PshapeImpl
 				pointB = new XYpoint(1, constant / yFactor - xFactor / yFactor);
 		}
 
-		this.startLambda = -Double.MAX_VALUE;
-		this.endLambda = Double.MAX_VALUE;
+		this.startLambda = -1000000;
+		this.endLambda = 1000000;
+
+		normedDirection = new XYvector(pointA, pointB).normed();
 
 	}
 
@@ -75,6 +77,8 @@ public class Line extends PshapeImpl
 		this.pointB = pointB;
 		this.startLambda = -10000000;
 		this.endLambda = 10000000;
+		normedDirection = new XYvector(pointA, pointB).normed();
+
 	}
 
 	/**
@@ -96,9 +100,8 @@ public class Line extends PshapeImpl
 
 		if (startLambda > endLambda)
 		{
-			double temp = startLambda;
-			startLambda = endLambda;
-			endLambda = temp;
+			throw new IllegalArgumentException("startLambda " + startLambda
+					+ " greater than endLambda " + endLambda);
 		}
 
 		if (pointA.equals(pointB))
@@ -109,6 +112,8 @@ public class Line extends PshapeImpl
 		this.pointB = pointB;
 		this.startLambda = startLambda;
 		this.endLambda = endLambda;
+		normedDirection = new XYvector(pointA, pointB).normed();
+
 	}
 
 	/*
@@ -136,11 +141,68 @@ public class Line extends PshapeImpl
 			return false;
 		Line other = (Line) obj;
 
-		if (getStartPoint().equals(other.getStartPoint())
-				&& getEndPoint().equals(other.getEndPoint()))
+		if (!this.normedDirection.equals(other.normedDirection))
+			return false;
+
+		GeoObject intersect = this.intersectWith(other);
+
+		if (intersect.isEmpty())
+			return false;
+
+		Line leftLine = new Line(1, 0, -10000);
+
+		boolean leftLineMatch = leftLine.intersectWith(this)
+				.equals(leftLine.intersectWith(other));
+
+		if (!leftLineMatch)
+			return false;
+
+		Line rightLine = new Line(1, 0, 10000);
+
+		boolean rightLineMatch = rightLine.intersectWith(this)
+				.equals(rightLine.intersectWith(other));
+
+		if (!rightLineMatch)
+			return false;
+
+		if (leftLineMatch && rightLineMatch
+				&& !leftLine.intersectWith(this).isEmpty()
+				&& !rightLine.intersectWith(this).isEmpty())
 			return true;
 
-		return false;
+		Line topLine = new Line(0, 1, 10000);
+
+		boolean topLineMatch = topLine.intersectWith(this)
+				.equals(topLine.intersectWith(other));
+
+		if (!topLineMatch)
+			return false;
+		Line bottomLine = new Line(1, 0, -10000);
+
+		boolean bottomLineMatch = bottomLine.intersectWith(this)
+				.equals(bottomLine.intersectWith(other));
+		if (!bottomLineMatch)
+			return false;
+
+		if (topLineMatch && bottomLineMatch
+				&& !topLine.intersectWith(this).isEmpty()
+				&& !bottomLine.intersectWith(this).isEmpty())
+			return true;
+
+		return (getStartPoint().equals(other.getStartPoint())
+				&& getEndPoint().equals(other.getEndPoint()));
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getBoundary()
+	 */
+	@Override
+	public GeoObject getBoundary()
+	{
+		return this;
 	}
 
 	@Override
@@ -157,6 +219,17 @@ public class Line extends PshapeImpl
 	public XYpoint getEndPoint()
 	{
 		return getPointByLambda(endLambda);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getFilledObject()
+	 */
+	@Override
+	public GeoObject getFilledObject()
+	{
+		return this;
 	}
 
 	/**
@@ -181,9 +254,6 @@ public class Line extends PshapeImpl
 			return (point.getX() - pointA.getX())
 					/ (pointB.getX() - pointA.getX());
 		}
-		//
-		// return (point.getX() - getPointA().getX())
-		// / (point.getX() - getPointB().getX());
 	}
 
 	private XYpoint getPoint(double nextDouble)
@@ -210,26 +280,9 @@ public class Line extends PshapeImpl
 	}
 
 	@Override
-	public int getPseudoHash()
-	{
-		final int prime = 31;
-		int result = 1;
-		long temp;
-		temp = Double.doubleToLongBits(endLambda);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result
-				+ ((pointA == null) ? 0 : pointA.getPseudoHash());
-		result = prime * result
-				+ ((pointB == null) ? 0 : pointB.getPseudoHash());
-		temp = Double.doubleToLongBits(startLambda);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		return result;
-	}
-
-	@Override
 	public XYpoint getSamplePoint(int sampleNumber)
 	{
-		Random rand = new Random(sampleNumber + getPseudoHash());
+		Random rand = new Random(sampleNumber + hashCode());
 		return getPoint(rand.nextDouble());
 	}
 
@@ -246,52 +299,48 @@ public class Line extends PshapeImpl
 	@Override
 	public int hashCode()
 	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((getStartPoint() == null) ? 0 : getStartPoint().hashCode())
-				+ ((getEndPoint() == null) ? 0 : getEndPoint().hashCode()) * 5;
-		return result;
-	}
-
-	@Override
-	public Set<Pshape> intersectWith(Pshape pshape)
-	{
-		if (pshape instanceof XYpoint)
-		{
-			return IntersectionManager.intersect(this, (XYpoint) pshape);
-		}
-		if (pshape instanceof Line)
-		{
-			return IntersectionManager.intersect(this, (Line) pshape);
-		}
-		if (pshape instanceof Arc)
-		{
-			return IntersectionManager.intersect(this, (Arc) pshape);
-		}
-		if (pshape instanceof Triangle)
-		{
-			return IntersectionManager.intersect(this, (Triangle) pshape);
-		}
-		if (pshape instanceof Circle)
-		{
-			return IntersectionManager.intersect(this, (Circle) pshape);
-		}
-
-		return null;
+		return normedDirection.hashCode();
 
 	}
 
 	@Override
-	public void paint(Graphics2D g2d)
+	public GeoObject intersectWith(GeoObject geoObject)
 	{
-		// setColourAndStroke(g2d);
+		if (geoObject instanceof XYpoint)
+		{
+			return IntersectionManager.intersect(this, (XYpoint) geoObject);
+		}
+		if (geoObject instanceof Line)
+		{
+			return IntersectionManager.intersect(this, (Line) geoObject);
+		}
+		if (geoObject instanceof Arc)
+		{
+			return IntersectionManager.intersect(this, (Arc) geoObject);
+		}
+		if (geoObject instanceof Triangle)
+		{
+			return IntersectionManager.intersect(this, (Triangle) geoObject);
+		}
+		if (geoObject instanceof Circle)
+		{
+			return IntersectionManager.intersect(this, (Circle) geoObject);
+		}
 
-		g2d.draw(new Line2D.Double(getStartPoint().getX(),
-				getStartPoint().getY(), getEndPoint().getX(),
-				getEndPoint().getY()));
+		return geoObject.intersectWith(this);
 
 	}
+
+	// @Override
+	// public void paint(Graphics2D g2d)
+	// {
+	// // setColourAndStroke(g2d);
+	//
+	// g2d.draw(new Line2D.Double(getStartPoint().getX(),
+	// getStartPoint().getY(), getEndPoint().getX(),
+	// getEndPoint().getY()));
+	//
+	// }
 
 	/**
 	 * Sub segment of the line
@@ -300,17 +349,26 @@ public class Line extends PshapeImpl
 	 *            point on the line
 	 * @param endPoint
 	 *            point on the line
-	 * @return a new line from one point to the other.
+	 * @return the intersection of the line from startPoint to endPoint and this
+	 *         line.
 	 */
 	public Line subSegment(XYpoint startPoint, XYpoint endPoint)
 	{
-		double startL = getLambda(startPoint);
-		double endL = getLambda(endPoint);
+		Line otherLine = new Line(startPoint, endPoint, 0, 1);
+		GeoObject geo = this.intersectWith(otherLine);
 
-		startL = Math.max(startL, startLambda);
-		endL = Math.min(endL, endLambda);
-
-		return new Line(pointA, pointB, startL, endL);
+		if (geo instanceof Line)
+			return (Line) geo;
+		else
+			throw new IllegalArgumentException("Points " + startPoint + " or "
+					+ endPoint + " not on line " + this);
+		// double startL = getLambda(startPoint);
+		// double endL = getLambda(endPoint);
+		//
+		// startL = Math.max(startL, startLambda);
+		// endL = Math.min(endL, endLambda);
+		//
+		// return new Line(pointA, pointB, startL, endL);
 
 	}
 
@@ -323,23 +381,13 @@ public class Line extends PshapeImpl
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getBoundary()
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#getZeroDimensionalPart()
 	 */
 	@Override
-	public GeoObject getBoundary()
+	public Set<XYpoint> getZeroDimensionalPart()
 	{
-		return this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getFilledObject()
-	 */
-	@Override
-	public GeoObject getFilledObject()
-	{
-		return this;
+		return new HashSet<XYpoint>();
 	}
 
 }

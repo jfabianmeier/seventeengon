@@ -2,8 +2,12 @@ package de.fabianmeier.seventeengon.shapes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.util.GeoVisible;
@@ -17,32 +21,39 @@ import de.fabianmeier.seventeengon.util.GeoVisible;
  */
 public class CompositeGeoObject implements GeoObject
 {
-	int drawingVisibility = 1;
+	// int drawingVisibility = 1;
 
+	private static GeoObject emptyObject = new CompositeGeoObject(
+			new ArrayList<GeoObject>());
 	private List<GeoObject> subObjectList = new ArrayList<>();
 
-	public CompositeGeoObject(Collection<GeoObject> geoCollection)
+	public static GeoObject getEmptyObject()
+	{
+		return emptyObject;
+	}
+
+	public CompositeGeoObject(Collection<? extends GeoObject> geoCollection)
 	{
 		subObjectList = new ArrayList<GeoObject>(geoCollection);
 
 	}
 
-	/**
-	 * Constructs a composite geoObject from a collection of shapes
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param shapeCollection
-	 *            set of Pshape
-	 * @return a CompositeGeoObject with these shapes as subobjects
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#containsPoint(de.fabianmeier
+	 * .seventeengon.shapes.XYpoint)
 	 */
-	public static CompositeGeoObject getCompositeGeoObject(
-			Collection<Pshape> shapeCollection)
+	@Override
+	public boolean containsPoint(XYpoint point)
 	{
-		List<GeoObject> subObjectList = new ArrayList<GeoObject>();
-		for (Pshape p : shapeCollection)
+		for (GeoObject geo : subObjectList)
 		{
-			subObjectList.add(p);
+			if (geo.containsPoint(point))
+				return true;
 		}
-		return new CompositeGeoObject(subObjectList);
+		return false;
 	}
 
 	@Override
@@ -64,6 +75,25 @@ public class CompositeGeoObject implements GeoObject
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getBoundary()
+	 */
+	@Override
+	public GeoObject getBoundary()
+	{
+		List<GeoObject> boundaries = new ArrayList<GeoObject>();
+
+		for (GeoObject geo : subObjectList)
+		{
+			boundaries.add(geo.getBoundary());
+		}
+
+		return new CompositeGeoObject(boundaries);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.fabianmeier.seventeengon.geoobjects.GeoObject#getDimension()
 	 */
 	@Override
@@ -77,6 +107,24 @@ public class CompositeGeoObject implements GeoObject
 				maxDim = geo.getDimension();
 		}
 		return maxDim;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getFilledObject()
+	 */
+	@Override
+	public GeoObject getFilledObject()
+	{
+		List<GeoObject> filled = new ArrayList<GeoObject>();
+
+		for (GeoObject geo : subObjectList)
+		{
+			filled.add(geo.getFilledObject());
+		}
+
+		return new CompositeGeoObject(filled);
 	}
 
 	/*
@@ -138,56 +186,38 @@ public class CompositeGeoObject implements GeoObject
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty()
+	{
+		return getDimension() == -1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
-	 * de.fabianmeier.seventeengon.shapes.GeoObject#containsPoint(de.fabianmeier
-	 * .seventeengon.shapes.XYpoint)
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#getZeroDimensionalPart()
 	 */
 	@Override
-	public boolean containsPoint(XYpoint point)
+	public Set<XYpoint> getZeroDimensionalPart()
 	{
-		for (GeoObject geo : subObjectList)
+		Set<XYpoint> back = new HashSet<XYpoint>();
+
+		for (GeoObject geoObject : getSubObjects())
 		{
-			if (geo.containsPoint(point))
-				return true;
+			back.addAll(geoObject.getZeroDimensionalPart());
 		}
-		return false;
+
+		return back;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getBoundary()
-	 */
 	@Override
-	public GeoObject getBoundary()
+	public String toString()
 	{
-		List<GeoObject> boundaries = new ArrayList<GeoObject>();
+		return "\\" + StringUtils.join(subObjectList, ",") + "/";
 
-		for (GeoObject geo : subObjectList)
-		{
-			boundaries.add(geo.getBoundary());
-		}
-
-		return new CompositeGeoObject(boundaries);
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getFilledObject()
-	 */
-	@Override
-	public GeoObject getFilledObject()
-	{
-		List<GeoObject> filled = new ArrayList<GeoObject>();
-
-		for (GeoObject geo : subObjectList)
-		{
-			filled.add(geo.getFilledObject());
-		}
-
-		return new CompositeGeoObject(filled);
 	}
 
 }

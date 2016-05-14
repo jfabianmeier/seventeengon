@@ -1,7 +1,6 @@
 package de.fabianmeier.seventeengon.shapes;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
+import java.util.HashSet;
 import java.util.Set;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
@@ -17,14 +16,10 @@ import de.fabianmeier.seventeengon.util.GeoVisible;
  * @author JFM
  *
  */
-public class XYpoint extends PshapeImpl
+public class XYpoint extends AtomicGeoObject
 {
 
-	private double distanceToZero;
-	private boolean farOff;
-
 	private final double x;
-
 	private final double y;
 
 	/**
@@ -41,15 +36,6 @@ public class XYpoint extends PshapeImpl
 
 		this.x = x;
 		this.y = y;
-
-		distanceToZero = Math.sqrt(x * x + y * y);
-		farOff = DMan.isInfinite(distanceToZero);
-		if (farOff)
-		{
-			x = x / distanceToZero;
-			y = y / distanceToZero;
-		}
-
 	}
 
 	/*
@@ -77,9 +63,6 @@ public class XYpoint extends PshapeImpl
 			return false;
 		XYpoint other = (XYpoint) obj;
 
-		if (farOff != other.farOff)
-			return false;
-
 		if (DMan.doubleHash(x) != DMan.doubleHash(other.x))
 			return false;
 		if (DMan.doubleHash(y) != DMan.doubleHash(other.y))
@@ -91,12 +74,6 @@ public class XYpoint extends PshapeImpl
 	public int getDimension()
 	{
 		return 0;
-	}
-
-	@Override
-	public int getPseudoHash()
-	{
-		return (int) Math.round(1000 * x + 10000 * y);
 	}
 
 	@Override
@@ -121,8 +98,6 @@ public class XYpoint extends PshapeImpl
 
 		int prime = 31;
 
-		if (farOff)
-			prime = 37;
 		int result = 1;
 		long temp;
 		temp = DMan.doubleHash(x);
@@ -133,50 +108,47 @@ public class XYpoint extends PshapeImpl
 	}
 
 	@Override
-	public Set<Pshape> intersectWith(Pshape pshape)
+	public GeoObject intersectWith(GeoObject geoObject)
 	{
-		if (pshape instanceof XYpoint)
+		if (geoObject instanceof XYpoint)
 		{
-			return IntersectionManager.intersect(this, (XYpoint) pshape);
+			return IntersectionManager.intersect(this, (XYpoint) geoObject);
 		}
-		if (pshape instanceof Line)
+		if (geoObject instanceof Line)
 		{
-			return IntersectionManager.intersect(this, (Line) pshape);
+			return IntersectionManager.intersect(this, (Line) geoObject);
 		}
-		if (pshape instanceof Arc)
+		if (geoObject instanceof Arc)
 		{
-			return IntersectionManager.intersect(this, (Arc) pshape);
+			return IntersectionManager.intersect(this, (Arc) geoObject);
 		}
-		if (pshape instanceof Triangle)
+		if (geoObject instanceof Triangle)
 		{
-			return IntersectionManager.intersect(this, (Triangle) pshape);
+			return IntersectionManager.intersect(this, (Triangle) geoObject);
 		}
-		if (pshape instanceof Circle)
+		if (geoObject instanceof Circle)
 		{
-			return IntersectionManager.intersect(this, (Circle) pshape);
+			return IntersectionManager.intersect(this, (Circle) geoObject);
 		}
 
-		return null;
+		return geoObject.intersectWith(this);
 
 	}
 
-	@Override
-	public void paint(Graphics2D g2d)
-	{
-		// setColourAndStroke(g2d);
-
-		g2d.fill(new Ellipse2D.Double(x - 1, y - 1, 2, 2));
-	}
+	// @Override
+	// public void paint(Graphics2D g2d)
+	// {
+	// // setColourAndStroke(g2d);
+	//
+	// g2d.fill(new Ellipse2D.Double(x - 1, y - 1, 2, 2));
+	// }
 
 	@Override
 	public String toString()
 	{
 		String localLabel = "Point";
 
-		String farOffS = farOff ? "INF" : "";
-
-		return localLabel + "(" + showValue(x) + ", " + showValue(y) + ")"
-				+ farOffS;
+		return localLabel + "(" + showValue(x) + ", " + showValue(y) + ")";
 	}
 
 	/*
@@ -199,6 +171,22 @@ public class XYpoint extends PshapeImpl
 	public GeoObject getFilledObject()
 	{
 		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#getZeroDimensionalPart()
+	 */
+	@Override
+	public Set<XYpoint> getZeroDimensionalPart()
+	{
+		Set<XYpoint> local = new HashSet<XYpoint>();
+
+		local.add(this);
+
+		return local;
 	}
 
 }

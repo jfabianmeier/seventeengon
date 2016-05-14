@@ -90,4 +90,19 @@ public class SentencePattern
 		return true;
 	}
 
+	/**
+	 * @return Number of CompName places in the pattern
+	 */
+	public int getCompCount()
+	{
+		int count = 0;
+		for (String word : words)
+		{
+			if (word == null)
+				count++;
+
+		}
+		return count;
+	}
+
 }

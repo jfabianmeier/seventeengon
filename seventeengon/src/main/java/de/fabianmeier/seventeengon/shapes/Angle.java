@@ -1,8 +1,6 @@
 package de.fabianmeier.seventeengon.shapes;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -10,28 +8,34 @@ import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.GeoVisible;
 
-public class Triangle extends AtomicGeoObject
+public class Angle extends AtomicGeoObject
 {
 
-	private final XYpoint pointA;
-	private final XYpoint pointB;
-	private final XYpoint pointC;
+	private final XYvector direction1;
+	private final XYpoint vertex;
+	private final XYvector direction2;
+
+	private final Triangle reprTriangle;
 
 	/**
 	 * Generates a triangle
 	 * 
-	 * @param a
+	 * @param onRay1
 	 *            first point
-	 * @param b
+	 * @param vertex
 	 *            second point
-	 * @param c
+	 * @param onRay2
 	 *            third point
 	 */
-	public Triangle(XYpoint a, XYpoint b, XYpoint c)
+	public Angle(XYpoint onRay1, XYpoint vertex, XYpoint onRay2)
 	{
-		pointA = a;
-		pointB = b;
-		pointC = c;
+		this.vertex = vertex;
+
+		direction1 = new XYvector(vertex, onRay1).normed();
+		direction2 = new XYvector(vertex, onRay2).normed();
+
+		reprTriangle = new Triangle(direction1.multiplyBy(10000).shift(vertex),
+				vertex, direction2.multiplyBy(10000).shift(vertex));
 	}
 
 	/*
@@ -44,9 +48,7 @@ public class Triangle extends AtomicGeoObject
 	@Override
 	public void draw(GeoCanvas canvas, String label, GeoVisible visi)
 	{
-		canvas.drawLine(pointA, pointB, label, visi);
-		canvas.drawLine(pointB, pointC, null, visi);
-		canvas.drawLine(pointC, pointA, null, visi);
+		canvas.drawAngle(vertex, direction1, direction2, label, visi);
 
 	}
 
@@ -59,27 +61,27 @@ public class Triangle extends AtomicGeoObject
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Triangle other = (Triangle) obj;
-		if (pointA == null)
+		Angle other = (Angle) obj;
+		if (direction1 == null)
 		{
-			if (other.pointA != null)
+			if (other.direction1 != null)
 				return false;
 		}
-		else if (!pointA.equals(other.pointA))
+		else if (!direction1.equals(other.direction1))
 			return false;
-		if (pointB == null)
+		if (direction2 == null)
 		{
-			if (other.pointB != null)
+			if (other.direction2 != null)
 				return false;
 		}
-		else if (!pointB.equals(other.pointB))
+		else if (!direction2.equals(other.direction2))
 			return false;
-		if (pointC == null)
+		if (vertex == null)
 		{
-			if (other.pointC != null)
+			if (other.vertex != null)
 				return false;
 		}
-		else if (!pointC.equals(other.pointC))
+		else if (!vertex.equals(other.vertex))
 			return false;
 		return true;
 	}
@@ -92,35 +94,27 @@ public class Triangle extends AtomicGeoObject
 
 	private XYpoint getPoint(double factor1, double factor2)
 	{
-		XYvector vectorAB = new XYvector(pointA, pointB);
-		XYvector vectorAC = new XYvector(pointA, pointC);
 
-		if (factor1 + factor2 > 1)
-		{
-			factor1 = 1 - factor1;
-			factor2 = 1 - factor2;
-		}
+		XYvector vector1 = direction1.multiplyBy(factor1);
+		XYvector vector2 = direction2.multiplyBy(factor2);
 
-		vectorAB = vectorAB.multiplyBy(factor1);
-		vectorAC = vectorAC.multiplyBy(factor2);
-
-		return vectorAC.shift(vectorAB.shift(pointA));
+		return vector1.shift(vector2.shift(vertex));
 
 	}
 
-	public XYpoint getPointA()
+	public XYvector getDirection1()
 	{
-		return pointA;
+		return direction1;
 	}
 
-	public XYpoint getPointB()
+	public XYpoint getVertex()
 	{
-		return pointB;
+		return vertex;
 	}
 
-	public XYpoint getPointC()
+	public XYvector getDirection2()
 	{
-		return pointC;
+		return direction2;
 	}
 
 	@Override
@@ -135,9 +129,11 @@ public class Triangle extends AtomicGeoObject
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((pointA == null) ? 0 : pointA.hashCode());
-		result = prime * result + ((pointB == null) ? 0 : pointB.hashCode());
-		result = prime * result + ((pointC == null) ? 0 : pointC.hashCode());
+		result = prime * result
+				+ ((direction1 == null) ? 0 : direction1.hashCode());
+		result = prime * result
+				+ ((direction2 == null) ? 0 : direction2.hashCode());
+		result = prime * result + ((vertex == null) ? 0 : vertex.hashCode());
 		return result;
 	}
 
@@ -146,37 +142,41 @@ public class Triangle extends AtomicGeoObject
 	{
 		if (geoObject instanceof XYpoint)
 		{
-			return IntersectionManager.intersect(this, (XYpoint) geoObject);
+			return IntersectionManager.intersect(reprTriangle,
+					(XYpoint) geoObject);
 		}
 		if (geoObject instanceof Line)
 		{
-			return IntersectionManager.intersect(this, (Line) geoObject);
+			return IntersectionManager.intersect(reprTriangle,
+					(Line) geoObject);
 		}
 		if (geoObject instanceof Arc)
 		{
-			return IntersectionManager.intersect(this, (Arc) geoObject);
+			return IntersectionManager.intersect(reprTriangle, (Arc) geoObject);
 		}
 		if (geoObject instanceof Triangle)
 		{
-			return IntersectionManager.intersect(this, (Triangle) geoObject);
+			return IntersectionManager.intersect(reprTriangle,
+					(Triangle) geoObject);
 		}
 		if (geoObject instanceof Circle)
 		{
-			return IntersectionManager.intersect(this, (Circle) geoObject);
+			return IntersectionManager.intersect(reprTriangle,
+					(Circle) geoObject);
 		}
+
 		return geoObject.intersectWith(this);
 
 	}
 
-	// @Override
 	// public void paint(Graphics2D g2d)
 	// {
 	// // setColourAndStroke(g2d);
 	//
 	// Path2D path = new Path2D.Double();
 	//
-	// path.moveTo(pointA.getX(), pointA.getY());
-	// path.lineTo(pointB.getX(), pointB.getY());
+	// path.moveTo(pointRay1.getX(), pointRay1.getY());
+	// path.lineTo(vertex.getX(), vertex.getY());
 	// path.lineTo(pointC.getX(), pointC.getY());
 	//
 	// path.closePath();
@@ -187,10 +187,8 @@ public class Triangle extends AtomicGeoObject
 	@Override
 	public String toString()
 	{
-		String localLabel = "ABC";
-
-		return localLabel + "(" + pointA.toString() + "; " + pointB.toString()
-				+ "; " + pointC.toString() + ")";
+		return "<" + direction1.multiplyBy(100).shift(vertex) + vertex
+				+ direction2.multiplyBy(100).shift(vertex);
 	}
 
 	/*
@@ -201,12 +199,7 @@ public class Triangle extends AtomicGeoObject
 	@Override
 	public GeoObject getBoundary()
 	{
-		List<GeoObject> lines = new ArrayList<GeoObject>();
-		lines.add(new Line(getPointA(), getPointB(), 0, 1));
-		lines.add(new Line(getPointB(), getPointC(), 0, 1));
-		lines.add(new Line(getPointC(), getPointA(), 0, 1));
-
-		return new CompositeGeoObject(lines);
+		return reprTriangle.getBoundary();
 
 	}
 

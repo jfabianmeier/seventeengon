@@ -1,25 +1,23 @@
 package de.fabianmeier.seventeengon.shapes;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
-import de.fabianmeier.seventeengon.util.Angle;
 import de.fabianmeier.seventeengon.util.GeoVisible;
+import de.fabianmeier.seventeengon.util.NumericAngle;
 
-public class Arc extends PshapeImpl
+public class Arc extends AtomicGeoObject
 {
 
 	private final XYpoint centre;
-	private final Angle endAngle;
+	private final NumericAngle endAngle;
 
 	private final double radius;
-	private final Angle startAngle;
+	private final NumericAngle startAngle;
 
 	/**
 	 * 
@@ -32,7 +30,8 @@ public class Arc extends PshapeImpl
 	 * @param endAngle
 	 *            End Angle
 	 */
-	public Arc(XYpoint centre, double radius, Angle startAngle, Angle endAngle)
+	public Arc(XYpoint centre, double radius, NumericAngle startAngle,
+			NumericAngle endAngle)
 	{
 		this.centre = centre;
 		this.radius = radius;
@@ -51,7 +50,8 @@ public class Arc extends PshapeImpl
 	 */
 	public Arc(XYpoint centre, double radius)
 	{
-		this(centre, radius, new Angle(0), new Angle(2 * Math.PI));
+		this(centre, radius, new NumericAngle(0),
+				new NumericAngle(2 * Math.PI));
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class Arc extends PshapeImpl
 	 *            Angle
 	 * @return if the angle is part of the arc.
 	 */
-	public boolean containsAngle(Angle angle)
+	public boolean containsAngle(NumericAngle angle)
 	{
 		return angle.inBetween(startAngle, endAngle);
 
@@ -122,13 +122,13 @@ public class Arc extends PshapeImpl
 		return true;
 	}
 
-	public Angle getAngle(XYpoint point)
+	public NumericAngle getAngle(XYpoint point)
 	{
 		XYvector vector = new XYvector(centre, point);
 		return vector.getAngle();
 	}
 
-	public XYpoint getAnglePoint(Angle angle)
+	public XYpoint getAnglePoint(NumericAngle angle)
 	{
 		XYvector vector = new XYvector(radius, angle);
 		return vector.shift(centre);
@@ -145,7 +145,7 @@ public class Arc extends PshapeImpl
 		return 1;
 	}
 
-	public Angle getEndAngle()
+	public NumericAngle getEndAngle()
 	{
 		return endAngle;
 	}
@@ -157,24 +157,14 @@ public class Arc extends PshapeImpl
 
 	private XYpoint getPoint(double nextDouble)
 	{
-		Angle angle = startAngle.addtoAngle(
-				Angle.angleDifference(startAngle, endAngle) * nextDouble);
+		NumericAngle angle = startAngle
+				.addtoAngle(NumericAngle.angleDifference(startAngle, endAngle)
+						* nextDouble);
 
 		XYvector radVector = (new XYvector(angle.cos(), angle.sin()))
 				.multiplyBy(radius);
 
 		return radVector.shift(centre);
-	}
-
-	@Override
-	public int getPseudoHash()
-	{
-		double didu = 1000 * startAngle.asDouble() + 100 * endAngle.asDouble()
-				+ 234 * radius;
-
-		int diduInt = (int) Math.round(didu);
-
-		return centre.getPseudoHash() + diduInt;
 	}
 
 	public double getRadius()
@@ -185,11 +175,11 @@ public class Arc extends PshapeImpl
 	@Override
 	public XYpoint getSamplePoint(int sampleNumber)
 	{
-		Random rand = new Random(sampleNumber + getPseudoHash());
+		Random rand = new Random(sampleNumber + hashCode());
 		return getPoint(rand.nextDouble());
 	}
 
-	public Angle getStartAngle()
+	public NumericAngle getStartAngle()
 	{
 		return startAngle;
 	}
@@ -206,7 +196,7 @@ public class Arc extends PshapeImpl
 		int result = 1;
 		result = prime * result + ((centre == null) ? 0 : centre.hashCode());
 		result = prime * result + (int) DMan
-				.doubleHash(Angle.angleDifference(startAngle, endAngle));
+				.doubleHash(NumericAngle.angleDifference(startAngle, endAngle));
 		long temp;
 		temp = DMan.doubleHash(radius);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -215,61 +205,61 @@ public class Arc extends PshapeImpl
 	}
 
 	@Override
-	public Set<Pshape> intersectWith(Pshape pshape)
+	public GeoObject intersectWith(GeoObject geoObject)
 	{
-		if (pshape instanceof XYpoint)
+		if (geoObject instanceof XYpoint)
 		{
-			return IntersectionManager.intersect(this, (XYpoint) pshape);
+			return IntersectionManager.intersect(this, (XYpoint) geoObject);
 		}
-		if (pshape instanceof Line)
+		if (geoObject instanceof Line)
 		{
-			return IntersectionManager.intersect(this, (Line) pshape);
+			return IntersectionManager.intersect(this, (Line) geoObject);
 		}
-		if (pshape instanceof Arc)
+		if (geoObject instanceof Arc)
 		{
-			return IntersectionManager.intersect(this, (Arc) pshape);
+			return IntersectionManager.intersect(this, (Arc) geoObject);
 		}
-		if (pshape instanceof Triangle)
+		if (geoObject instanceof Triangle)
 		{
-			return IntersectionManager.intersect(this, (Triangle) pshape);
+			return IntersectionManager.intersect(this, (Triangle) geoObject);
 		}
-		if (pshape instanceof Circle)
+		if (geoObject instanceof Circle)
 		{
-			return IntersectionManager.intersect(this, (Circle) pshape);
+			return IntersectionManager.intersect(this, (Circle) geoObject);
 		}
 
-		return null;
+		return geoObject.intersectWith(this);
 
 	}
-
-	@Override
-	public void paint(Graphics2D g2d)
-	{
-		// setColourAndStroke(g2d);
-
-		if (!startAngle.equals(endAngle))
-		{
-
-			g2d.draw(new Arc2D.Double(centre.getX() - radius,
-					centre.getY() - radius, 2 * radius, 2 * radius,
-					-startAngle.asDouble() * 180 / Math.PI,
-					-Angle.angleDifference(startAngle, endAngle) * 180
-							/ Math.PI,
-					Arc2D.OPEN));
-		}
-		else
-		{
-
-			g2d.draw(new Ellipse2D.Double(centre.getX() - radius,
-					centre.getY() - radius, 2 * radius, 2 * radius));
-		}
-
-	}
+	//
+	// @Override
+	// public void paint(Graphics2D g2d)
+	// {
+	// // setColourAndStroke(g2d);
+	//
+	// if (!startAngle.equals(endAngle))
+	// {
+	//
+	// g2d.draw(new Arc2D.Double(centre.getX() - radius,
+	// centre.getY() - radius, 2 * radius, 2 * radius,
+	// -startAngle.asDouble() * 180 / Math.PI,
+	// -NumericAngle.angleDifference(startAngle, endAngle) * 180
+	// / Math.PI,
+	// Arc2D.OPEN));
+	// }
+	// else
+	// {
+	//
+	// g2d.draw(new Ellipse2D.Double(centre.getX() - radius,
+	// centre.getY() - radius, 2 * radius, 2 * radius));
+	// }
+	//
+	// }
 
 	@Override
 	public String toString()
 	{
-		String localLabel = "Circle";
+		String localLabel = "Arc";
 
 		String back = localLabel + ": " + centre.toString() + " >> "
 				+ showValue(radius);
@@ -303,6 +293,18 @@ public class Arc extends PshapeImpl
 	{
 		return new Circle(getCentre(), getRadius(), getStartAngle(),
 				getEndAngle());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#getZeroDimensionalPart()
+	 */
+	@Override
+	public Set<XYpoint> getZeroDimensionalPart()
+	{
+		return new HashSet<XYpoint>();
 	}
 
 }

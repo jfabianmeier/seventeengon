@@ -2,7 +2,7 @@
  * s
  * 
  */
-package de.fabianmeier.seventeengon.processing;
+package de.fabianmeier.seventeengon.generator;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,7 +32,7 @@ public class RecursiveGeoGenerator implements GeoGenerator
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.fabianmeier.seventeengon.processing.GeoGenerator#generateAndAdd(de.
+	 * de.fabianmeier.seventeengon.generator.GeoGenerator#generateAndAdd(de.
 	 * fabianmeier.seventeengon.geoobjects.GeoHolder,
 	 * de.fabianmeier.seventeengon.naming.CompName)
 	 */

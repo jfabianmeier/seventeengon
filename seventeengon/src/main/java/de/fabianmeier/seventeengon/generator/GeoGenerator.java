@@ -1,4 +1,4 @@
-package de.fabianmeier.seventeengon.processing;
+package de.fabianmeier.seventeengon.generator;
 
 import java.io.IOException;
 

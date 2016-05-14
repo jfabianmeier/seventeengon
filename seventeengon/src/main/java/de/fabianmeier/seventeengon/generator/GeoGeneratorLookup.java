@@ -1,4 +1,4 @@
-package de.fabianmeier.seventeengon.processing;
+package de.fabianmeier.seventeengon.generator;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +27,26 @@ public class GeoGeneratorLookup
 
 	static
 	{
-		add(new Sentence("Sei P ein Punkt"), new PointGenerator());
-		add(new Sentence("Sei ABC ein Dreieck"), new TriangleGenerator());
+		add(AngleGenerator.ANGLE, new AngleGenerator());
+		add(AngleGenerator.BAC, new AngleGenerator());
+		add(CircleGenerator.CIRCLE, new CircleGenerator());
+		add(LineGenerator.LINE, new LineGenerator());
+		add(LineGenerator.AB, new LineGenerator());
+		add(PointGenerator.CUT, new PointGenerator());
+		add(PointGenerator.INSIDE, new PointGenerator());
+		add(PointGenerator.INX, new PointGenerator());
+		add(PointGenerator.ONX, new PointGenerator());
+		add(PointGenerator.OUTSIDE, new PointGenerator());
+		add(PointGenerator.OVER, new PointGenerator());
+		add(PointGenerator.OVERINSIDE, new PointGenerator());
+		add(PointGenerator.SIMPLE, new PointGenerator());
+		add(SegmentGenerator.SEGMENT, new SegmentGenerator());
+		add(SegmentGenerator.AB, new SegmentGenerator());
+		add(TriangleGenerator.TRIANGLE, new TriangleGenerator());
+		add(TriangleGenerator.ABC, new TriangleGenerator());
+
+		// add(new Sentence("Sei P ein Punkt"), new PointGenerator());
+		// add(new Sentence("Sei ABC ein Dreieck"), new TriangleGenerator());
 
 		try
 		{
@@ -88,7 +106,7 @@ public class GeoGeneratorLookup
 			return pattern;
 
 		ReducedSentencePattern reducedPattern = new ReducedSentencePattern(
-				input);
+				pattern);
 		SentencePattern pattern2 = secondLookUp.get(reducedPattern);
 
 		if (pattern2 != null)
@@ -111,7 +129,7 @@ public class GeoGeneratorLookup
 		}
 
 		throw new IOException(
-				"No compatible pattern found for" + pattern + ".");
+				"No compatible pattern found for " + pattern + ".");
 
 	}
 
@@ -125,12 +143,12 @@ public class GeoGeneratorLookup
 	 * @throws IOException
 	 *             if some sentence is not well-formed or not recorded.
 	 */
-	public static void generateAndAdd(GeoHolder geoHolder, Sentence input)
+	public static boolean generateAndAdd(GeoHolder geoHolder, Sentence input)
 			throws IOException
 	{
 		SentencePattern pattern = getValidSentencePattern(input);
 		GeoGenerator generator = get(pattern);
-		generator.generateAndAdd(geoHolder,
+		return generator.generateAndAdd(geoHolder,
 				generateNewSentenceForPattern(pattern, input));
 	}
 
@@ -192,16 +210,16 @@ public class GeoGeneratorLookup
 	/**
 	 * adds a sentence/geoGenerator pair to the dictionary
 	 * 
-	 * @param sentence
-	 *            Sentence
+	 * @param sentencePattern
+	 *            SentencePattern
 	 * @param geoGen
 	 *            GeoGenerator
 	 */
-	public static void add(Sentence sentence, GeoGenerator geoGen)
+	public static void add(SentencePattern sentencePattern, GeoGenerator geoGen)
 	{
-		lookUp.put(new SentencePattern(sentence), geoGen);
-		secondLookUp.put(new ReducedSentencePattern(sentence),
-				new SentencePattern(sentence));
+		lookUp.put(sentencePattern, geoGen);
+		secondLookUp.put(new ReducedSentencePattern(sentencePattern),
+				sentencePattern);
 	}
 
 	/**
@@ -217,13 +235,13 @@ public class GeoGeneratorLookup
 		GeoGenerator localGeo = new RecursiveGeoGenerator(sentence,
 				replacement);
 
-		add(sentence, localGeo);
+		add(new SentencePattern(sentence), localGeo);
 
 	}
 
-	public static void add(CompName compName, GeoGenerator geoGen)
+	public static void add(CompNamePattern compNamePattern, GeoGenerator geoGen)
 	{
-		compLookUp.put(new CompNamePattern(compName), geoGen);
+		compLookUp.put(compNamePattern, geoGen);
 	}
 
 }

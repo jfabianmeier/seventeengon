@@ -10,12 +10,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.fabianmeier.seventeengon.generator.GeoGenerator;
+import de.fabianmeier.seventeengon.generator.GeoGeneratorLookup;
 import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
 import de.fabianmeier.seventeengon.geoobjects.SampleGenerator;
 import de.fabianmeier.seventeengon.geoobjects.TextualCanvas;
 import de.fabianmeier.seventeengon.naming.Sentence;
-import de.fabianmeier.seventeengon.processing.GeoGenerator;
-import de.fabianmeier.seventeengon.processing.GeoGeneratorLookup;
 
 /**
  * @author JFM
@@ -32,7 +32,7 @@ public class GeoGeneratorTest
 
 	/**
 	 * Test method for
-	 * {@link de.fabianmeier.seventeengon.processing.GeoGeneratorLookup#get(java.lang.String)}
+	 * {@link de.fabianmeier.seventeengon.generator.GeoGeneratorLookup#get(java.lang.String)}
 	 * .
 	 * 
 	 * @throws IOException
@@ -59,7 +59,7 @@ public class GeoGeneratorTest
 
 	/**
 	 * Test method for
-	 * {@link de.fabianmeier.seventeengon.processing.GeoGeneratorLookup#add(java.lang.String, java.util.List)}
+	 * {@link de.fabianmeier.seventeengon.generator.GeoGeneratorLookup#add(java.lang.String, java.util.List)}
 	 * .
 	 * 
 	 * @throws IOException
@@ -92,7 +92,7 @@ public class GeoGeneratorTest
 
 	/**
 	 * Test method for
-	 * {@link de.fabianmeier.seventeengon.processing.GeoGeneratorLookup#add(java.lang.String, java.util.List)}
+	 * {@link de.fabianmeier.seventeengon.generator.GeoGeneratorLookup#add(java.lang.String, java.util.List)}
 	 * .
 	 * 
 	 * @throws IOException
@@ -120,7 +120,7 @@ public class GeoGeneratorTest
 
 	/**
 	 * Test method for
-	 * {@link de.fabianmeier.seventeengon.processing.GeoGeneratorLookup#add(java.lang.String, java.util.List)}
+	 * {@link de.fabianmeier.seventeengon.generator.GeoGeneratorLookup#add(java.lang.String, java.util.List)}
 	 * .
 	 * 
 	 * @throws IOException

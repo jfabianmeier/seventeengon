@@ -11,7 +11,7 @@
 // import de.fabianmeier.seventeengon.shapes.Gshape;
 // import de.fabianmeier.seventeengon.shapes.GshapeImpl;
 // import de.fabianmeier.seventeengon.shapes.Line;
-// import de.fabianmeier.seventeengon.shapes.Pshape;
+// import de.fabianmeier.seventeengon.shapes.GeoObject;
 // import de.fabianmeier.seventeengon.shapes.Triangle;
 // import de.fabianmeier.seventeengon.shapes.XYpoint;
 //
@@ -33,11 +33,11 @@
 //
 // Line line = new Line(new XYpoint(0, 10), new XYpoint(30, 60));
 //
-// Set<Pshape> cut = circle.intersectWith(triangle);
+// Set<GeoObject> cut = circle.intersectWith(triangle);
 //
-// Set<Pshape> cut2 = line.intersectWith(triangle);
+// Set<GeoObject> cut2 = line.intersectWith(triangle);
 //
-// Set<Pshape> circtri = new HashSet<Pshape>();
+// Set<GeoObject> circtri = new HashSet<GeoObject>();
 //
 // circtri.add(triangle);
 // circtri.add(circle);

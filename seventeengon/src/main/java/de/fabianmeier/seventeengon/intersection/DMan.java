@@ -24,24 +24,13 @@ public class DMan
 	 * 
 	 * @param a
 	 *            double value
-	 * @return a long value that is either the rounded value of a multiplied
-	 *         with a million or a representative of positive or negative
-	 *         infinity if the absolute value of a exceeds one million
+	 * @return a long value that is the rounded value of a multiplied with a
+	 *         million
 	 */
 	public static long doubleHash(double a)
 	{
-		if (a > 1000000)
-			return 1000000 * 100000;
-
-		if (a < -1000000)
-			return -1000000 * 100000;
 
 		return Math.round(a * 100000);
-	}
-
-	public static boolean isInfinite(double a)
-	{
-		return (a > 1000000 || a < -1000000);
 	}
 
 	/**

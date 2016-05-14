@@ -15,7 +15,7 @@
 // import org.w3c.dom.Document;
 //
 // import de.fabianmeier.seventeengon.shapes.Gshape;
-// import de.fabianmeier.seventeengon.shapes.Pshape;
+// import de.fabianmeier.seventeengon.shapes.GeoObject;
 //
 // public class ToSVG
 // {
@@ -42,10 +42,10 @@
 //
 // for (int i = 0; i <= 2; i++)
 // for (Gshape gshape : gshapeSet)
-// for (Pshape pshape : gshape.getPrimitiveShapes())
+// for (GeoObject GeoObject : gshape.getPrimitiveShapes())
 // {
-// if (pshape.getVisibility() == i)
-// pshape.paint(svgGenerator);
+// if (GeoObject.getVisibility() == i)
+// GeoObject.paint(svgGenerator);
 // }
 //
 // // Finally, stream out SVG to the standard output using

@@ -1,7 +1,7 @@
 package de.fabianmeier.seventeengon.shapes;
 
 import de.fabianmeier.seventeengon.intersection.DMan;
-import de.fabianmeier.seventeengon.util.Angle;
+import de.fabianmeier.seventeengon.util.NumericAngle;
 
 public class XYvector
 {
@@ -34,7 +34,7 @@ public class XYvector
 		yMove = end.getY() - start.getY();
 	}
 
-	public XYvector(double radius, Angle angle)
+	public XYvector(double radius, NumericAngle angle)
 	{
 		xMove = radius * angle.cos();
 		yMove = radius * angle.sin();
@@ -75,16 +75,16 @@ public class XYvector
 	 * 
 	 * @return the angle of the vector to the positive x-axis.
 	 */
-	public Angle getAngle()
+	public NumericAngle getAngle()
 	{
 		if (DMan.same(0, getLength()))
 			throw new UnsupportedOperationException("No angle for null vector");
 		double angle = Math.acos(xMove / getLength());
 
 		if (yMove > 0)
-			return new Angle(angle);
+			return new NumericAngle(angle);
 		else
-			return new Angle(2 * Math.PI - angle);
+			return new NumericAngle(2 * Math.PI - angle);
 
 	}
 

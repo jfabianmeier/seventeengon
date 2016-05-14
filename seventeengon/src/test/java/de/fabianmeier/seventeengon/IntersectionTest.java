@@ -5,21 +5,22 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Set;
-
 import org.junit.Test;
 
 import de.fabianmeier.seventeengon.shapes.Arc;
 import de.fabianmeier.seventeengon.shapes.Circle;
-import de.fabianmeier.seventeengon.shapes.CompositeGeoObject;
 import de.fabianmeier.seventeengon.shapes.GeoObject;
 import de.fabianmeier.seventeengon.shapes.Line;
-import de.fabianmeier.seventeengon.shapes.Pshape;
 import de.fabianmeier.seventeengon.shapes.Triangle;
 import de.fabianmeier.seventeengon.shapes.XYpoint;
 
 public class IntersectionTest
 {
+
+	private static boolean pointAssert(GeoObject geo, double x, double y)
+	{
+		return (geo.containsPoint(new XYpoint(x, y)));
+	}
 
 	@Test
 	public void testIntersectXYpointXYpoint()
@@ -38,9 +39,9 @@ public class IntersectionTest
 		XYpoint point1 = new XYpoint(10, 30);
 		Line line = new Line(new XYpoint(0, 20), new XYpoint(20, 40));
 
-		Set<Pshape> back = line.intersectWith(point1);
+		GeoObject back = line.intersectWith(point1);
 
-		assertTrue(back.contains(point1));
+		assertTrue(back.containsPoint(point1));
 
 		XYpoint point2 = new XYpoint(0, 0);
 
@@ -105,18 +106,16 @@ public class IntersectionTest
 		Line line = new Line(new XYpoint(0, 10), new XYpoint(0, 30));
 		Line line2 = new Line(new XYpoint(10, 0), new XYpoint(40, 0));
 
-		Set<Pshape> cut = line.intersectWith(line2);
-		assertTrue(cut.contains(new XYpoint(0, 0)));
+		GeoObject cut = line.intersectWith(line2);
+		assertTrue(cut.containsPoint(new XYpoint(0, 0)));
 
 		Line line3 = new Line(new XYpoint(0, 43), new XYpoint(0, 40));
 
 		cut = line.intersectWith(line3);
 
-		GeoObject geo = CompositeGeoObject.getCompositeGeoObject(cut);
-
-		assertTrue(geo.containsPoint(new XYpoint(0, 40)));
-		assertTrue(geo.containsPoint(new XYpoint(0, 42)));
-		assertTrue(geo.containsPoint(new XYpoint(0, 43)));
+		assertTrue(cut.containsPoint(new XYpoint(0, 40)));
+		assertTrue(cut.containsPoint(new XYpoint(0, 42)));
+		assertTrue(cut.containsPoint(new XYpoint(0, 43)));
 
 	}
 
@@ -126,10 +125,10 @@ public class IntersectionTest
 		Line line = new Line(new XYpoint(10, 10), new XYpoint(10, 40));
 		Arc circle = new Arc(new XYpoint(10, 10), 10);
 
-		Set<Pshape> cut = circle.intersectWith(line);
+		GeoObject cut = circle.intersectWith(line);
 
-		assertTrue(cut.contains(new XYpoint(10, 0)));
-		assertTrue(cut.contains(new XYpoint(10, 20)));
+		assertTrue(cut.containsPoint(new XYpoint(10, 0)));
+		assertTrue(cut.containsPoint(new XYpoint(10, 20)));
 	}
 
 	@Test
@@ -139,12 +138,10 @@ public class IntersectionTest
 		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10),
 				new XYpoint(10, 0));
 
-		Set<Pshape> cut = line.intersectWith(triangle);
+		GeoObject cut = line.intersectWith(triangle);
 
-		Line line2 = (Line) cut.iterator().next();
-
-		assertFalse(line2.intersectWith(new XYpoint(0, 5)).isEmpty());
-		assertTrue(line2.intersectWith(new XYpoint(0, 15)).isEmpty());
+		assertTrue(cut.containsPoint(new XYpoint(0, 5)));
+		assertFalse(cut.containsPoint(new XYpoint(0, 15)));
 	}
 
 	@Test
@@ -154,11 +151,11 @@ public class IntersectionTest
 
 		Line line = new Line(new XYpoint(0, 0), new XYpoint(0, 10));
 
-		Set<Pshape> cut = line.intersectWith(fcirc);
+		GeoObject cut = line.intersectWith(fcirc);
 
-		assertTrue(cut.size() == 1);
-
-		assertTrue(cut.iterator().next() instanceof Line);
+		assertTrue(pointAssert(cut, 0, -10));
+		assertTrue(pointAssert(cut, 0, 10));
+		assertFalse(pointAssert(cut, 3, 3));
 
 	}
 
@@ -176,9 +173,9 @@ public class IntersectionTest
 	{
 		Arc circle = new Arc(new XYpoint(0, 0), 10);
 		Line line = new Line(new XYpoint(10, 0), new XYpoint(10, 20));
-		Set<Pshape> cut = line.intersectWith(circle);
+		GeoObject cut = line.intersectWith(circle);
 
-		assertTrue(cut.contains(new XYpoint(10, 0)));
+		assertTrue(pointAssert(cut, 10, 0));
 	}
 
 	@Test
@@ -187,10 +184,10 @@ public class IntersectionTest
 		Arc circle1 = new Arc(new XYpoint(0, 0), 5);
 		Arc circle2 = new Arc(new XYpoint(0, 8), 5);
 
-		Set<Pshape> cut = circle1.intersectWith(circle2);
+		GeoObject cut = circle1.intersectWith(circle2);
 
-		assertTrue(cut.contains(new XYpoint(3, 4)));
-		assertTrue(cut.contains(new XYpoint(-3, 4)));
+		assertTrue(pointAssert(cut, 3, 4));
+		assertTrue(pointAssert(cut, -3, 4));
 	}
 
 	@Test
@@ -200,32 +197,34 @@ public class IntersectionTest
 				new XYpoint(10, 0));
 		Arc circle = new Arc(new XYpoint(0, 0), 10);
 
-		Set<Pshape> cut = triangle.intersectWith(circle);
+		GeoObject cut = triangle.intersectWith(circle);
 
-		assertTrue(cut.contains(new XYpoint(0, 10)));
-		assertTrue(cut.contains(new XYpoint(10, 0)));
+		assertTrue(pointAssert(cut, 0, 10));
+		assertTrue(pointAssert(cut, 10, 0));
 	}
 
 	@Test
 	public void testIntersectCircleFilledCircle()
 	{
-		Arc circle = new Arc(new XYpoint(0, 0), 5);
+		Arc arc = new Arc(new XYpoint(0, 0), 5);
 		Circle fcirc = new Circle(new XYpoint(0, 5), 10);
 
-		Set<Pshape> cut = circle.intersectWith(fcirc);
+		GeoObject cut = arc.intersectWith(fcirc);
 
-		assertTrue(cut.contains(circle));
+		assertTrue(pointAssert(cut, 0, 5));
+		assertTrue(pointAssert(cut, 5, 0));
 	}
 
 	@Test
 	public void testIntersectCircleFilledCircle2()
 	{
-		Arc circle = new Arc(new XYpoint(0, 0), 5);
+		Arc arc = new Arc(new XYpoint(0, 0), 5);
 		Circle fcirc = new Circle(new XYpoint(0, 5), 100);
 
-		Set<Pshape> cut = circle.intersectWith(fcirc);
+		GeoObject cut = arc.intersectWith(fcirc);
 
-		assertTrue(cut.contains(circle));
+		assertTrue(pointAssert(cut, 0, 5));
+		assertTrue(pointAssert(cut, 5, 0));
 	}
 
 	@Test
@@ -235,8 +234,8 @@ public class IntersectionTest
 				new XYpoint(-1, 10), new XYpoint(10, -1));
 		XYpoint point = new XYpoint(0, 0);
 
-		Set<Pshape> cut = point.intersectWith(triangle);
-		assertTrue(cut.contains(point));
+		GeoObject cut = point.intersectWith(triangle);
+		assertTrue(pointAssert(cut, 0, 0));
 	}
 
 	@Test
@@ -246,9 +245,9 @@ public class IntersectionTest
 		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(10, 10),
 				new XYpoint(0, 10));
 
-		Set<Pshape> cut = line.intersectWith(triangle);
+		GeoObject cut = line.intersectWith(triangle);
 
-		assertTrue(cut.contains(new XYpoint(0, 0)));
+		assertTrue(pointAssert(cut, 0, 0));
 	}
 
 	@Test
@@ -258,7 +257,7 @@ public class IntersectionTest
 		Triangle triangle = new Triangle(new XYpoint(10, 10),
 				new XYpoint(10, 20), new XYpoint(20, 20));
 
-		Set<Pshape> cut = triangle.intersectWith(circle);
+		GeoObject cut = triangle.intersectWith(circle);
 
 		assertTrue(cut.isEmpty());
 	}
@@ -271,9 +270,9 @@ public class IntersectionTest
 		Triangle triangle2 = new Triangle(new XYpoint(0, 0),
 				new XYpoint(-10, 0), new XYpoint(0, -10));
 
-		Set<Pshape> cut = triangle1.intersectWith(triangle2);
+		GeoObject cut = triangle1.intersectWith(triangle2);
 
-		assertTrue(cut.contains(new XYpoint(0, 0)));
+		assertTrue(pointAssert(cut, 0, 0));
 	}
 
 	@Test
@@ -283,16 +282,9 @@ public class IntersectionTest
 				new XYpoint(10, 0));
 		Circle fcirc = new Circle(new XYpoint(0, 0), 5);
 
-		Set<Pshape> cut = triangle.intersectWith(fcirc);
+		GeoObject cut = triangle.intersectWith(fcirc);
 
-		for (Pshape pshape : cut)
-		{
-			if (pshape instanceof Circle)
-			{
-				Circle fcirc2 = (Circle) pshape;
-				assertFalse(fcirc2.intersectWith(new XYpoint(3, 3)).isEmpty());
-			}
-		}
+		assertTrue(pointAssert(cut, 3, 3));
 
 	}
 
@@ -302,7 +294,7 @@ public class IntersectionTest
 		Circle fcirc = new Circle(new XYpoint(10, 20), 3);
 		XYpoint point = new XYpoint(11, 21);
 
-		Set<Pshape> cut = fcirc.intersectWith(point);
+		GeoObject cut = fcirc.intersectWith(point);
 
 		assertFalse(cut.isEmpty());
 	}
@@ -314,16 +306,9 @@ public class IntersectionTest
 
 		Line line = new Line(new XYpoint(2, 10), new XYpoint(2, 0));
 
-		Set<Pshape> cut = line.intersectWith(fcirc);
+		GeoObject cut = line.intersectWith(fcirc);
 
-		for (Pshape pshape : cut)
-		{
-			if (pshape instanceof Line)
-			{
-				Line line2 = (Line) pshape;
-				assertFalse(line2.intersectWith(new XYpoint(2, 1)).isEmpty());
-			}
-		}
+		assertTrue(pointAssert(cut, 2, 1));
 	}
 
 	@Test
@@ -332,16 +317,9 @@ public class IntersectionTest
 		Arc circle = new Arc(new XYpoint(1, 1), 5);
 		Circle fcirc = new Circle(new XYpoint(1, 1), 5);
 
-		Set<Pshape> cut = circle.intersectWith(fcirc);
+		GeoObject cut = circle.intersectWith(fcirc);
 
-		for (Pshape pshape : cut)
-		{
-			if (pshape instanceof Arc)
-			{
-				Arc circle2 = (Arc) pshape;
-				assertFalse(circle2.intersectWith(new XYpoint(6, 1)).isEmpty());
-			}
-		}
+		assertTrue(pointAssert(cut, 6, 1));
 	}
 
 	@Test
@@ -351,17 +329,9 @@ public class IntersectionTest
 		Triangle triangle = new Triangle(new XYpoint(-1, -1),
 				new XYpoint(1, -1), new XYpoint(1, 1));
 
-		Set<Pshape> cut = fcirc.intersectWith(triangle);
+		GeoObject cut = fcirc.intersectWith(triangle);
 
-		for (Pshape pshape : cut)
-		{
-			if (pshape instanceof Triangle)
-			{
-				Triangle triangle2 = (Triangle) pshape;
-				assertFalse(
-						triangle2.intersectWith(new XYpoint(0, 0)).isEmpty());
-			}
-		}
+		assertTrue(pointAssert(cut, 0, 0));
 
 	}
 
@@ -371,16 +341,9 @@ public class IntersectionTest
 		Circle fcirc1 = new Circle(new XYpoint(0, 0), 10);
 		Circle fcirc2 = new Circle(new XYpoint(5, 0), 5);
 
-		Set<Pshape> cut = fcirc1.intersectWith(fcirc2);
+		GeoObject cut = fcirc1.intersectWith(fcirc2);
 
-		for (Pshape pshape : cut)
-		{
-			if (pshape instanceof Circle)
-			{
-				assertFalse(pshape.intersectWith(new XYpoint(6, 1)).isEmpty());
-
-			}
-		}
+		assertTrue(pointAssert(cut, 6, 1));
 	}
 
 }

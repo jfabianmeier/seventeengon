@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fabianmeier.seventeengon.processing;
+package de.fabianmeier.seventeengon.generator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -103,12 +103,12 @@ public class PointGenerator implements GeoGenerator
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.fabianmeier.seventeengon.processing.GeoGenerator#generateAndAdd(de.
+	 * de.fabianmeier.seventeengon.generator.GeoGenerator#generateAndAdd(de.
 	 * fabianmeier.seventeengon.geoobjects.GeoHolder,
 	 * de.fabianmeier.seventeengon.naming.CompName)
 	 */
 	@Override
-	public boolean generateAndAdd(GeoHolder geoHolder, CompName sentence)
+	public boolean generateAndAdd(GeoHolder geoHolder, CompName compName)
 			throws IOException
 	{
 		// TODO Auto-generated method stub

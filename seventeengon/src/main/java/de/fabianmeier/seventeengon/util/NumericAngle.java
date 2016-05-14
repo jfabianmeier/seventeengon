@@ -1,9 +1,9 @@
 package de.fabianmeier.seventeengon.util;
 
 import de.fabianmeier.seventeengon.intersection.DMan;
-import de.fabianmeier.seventeengon.shapes.PshapeImpl;
+import de.fabianmeier.seventeengon.shapes.AtomicGeoObject;
 
-public class Angle
+public class NumericAngle
 {
 	private double normalizedAngle;
 
@@ -16,7 +16,7 @@ public class Angle
 	 * @return positive difference between these angles (as value between 0 and
 	 *         2pi)
 	 */
-	public static double angleDifference(Angle start, Angle end)
+	public static double angleDifference(NumericAngle start, NumericAngle end)
 	{
 		double endAngle = end.normalizedAngle;
 		while (endAngle < start.normalizedAngle)
@@ -45,16 +45,16 @@ public class Angle
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Angle other = (Angle) obj;
+		NumericAngle other = (NumericAngle) obj;
 		if (DMan.doubleHash(normalizedAngle) != DMan
 				.doubleHash(other.normalizedAngle))
 			return false;
 		return true;
 	}
 
-	public Angle addtoAngle(double shift)
+	public NumericAngle addtoAngle(double shift)
 	{
-		return new Angle(normalizedAngle + shift);
+		return new NumericAngle(normalizedAngle + shift);
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class Angle
 	 *            Double value of an angle (arbitrary positive or negative
 	 *            number).
 	 */
-	public Angle(double angle)
+	public NumericAngle(double angle)
 	{
 		while (angle >= 2 * Math.PI)
 			angle -= 2 * Math.PI;
@@ -103,7 +103,7 @@ public class Angle
 	 *            end Angle
 	 * @return If this angle lies in the angle range described by start and end.
 	 */
-	public boolean inBetween(Angle start, Angle end)
+	public boolean inBetween(NumericAngle start, NumericAngle end)
 	{
 		double shiftedAngle = normalizedAngle;
 
@@ -137,7 +137,7 @@ public class Angle
 	@Override
 	public String toString()
 	{
-		return PshapeImpl.showValue(normalizedAngle / Math.PI) + "pi";
+		return AtomicGeoObject.showValue(normalizedAngle / Math.PI) + "pi";
 	}
 
 }

@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.fabianmeier.seventeengon.generator.GeoGenerator;
+import de.fabianmeier.seventeengon.generator.GeoGeneratorLookup;
 import de.fabianmeier.seventeengon.naming.CompName;
 import de.fabianmeier.seventeengon.naming.CompNamePattern;
 import de.fabianmeier.seventeengon.naming.GeoName;
 import de.fabianmeier.seventeengon.naming.Sentence;
-import de.fabianmeier.seventeengon.processing.GeoGenerator;
-import de.fabianmeier.seventeengon.processing.GeoGeneratorLookup;
 import de.fabianmeier.seventeengon.shapes.GeoObject;
 import de.fabianmeier.seventeengon.util.GeoVisible;
 

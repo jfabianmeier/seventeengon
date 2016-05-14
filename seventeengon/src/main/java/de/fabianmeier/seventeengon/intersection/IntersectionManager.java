@@ -9,44 +9,69 @@ import java.util.Set;
 
 import de.fabianmeier.seventeengon.shapes.Arc;
 import de.fabianmeier.seventeengon.shapes.Circle;
+import de.fabianmeier.seventeengon.shapes.CompositeGeoObject;
+import de.fabianmeier.seventeengon.shapes.GeoObject;
 import de.fabianmeier.seventeengon.shapes.Line;
-import de.fabianmeier.seventeengon.shapes.Pshape;
 import de.fabianmeier.seventeengon.shapes.Triangle;
 import de.fabianmeier.seventeengon.shapes.XYpoint;
 import de.fabianmeier.seventeengon.shapes.XYvector;
-import de.fabianmeier.seventeengon.util.Angle;
+import de.fabianmeier.seventeengon.util.NumericAngle;
 
 public class IntersectionManager
 {
-	private static Set<Pshape> circlePieces(Arc circle,
-			Set<XYpoint> pointsOnCircle, Pshape pshape1, Pshape pshape2)
-	{
-		Set<Pshape> pshapeSet = new HashSet<Pshape>();
-		pshapeSet.add(pshape1);
-		pshapeSet.add(pshape2);
 
-		return circlePieces(circle, pointsOnCircle, pshapeSet);
+	private static Set<XYpoint> getAllXYPoints(Set<GeoObject> geoObjectSet)
+	{
+		Set<XYpoint> pointSet = new HashSet<XYpoint>();
+
+		for (GeoObject geo : geoObjectSet)
+		{
+			pointSet.addAll(geo.getZeroDimensionalPart());
+		}
+
+		return pointSet;
 	}
 
-	// Checks for the pieces of circle separated by pointsOnCircle if they
-	// belong to intersectionShapes, assuming that the whole segment is either
-	// in or out.
-	private static Set<Pshape> circlePieces(Arc circle,
-			Set<XYpoint> pointsOnCircle, Set<Pshape> intersectionShapes)
+	private static GeoObject circlePieces(Arc circle,
+			Set<XYpoint> pointsOnCircle, GeoObject GeoObject1,
+			GeoObject GeoObject2)
+	{
+		Set<GeoObject> GeoObjectSet = new HashSet<GeoObject>();
+		GeoObjectSet.add(GeoObject1);
+		GeoObjectSet.add(GeoObject2);
+
+		return circlePieces(circle, pointsOnCircle, GeoObjectSet);
+	}
+
+	/**
+	 * Checks for the pieces of an arc separated by pointsOnCircle if they
+	 * belong to intersectionShapes, assuming that the whole segment is either
+	 * in or out.
+	 * 
+	 * @param arc
+	 *            Arc
+	 * @param pointsOnArc
+	 *            points on the Arc
+	 * @param intersectionShapes
+	 *            Set of elements the arc elements should be in
+	 * @return A list of XYpoints and Arc
+	 */
+	private static GeoObject circlePieces(Arc arc, Set<XYpoint> pointsOnArc,
+			Set<GeoObject> intersectionShapes)
 	{
 
 		List<Double> angleDoubleList = new ArrayList<Double>();
 
-		Set<Pshape> back = new HashSet<Pshape>();
+		Set<GeoObject> back = new HashSet<GeoObject>();
 
-		for (XYpoint point : pointsOnCircle)
+		for (XYpoint point : pointsOnArc)
 		{
-			angleDoubleList.add(circle.getAngle(point).asDouble());
+			angleDoubleList.add(arc.getAngle(point).asDouble());
 			if (containedInAll(intersectionShapes, point))
 				back.add(point);
 		}
 
-		if (pointsOnCircle.isEmpty())
+		if (pointsOnArc.isEmpty())
 		{
 			angleDoubleList.add(0.0);
 		}
@@ -66,30 +91,30 @@ public class IntersectionManager
 
 		for (int i = 0; i < n; i++)
 		{
-			XYpoint point = circle
-					.getAnglePoint(new Angle(betweenAngleDoubeList.get(i)));
+			XYpoint point = arc.getAnglePoint(
+					new NumericAngle(betweenAngleDoubeList.get(i)));
 
 			if (containedInAll(intersectionShapes, point))
 			{
-				back.add(new Arc(circle.getCentre(), circle.getRadius(),
-						new Angle(angleDoubleList.get(i)),
-						new Angle(angleDoubleList.get((i + 1) % n))));
+				back.add(new Arc(arc.getCentre(), arc.getRadius(),
+						new NumericAngle(angleDoubleList.get(i)),
+						new NumericAngle(angleDoubleList.get((i + 1) % n))));
 			}
 
 		}
 
-		return back;
+		return new CompositeGeoObject(back);
 
 	}
 
-	private static boolean containedInAll(Set<Pshape> intersectionShapes,
+	private static boolean containedInAll(Set<GeoObject> intersectionShapes,
 			XYpoint point)
 	{
 		boolean contained = true;
 
-		for (Pshape pshape : intersectionShapes)
+		for (GeoObject geoObject : intersectionShapes)
 		{
-			if (pshape.intersectWith(point).isEmpty())
+			if (!geoObject.containsPoint(point))
 				contained = false;
 		}
 		return contained;
@@ -103,13 +128,11 @@ public class IntersectionManager
 	 *            Arc
 	 * @return if the arcs intersect
 	 */
-	public static Set<Pshape> intersect(Arc arc1, Arc arc2)
+	public static GeoObject intersect(Arc arc1, Arc arc2)
 	{
 
 		if (arc1.getCentre().equals(arc2.getCentre()))
 		{
-			Set<Pshape> back = new HashSet<Pshape>();
-
 			if (DMan.same(arc1.getRadius(), arc2.getRadius()))
 			{
 
@@ -120,14 +143,12 @@ public class IntersectionManager
 				pointSet.add(arc2.getStartPoint());
 				pointSet.add(arc2.getEndPoint());
 
-				back.addAll(circlePieces(arc1, pointSet, arc1, arc2));
-
-				return back;
+				return circlePieces(arc1, pointSet, arc1, arc2);
 
 			}
 			else
 			{
-				return back;
+				return CompositeGeoObject.getEmptyObject();
 			}
 
 		}
@@ -146,17 +167,9 @@ public class IntersectionManager
 
 			Line pseudoLine = new Line(xFactor, yFactor, constant);
 
-			Set<Pshape> intersections = pseudoLine.intersectWith(arc1);
+			GeoObject intersections = pseudoLine.intersectWith(arc1);
 
-			Set<Pshape> back = new HashSet<Pshape>();
-
-			for (Pshape pshape : intersections)
-			{
-				if (!arc2.intersectWith(pshape).isEmpty())
-					back.add(pshape);
-			}
-
-			return back;
+			return intersections.intersectWith(arc2);
 
 		}
 	}
@@ -169,35 +182,27 @@ public class IntersectionManager
 	 *            Circle
 	 * @return if the arc and the circle intersect
 	 */
-	public static Set<Pshape> intersect(Arc arc, Circle fcirc)
+	public static GeoObject intersect(Arc arc, Circle fcirc)
 	{
-		Arc circle2 = new Arc(fcirc.getCentre(), fcirc.getRadius(),
+		Arc arc2 = new Arc(fcirc.getCentre(), fcirc.getRadius(),
 				fcirc.getStartAngle(), fcirc.getEndAngle());
 
-		Set<Pshape> circleInter = arc.intersectWith(circle2);
+		GeoObject circleInter = arc.intersectWith(arc2);
 
-		for (Pshape pseudoCircle : circleInter)
-		{
-			if (pseudoCircle instanceof Arc)
-			{
-				return circleInter;
-			}
-		}
+		if (circleInter.getDimension() > 0)
+			return circleInter;
 
-		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
+		Set<GeoObject> intersectionPieces = new HashSet<GeoObject>();
 
 		if (!fcirc.getStartPoint().equals(fcirc.getEndPoint()))
 		{
 			Line line = new Line(fcirc.getStartPoint(), fcirc.getEndPoint());
-			intersectionPieces.addAll(arc.intersectWith(line));
+			intersectionPieces.add(arc.intersectWith(line));
 		}
 
-		intersectionPieces.addAll(arc.intersectWith(circle2));
+		intersectionPieces.add(arc.intersectWith(arc2));
 
-		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
-
-		for (Pshape pshape : intersectionPieces)
-			intersectionPoints.add((XYpoint) pshape);
+		Set<XYpoint> intersectionPoints = getAllXYPoints(intersectionPieces);
 
 		return circlePieces(arc, intersectionPoints, arc, fcirc);
 
@@ -211,20 +216,20 @@ public class IntersectionManager
 	 *            Line
 	 * @return if the circle and the line intersect
 	 */
-	public static Set<Pshape> intersect(Arc circle, Line line)
+	public static GeoObject intersect(Arc circle, Line line)
 	{
 		return intersect(line, circle);
 	}
 
 	/**
 	 * 
-	 * @param circle
+	 * @param arc
 	 *            Circle
 	 * @param triangle
 	 *            Triangle
 	 * @return if they intersect
 	 */
-	public static Set<Pshape> intersect(Arc circle, Triangle triangle)
+	public static GeoObject intersect(Arc arc, Triangle triangle)
 	{
 		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB(), 0,
 				1);
@@ -233,18 +238,15 @@ public class IntersectionManager
 		Line lineCA = new Line(triangle.getPointC(), triangle.getPointA(), 0,
 				1);
 
-		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
+		Set<GeoObject> intersectionPieces = new HashSet<GeoObject>();
 
-		intersectionPieces.addAll(circle.intersectWith(lineAB));
-		intersectionPieces.addAll(circle.intersectWith(lineBC));
-		intersectionPieces.addAll(circle.intersectWith(lineCA));
+		intersectionPieces.add(arc.intersectWith(lineAB));
+		intersectionPieces.add(arc.intersectWith(lineBC));
+		intersectionPieces.add(arc.intersectWith(lineCA));
 
-		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
+		Set<XYpoint> intersectionPoints = getAllXYPoints(intersectionPieces);
 
-		for (Pshape pshape : intersectionPieces)
-			intersectionPoints.add((XYpoint) pshape);
-
-		return circlePieces(circle, intersectionPoints, circle, triangle);
+		return circlePieces(arc, intersectionPoints, arc, triangle);
 
 	}
 
@@ -256,13 +258,13 @@ public class IntersectionManager
 	 *            Point
 	 * @return if the point lies inside or on the Circle
 	 */
-	public static Set<Pshape> intersect(Arc circle, XYpoint point)
+	public static GeoObject intersect(Arc circle, XYpoint point)
 	{
 		return intersect(point, circle);
 
 	}
 
-	public static Set<Pshape> intersect(Circle fcirc, Arc circle)
+	public static GeoObject intersect(Circle fcirc, Arc circle)
 	{
 		return intersect(circle, fcirc);
 	}
@@ -275,11 +277,10 @@ public class IntersectionManager
 	 *            Circle
 	 * @return if the two circles intersect
 	 */
-	public static Set<Pshape> intersect(Circle fcirc1, Circle fcirc2)
+	public static GeoObject intersect(Circle fcirc1, Circle fcirc2)
 	{
-		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
 
-		Set<Pshape> intersectionShapes = new HashSet<Pshape>();
+		Set<GeoObject> intersectionShapes = new HashSet<GeoObject>();
 
 		Arc circle1 = new Arc(fcirc1.getCentre(), fcirc1.getRadius(),
 				fcirc1.getStartAngle(), fcirc1.getEndAngle());
@@ -290,7 +291,7 @@ public class IntersectionManager
 		if (!fcirc2.getStartPoint().equals(fcirc2.getEndPoint()))
 		{
 			Line line2 = new Line(fcirc2.getStartPoint(), fcirc2.getEndPoint());
-			intersectionShapes.addAll(circle1.intersectWith(line2));
+			intersectionShapes.add(circle1.intersectWith(line2));
 		}
 
 		if (!fcirc1.getStartPoint().equals(fcirc1.getEndPoint()))
@@ -300,22 +301,16 @@ public class IntersectionManager
 			{
 				Line line2 = new Line(fcirc2.getStartPoint(),
 						fcirc2.getEndPoint());
-				intersectionShapes.addAll(circle1.intersectWith(line2));
+				intersectionShapes.add(circle1.intersectWith(line2));
 
-				intersectionShapes.addAll(line1.intersectWith(line2));
+				intersectionShapes.add(line1.intersectWith(line2));
 			}
-			intersectionShapes.addAll(line1.intersectWith(circle2));
+			intersectionShapes.add(line1.intersectWith(circle2));
 		}
 
-		intersectionShapes.addAll(circle1.intersectWith(circle2));
+		intersectionShapes.add(circle1.intersectWith(circle2));
 
-		for (Pshape pshape : intersectionShapes)
-		{
-			if (pshape instanceof XYpoint)
-			{
-				intersectionPoints.add((XYpoint) pshape);
-			}
-		}
+		Set<XYpoint> intersectionPoints = getAllXYPoints(intersectionShapes);
 
 		if (!fcirc1.getStartPoint().intersectWith(fcirc2).isEmpty())
 			intersectionPoints.add(fcirc1.getStartPoint());
@@ -327,9 +322,9 @@ public class IntersectionManager
 		if (!fcirc2.getEndPoint().intersectWith(fcirc1).isEmpty())
 			intersectionPoints.add(fcirc2.getEndPoint());
 
-		Set<Pshape> back = new HashSet<Pshape>();
+		Set<GeoObject> back = new HashSet<GeoObject>();
 
-		back.addAll(triangulizeConvexSet(intersectionPoints));
+		back.add(triangulizeConvexSet(intersectionPoints));
 
 		Set<XYpoint> onCircle = new HashSet<XYpoint>();
 
@@ -339,35 +334,34 @@ public class IntersectionManager
 				onCircle.add(point);
 		}
 
-		Set<Pshape> preCircles = circlePieces(circle2, onCircle, circle2,
-				circle1);
+		GeoObject preCircles = circlePieces(circle2, onCircle, fcirc1, fcirc2);
 
-		for (Pshape pshape : preCircles)
+		for (GeoObject geoObject : preCircles.getSubObjects())
 		{
-			if (pshape instanceof Arc)
+			if (geoObject instanceof Arc)
 			{
-				Arc preCircle = (Arc) pshape;
+				Arc preCircle = (Arc) geoObject;
 				back.add(new Circle(preCircle.getCentre(),
 						preCircle.getRadius(), preCircle.getStartAngle(),
 						preCircle.getEndAngle()));
 			}
 		}
 
-		return back;
+		return new CompositeGeoObject(back);
 
 	}
 
-	public static Set<Pshape> intersect(Circle fcirc, Line line)
+	public static GeoObject intersect(Circle fcirc, Line line)
 	{
 		return intersect(line, fcirc);
 	}
 
-	public static Set<Pshape> intersect(Circle fcirc, Triangle triangle)
+	public static GeoObject intersect(Circle fcirc, Triangle triangle)
 	{
 		return intersect(triangle, fcirc);
 	}
 
-	public static Set<Pshape> intersect(Circle fcirc, XYpoint point)
+	public static GeoObject intersect(Circle fcirc, XYpoint point)
 	{
 		return intersect(point, fcirc);
 	}
@@ -380,7 +374,7 @@ public class IntersectionManager
 	 *            Circle
 	 * @return intersection of line and circle
 	 */
-	public static Set<Pshape> intersect(Line line, Arc circle)
+	public static GeoObject intersect(Line line, Arc circle)
 	{
 		XYvector lineVector = new XYvector(line.getPointA(), line.getPointB());
 
@@ -401,7 +395,7 @@ public class IntersectionManager
 					.add(lineVector.multiplyBy(d).shift(line.getPointA()));
 		}
 
-		Set<Pshape> back = new HashSet<Pshape>();
+		Set<GeoObject> back = new HashSet<GeoObject>();
 
 		for (XYpoint point : possiblePoints)
 		{
@@ -411,7 +405,7 @@ public class IntersectionManager
 				back.add(point);
 			}
 		}
-		return back;
+		return new CompositeGeoObject(back);
 
 	}
 
@@ -423,48 +417,35 @@ public class IntersectionManager
 	 *            Circle
 	 * @return if the line and the circle intersect
 	 */
-	public static Set<Pshape> intersect(Line line, Circle fcirc)
+	public static GeoObject intersect(Line line, Circle fcirc)
 	{
 
 		Arc circle = new Arc(fcirc.getCentre(), fcirc.getRadius());
 
-		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
+		Set<GeoObject> intersectionPieces = new HashSet<GeoObject>();
 
 		if (!fcirc.getStartPoint().equals(fcirc.getEndPoint()))
 		{
 			Line lineSE = new Line(fcirc.getStartPoint(), fcirc.getEndPoint(),
 					0, 1);
-			intersectionPieces.addAll(line.intersectWith(lineSE));
+			intersectionPieces.add(line.intersectWith(lineSE));
 		}
 
-		intersectionPieces.addAll(line.intersectWith(circle));
-		Set<Pshape> back = new HashSet<Pshape>();
+		intersectionPieces.add(line.intersectWith(circle));
 
 		if (intersectionPieces.size() == 0)
-			return back;
+			return CompositeGeoObject.getEmptyObject();
 
-		Set<XYpoint> pointSet = new HashSet<XYpoint>();
-
-		for (Pshape pshape : intersectionPieces)
-		{
-			if (pshape instanceof XYpoint)
-			{
-				XYpoint neuPoint = (XYpoint) pshape;
-				pointSet.add(neuPoint);
-			}
-		}
+		Set<XYpoint> pointSet = getAllXYPoints(intersectionPieces);
 
 		if (pointSet.size() == 1)
 		{
-			back.addAll(pointSet);
-			return back;
+			return pointSet.iterator().next();
 		}
 
 		List<XYpoint> pointList = new ArrayList<XYpoint>(pointSet);
 
-		back.add(line.subSegment(pointList.get(0), pointList.get(1)));
-
-		return back;
+		return line.subSegment(pointList.get(0), pointList.get(1));
 
 	}
 
@@ -476,9 +457,8 @@ public class IntersectionManager
 	 *            Line
 	 * @return if both lines intersect
 	 */
-	public static Set<Pshape> intersect(Line line1, Line line2)
+	public static GeoObject intersect(Line line1, Line line2)
 	{
-		Set<Pshape> back = new HashSet<Pshape>();
 
 		Line longLine = new Line(line1.getPointA(), line1.getPointB());
 
@@ -502,16 +482,16 @@ public class IntersectionManager
 			{
 				if (DMan.same(startLambda, endLambda))
 				{
-					back.add(line1.getPointByLambda(startLambda));
+					return line1.getPointByLambda(startLambda);
 				}
 				else
 				{
-					back.add(new Line(line1.getPointA(), line1.getPointB(),
-							startLambda, endLambda));
+					return new Line(line1.getPointA(), line1.getPointB(),
+							startLambda, endLambda);
 				}
 			}
 
-			return back;
+			return CompositeGeoObject.getEmptyObject();
 		}
 
 		XYvector vector1 = new XYvector(line1.getPointA(), line1.getPointB());
@@ -522,7 +502,7 @@ public class IntersectionManager
 
 		if (vector1.equals(vector2) || vector1.equals(vector2.multiplyBy(-1)))
 		{
-			return back;
+			return CompositeGeoObject.getEmptyObject();
 		}
 
 		double[][] coefficients = new double[2][2];
@@ -545,10 +525,9 @@ public class IntersectionManager
 
 		if (!line1.intersectWith(point).isEmpty()
 				&& !line2.intersectWith(point).isEmpty())
-			back.add(point);
+			return point;
 
-		return back;
-
+		return CompositeGeoObject.getEmptyObject();
 	}
 
 	/**
@@ -559,7 +538,7 @@ public class IntersectionManager
 	 *            Triangle
 	 * @return if the line and the triangle intersect.
 	 */
-	public static Set<Pshape> intersect(Line line, Triangle triangle)
+	public static GeoObject intersect(Line line, Triangle triangle)
 	{
 		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB(), 0,
 				1);
@@ -568,39 +547,27 @@ public class IntersectionManager
 		Line lineCA = new Line(triangle.getPointC(), triangle.getPointA(), 0,
 				1);
 
-		Set<Pshape> intersectionPieces = new HashSet<Pshape>();
+		Set<GeoObject> intersectionPieces = new HashSet<GeoObject>();
 
-		intersectionPieces.addAll(line.intersectWith(lineAB));
-		intersectionPieces.addAll(line.intersectWith(lineBC));
-		intersectionPieces.addAll(line.intersectWith(lineCA));
+		intersectionPieces.add(line.intersectWith(lineAB));
+		intersectionPieces.add(line.intersectWith(lineBC));
+		intersectionPieces.add(line.intersectWith(lineCA));
 
-		Set<Pshape> back = new HashSet<Pshape>();
+		Set<GeoObject> back = new HashSet<GeoObject>();
 
 		if (intersectionPieces.size() == 0)
-			return back;
+			return CompositeGeoObject.getEmptyObject();
 
-		Set<XYpoint> pointSet = new HashSet<XYpoint>();
-
-		for (Pshape pshape : intersectionPieces)
-		{
-			if (pshape instanceof XYpoint)
-			{
-				XYpoint neuPoint = (XYpoint) pshape;
-				pointSet.add(neuPoint);
-			}
-		}
+		Set<XYpoint> pointSet = getAllXYPoints(intersectionPieces);
 
 		if (pointSet.size() == 1)
 		{
-			back.addAll(pointSet);
-			return back;
+			return pointSet.iterator().next();
 		}
 
 		List<XYpoint> pointList = new ArrayList<XYpoint>(pointSet);
 
-		back.add(line.subSegment(pointList.get(0), pointList.get(1)));
-
-		return back;
+		return line.subSegment(pointList.get(0), pointList.get(1));
 
 	}
 
@@ -612,12 +579,12 @@ public class IntersectionManager
 	 *            Point
 	 * @return if the Point lies on the line
 	 */
-	public static Set<Pshape> intersect(Line line, XYpoint point)
+	public static GeoObject intersect(Line line, XYpoint point)
 	{
 		return intersect(point, line);
 	}
 
-	public static Set<Pshape> intersect(Triangle triangle, Arc circle)
+	public static GeoObject intersect(Triangle triangle, Arc circle)
 	{
 		return intersect(circle, triangle);
 
@@ -631,11 +598,10 @@ public class IntersectionManager
 	 *            Circle
 	 * @return if the triangle and the circle intersect
 	 */
-	public static Set<Pshape> intersect(Triangle triangle, Circle fcirc)
+	public static GeoObject intersect(Triangle triangle, Circle fcirc)
 	{
-		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
 
-		Set<Pshape> intersectionShapes = new HashSet<Pshape>();
+		Set<GeoObject> intersectionShapes = new HashSet<GeoObject>();
 
 		Line lineAB = new Line(triangle.getPointA(), triangle.getPointB(), 0,
 				1);
@@ -647,28 +613,22 @@ public class IntersectionManager
 		{
 			Line line = new Line(fcirc.getStartPoint(), fcirc.getEndPoint(), 0,
 					1);
-			intersectionShapes.addAll(lineBC.intersectWith(line));
+			intersectionShapes.add(lineBC.intersectWith(line));
 
-			intersectionShapes.addAll(lineCA.intersectWith(line));
+			intersectionShapes.add(lineCA.intersectWith(line));
 
-			intersectionShapes.addAll(lineAB.intersectWith(line));
+			intersectionShapes.add(lineAB.intersectWith(line));
 		}
 		Arc circle = new Arc(fcirc.getCentre(), fcirc.getRadius(),
 				fcirc.getStartAngle(), fcirc.getEndAngle());
 
-		intersectionShapes.addAll(lineAB.intersectWith(circle));
+		intersectionShapes.add(lineAB.intersectWith(circle));
 
-		intersectionShapes.addAll(lineBC.intersectWith(circle));
+		intersectionShapes.add(lineBC.intersectWith(circle));
 
-		intersectionShapes.addAll(lineCA.intersectWith(circle));
+		intersectionShapes.add(lineCA.intersectWith(circle));
 
-		for (Pshape pshape : intersectionShapes)
-		{
-			if (pshape instanceof XYpoint)
-			{
-				intersectionPoints.add((XYpoint) pshape);
-			}
-		}
+		Set<XYpoint> intersectionPoints = getAllXYPoints(intersectionShapes);
 
 		if (!triangle.getPointA().intersectWith(fcirc).isEmpty())
 			intersectionPoints.add(triangle.getPointA());
@@ -682,9 +642,9 @@ public class IntersectionManager
 		if (!fcirc.getEndPoint().intersectWith(triangle).isEmpty())
 			intersectionPoints.add(fcirc.getEndPoint());
 
-		Set<Pshape> back = new HashSet<Pshape>();
+		Set<GeoObject> back = new HashSet<GeoObject>();
 
-		back.addAll(triangulizeConvexSet(intersectionPoints));
+		back.add(triangulizeConvexSet(intersectionPoints));
 
 		Set<XYpoint> onCircle = new HashSet<XYpoint>();
 
@@ -694,24 +654,23 @@ public class IntersectionManager
 				onCircle.add(point);
 		}
 
-		Set<Pshape> preCircles = circlePieces(circle, onCircle, fcirc,
-				triangle);
+		GeoObject preCircles = circlePieces(circle, onCircle, fcirc, triangle);
 
-		for (Pshape pshape : preCircles)
+		for (GeoObject GeoObject : preCircles.getSubObjects())
 		{
-			if (pshape instanceof Arc)
+			if (GeoObject instanceof Arc)
 			{
-				Arc preCircle = (Arc) pshape;
+				Arc preCircle = (Arc) GeoObject;
 				back.add(new Circle(preCircle.getCentre(),
 						preCircle.getRadius(), preCircle.getStartAngle(),
 						preCircle.getEndAngle()));
 			}
 		}
 
-		return back;
+		return new CompositeGeoObject(back);
 	}
 
-	public static Set<Pshape> intersect(Triangle triangle, Line line)
+	public static GeoObject intersect(Triangle triangle, Line line)
 	{
 		return intersect(line, triangle);
 
@@ -725,11 +684,10 @@ public class IntersectionManager
 	 *            Triangle
 	 * @return The intersection of the triangles
 	 */
-	public static Set<Pshape> intersect(Triangle triangle1, Triangle triangle2)
+	public static GeoObject intersect(Triangle triangle1, Triangle triangle2)
 	{
-		Set<XYpoint> intersectionPoints = new HashSet<XYpoint>();
 
-		Set<Pshape> intersectionShapes = new HashSet<Pshape>();
+		Set<GeoObject> intersectionShapes = new HashSet<GeoObject>();
 
 		Line line1AB = new Line(triangle1.getPointA(), triangle1.getPointB(), 0,
 				1);
@@ -744,25 +702,19 @@ public class IntersectionManager
 		Line line2CA = new Line(triangle2.getPointC(), triangle2.getPointA(), 0,
 				1);
 
-		intersectionShapes.addAll(line1AB.intersectWith(line2AB));
-		intersectionShapes.addAll(line1AB.intersectWith(line2BC));
-		intersectionShapes.addAll(line1AB.intersectWith(line2CA));
+		intersectionShapes.add(line1AB.intersectWith(line2AB));
+		intersectionShapes.add(line1AB.intersectWith(line2BC));
+		intersectionShapes.add(line1AB.intersectWith(line2CA));
 
-		intersectionShapes.addAll(line1BC.intersectWith(line2AB));
-		intersectionShapes.addAll(line1BC.intersectWith(line2BC));
-		intersectionShapes.addAll(line1BC.intersectWith(line2CA));
+		intersectionShapes.add(line1BC.intersectWith(line2AB));
+		intersectionShapes.add(line1BC.intersectWith(line2BC));
+		intersectionShapes.add(line1BC.intersectWith(line2CA));
 
-		intersectionShapes.addAll(line1CA.intersectWith(line2AB));
-		intersectionShapes.addAll(line1CA.intersectWith(line2BC));
-		intersectionShapes.addAll(line1CA.intersectWith(line2CA));
+		intersectionShapes.add(line1CA.intersectWith(line2AB));
+		intersectionShapes.add(line1CA.intersectWith(line2BC));
+		intersectionShapes.add(line1CA.intersectWith(line2CA));
 
-		for (Pshape pshape : intersectionShapes)
-		{
-			if (pshape instanceof XYpoint)
-			{
-				intersectionPoints.add((XYpoint) pshape);
-			}
-		}
+		Set<XYpoint> intersectionPoints = getAllXYPoints(intersectionShapes);
 
 		if (!triangle1.getPointA().intersectWith(triangle2).isEmpty())
 			intersectionPoints.add(triangle1.getPointA());
@@ -782,7 +734,7 @@ public class IntersectionManager
 
 	}
 
-	public static Set<Pshape> intersect(Triangle triangle, XYpoint point)
+	public static GeoObject intersect(Triangle triangle, XYpoint point)
 	{
 		return intersect(point, triangle);
 
@@ -796,21 +748,19 @@ public class IntersectionManager
 	 *            Circle
 	 * @return if both objects intersect
 	 */
-	public static Set<Pshape> intersect(XYpoint point, Arc circle)
+	public static GeoObject intersect(XYpoint point, Arc circle)
 	{
 		XYvector shiftVector = new XYvector(circle.getCentre(), point);
 
-		Set<Pshape> back = new HashSet<Pshape>();
-
 		if (DMan.same(shiftVector.getLength(), circle.getRadius()))
 		{
-			Angle angle = shiftVector.getAngle();
+			NumericAngle angle = shiftVector.getAngle();
 			if (circle.containsAngle(angle))
-				back.add(point);
+				return point;
 
 		}
 
-		return back;
+		return CompositeGeoObject.getEmptyObject();
 	}
 
 	/**
@@ -821,42 +771,42 @@ public class IntersectionManager
 	 *            Circle
 	 * @return if the point lies inside or on the circle
 	 */
-	public static Set<Pshape> intersect(XYpoint point, Circle fcirc)
+	public static GeoObject intersect(XYpoint point, Circle fcirc)
 	{
-		Set<Pshape> back = new HashSet<Pshape>();
+
 		XYvector radiusVector = new XYvector(fcirc.getCentre(), point);
 
 		if (!DMan.lessOrEqual(radiusVector.getLength(), fcirc.getRadius()))
 		{
-			return back;
+			return CompositeGeoObject.getEmptyObject();
 		}
 		else
 		{
 			if (fcirc.getStartPoint().equals(fcirc.getEndPoint()))
 			{
-				back.add(point);
+				return point;
 			}
 			else
 			{
 				XYvector vector1 = new XYvector(fcirc.getStartPoint(),
 						fcirc.getEndPoint());
-				Angle vectorAngle1 = vector1.getAngle();
+				NumericAngle vectorAngle1 = vector1.getAngle();
 
 				XYvector vector2 = new XYvector(fcirc.getEndPoint(),
 						fcirc.getStartPoint());
-				Angle vectorAngle2 = vector2.getAngle();
+				NumericAngle vectorAngle2 = vector2.getAngle();
 
 				XYvector pointVector = new XYvector(fcirc.getStartPoint(),
 						point);
-				Angle pointAngle = pointVector.getAngle();
+				NumericAngle pointAngle = pointVector.getAngle();
 
 				if (pointAngle.inBetween(vectorAngle2, vectorAngle1))
-					back.add(point);
+					return point;
 			}
 
 		}
 
-		return back;
+		return CompositeGeoObject.getEmptyObject();
 
 	}
 
@@ -868,10 +818,8 @@ public class IntersectionManager
 	 *            Line
 	 * @return if both objects intersect
 	 */
-	public static Set<Pshape> intersect(XYpoint point, Line line)
+	public static GeoObject intersect(XYpoint point, Line line)
 	{
-
-		Set<Pshape> back = new HashSet<Pshape>();
 
 		XYvector BA = new XYvector(line.getPointA(), line.getPointB());
 		XYvector BAorth = new XYvector(BA.getyMove(), -BA.getxMove());
@@ -897,12 +845,12 @@ public class IntersectionManager
 
 			&& DMan.lessOrEqual(lambda[0], line.getEndLambda()))
 			{
-				back.add(point);
+				return point;
 			}
 
 		}
 
-		return back;
+		return CompositeGeoObject.getEmptyObject();
 	}
 
 	/**
@@ -913,9 +861,9 @@ public class IntersectionManager
 	 *            Triangle
 	 * @return if point lies inside or on the triangle
 	 */
-	public static Set<Pshape> intersect(XYpoint point, Triangle triangle)
+	public static GeoObject intersect(XYpoint point, Triangle triangle)
 	{
-		Set<Pshape> back = new HashSet<Pshape>();
+		Set<GeoObject> back = new HashSet<GeoObject>();
 
 		double[][] coefficients = new double[2][2];
 
@@ -940,7 +888,7 @@ public class IntersectionManager
 			back.add(point);
 		}
 
-		return back;
+		return new CompositeGeoObject(back);
 	}
 
 	/**
@@ -951,14 +899,13 @@ public class IntersectionManager
 	 *            Point
 	 * @return if objects intersect
 	 */
-	public static Set<Pshape> intersect(XYpoint point1, XYpoint point2)
+	public static GeoObject intersect(XYpoint point1, XYpoint point2)
 	{
-		Set<Pshape> back = new HashSet<Pshape>();
-
 		if (point1.equals(point2))
-			back.add(point1);
+			return point1;
+		else
+			return CompositeGeoObject.getEmptyObject();
 
-		return back;
 	}
 
 	private static double square(double x)
@@ -966,18 +913,16 @@ public class IntersectionManager
 		return x * x;
 	}
 
-	private static Set<Pshape> triangulizeConvexSet(
+	private static GeoObject triangulizeConvexSet(
 			Set<XYpoint> intersectionPoints)
 	{
-		Set<Pshape> back = new HashSet<Pshape>();
 
 		if (intersectionPoints.size() == 0)
-			return back;
+			return CompositeGeoObject.getEmptyObject();
 
 		if (intersectionPoints.size() == 1)
 		{
-			back.addAll(intersectionPoints);
-			return back;
+			return new CompositeGeoObject(intersectionPoints);
 		}
 
 		if (intersectionPoints.size() == 2)
@@ -985,9 +930,8 @@ public class IntersectionManager
 			List<XYpoint> linePoints = new ArrayList<XYpoint>(
 					intersectionPoints);
 
-			back.add(new Line(linePoints.get(0), linePoints.get(1), 0, 1));
+			return new Line(linePoints.get(0), linePoints.get(1), 0, 1);
 
-			return back;
 		}
 
 		XYpoint startPoint = intersectionPoints.iterator().next();
@@ -1023,6 +967,8 @@ public class IntersectionManager
 
 		});
 
+		Set<GeoObject> back = new HashSet<GeoObject>();
+
 		for (int i = 0; i < vectorList.size() - 1; i++)
 		{
 			// Wenn der Winkel kleiner als 180° ist, füge das Dreieck hinzu.
@@ -1033,7 +979,7 @@ public class IntersectionManager
 
 		}
 
-		return back;
+		return new CompositeGeoObject(back);
 	}
 
 }

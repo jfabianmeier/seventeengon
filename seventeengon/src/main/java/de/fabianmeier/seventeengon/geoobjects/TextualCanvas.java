@@ -7,8 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.fabianmeier.seventeengon.shapes.XYpoint;
-import de.fabianmeier.seventeengon.util.Angle;
+import de.fabianmeier.seventeengon.shapes.XYvector;
 import de.fabianmeier.seventeengon.util.GeoVisible;
+import de.fabianmeier.seventeengon.util.NumericAngle;
 
 /**
  * @author JFM
@@ -59,8 +60,8 @@ public class TextualCanvas implements GeoCanvas
 	 * de.fabianmeier.seventeengon.util.Angle, int, java.lang.String)
 	 */
 	@Override
-	public void drawArc(XYpoint centre, Angle startAngle, Angle endAngle,
-			String label, GeoVisible visi)
+	public void drawArc(XYpoint centre, NumericAngle startAngle,
+			NumericAngle endAngle, String label, GeoVisible visi)
 	{
 		writings.add(label + ": " + "Arc from " + startAngle.toString() + " to "
 				+ endAngle.toString() + " around " + centre
@@ -98,6 +99,26 @@ public class TextualCanvas implements GeoCanvas
 		writings.add(label + ": " + "Triangle with " + a.toString() + ", "
 				+ b.toString() + " and " + c.toString() + " with visibility: "
 				+ visi);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.geoobjects.GeoCanvas#drawAngle(de.fabianmeier
+	 * .seventeengon.shapes.XYpoint,
+	 * de.fabianmeier.seventeengon.shapes.XYvector,
+	 * de.fabianmeier.seventeengon.shapes.XYvector, java.lang.String,
+	 * de.fabianmeier.seventeengon.util.GeoVisible)
+	 */
+	@Override
+	public void drawAngle(XYpoint vertex, XYvector direction1,
+			XYvector direction2, String label, GeoVisible visi)
+	{
+		writings.add(label + ": " + "Angle with vertex " + vertex.toString()
+				+ " and rays: " + direction1 + ", " + direction2
+				+ " with visibility: " + visi);
 
 	}
 

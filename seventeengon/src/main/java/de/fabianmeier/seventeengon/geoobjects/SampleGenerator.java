@@ -10,6 +10,9 @@ package de.fabianmeier.seventeengon.geoobjects;
 public class SampleGenerator
 {
 
+	// TODO: Should probably be integrated into GeoHolder because it goes along
+	// with it.
+
 	private static int samplingValue = 0;
 
 	private static double width = 2000;
