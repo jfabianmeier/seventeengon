@@ -33,7 +33,7 @@ public class IndexedName implements GeoName
 	@Override
 	public String toString()
 	{
-		String back = basicName.toString() + "_";
+		String back = basicName.toString();
 
 		if (index != null)
 		{

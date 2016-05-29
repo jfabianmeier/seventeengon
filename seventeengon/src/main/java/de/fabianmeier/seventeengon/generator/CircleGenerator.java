@@ -4,11 +4,15 @@
 package de.fabianmeier.seventeengon.generator;
 
 import java.io.IOException;
+import java.util.List;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
 import de.fabianmeier.seventeengon.naming.CompName;
 import de.fabianmeier.seventeengon.naming.Sentence;
 import de.fabianmeier.seventeengon.naming.SentencePattern;
+import de.fabianmeier.seventeengon.shapes.Arc;
+import de.fabianmeier.seventeengon.shapes.XYpoint;
+import de.fabianmeier.seventeengon.shapes.XYvector;
 
 /**
  * @author JFM
@@ -32,8 +36,29 @@ public class CircleGenerator implements GeoGenerator
 	public boolean generateAndAdd(GeoHolder geoHolder, Sentence sentence)
 			throws IOException
 	{
-		// TODO Auto-generated method stub
-		throw new IllegalStateException();
+		if (!geoHolder.generateCompNames(sentence))
+			return false;
+
+		if ((new SentencePattern(sentence)).equals(CIRCLE))
+		{
+			List<CompName> compNames = sentence.getCompositeNames();
+			CompName k = compNames.get(0);
+			CompName P = compNames.get(1);
+			CompName Q = compNames.get(2);
+
+			XYpoint pointP = geoHolder.getPointOrIO(P);
+			XYpoint pointQ = geoHolder.getPointOrIO(Q);
+
+			Arc circle = new Arc(pointP,
+					(new XYvector(pointP, pointQ)).getLength());
+
+			geoHolder.add(k, circle);
+
+			return true;
+
+		}
+		throw new IllegalArgumentException(
+				sentence + " is not defined operation.");
 	}
 
 	/*
@@ -45,11 +70,11 @@ public class CircleGenerator implements GeoGenerator
 	 * de.fabianmeier.seventeengon.naming.CompName)
 	 */
 	@Override
-	public boolean generateAndAdd(GeoHolder geoHolder, CompName sentence)
+	public boolean generateAndAdd(GeoHolder geoHolder, CompName compName)
 			throws IOException
 	{
-		// TODO Auto-generated method stub
-		throw new IllegalStateException();
+		throw new IllegalArgumentException(
+				compName + " is not defined operation.");
 	}
 
 }

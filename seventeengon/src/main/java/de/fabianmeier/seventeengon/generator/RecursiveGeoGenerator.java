@@ -37,11 +37,11 @@ public class RecursiveGeoGenerator implements GeoGenerator
 	 * de.fabianmeier.seventeengon.naming.CompName)
 	 */
 	@Override
-	public boolean generateAndAdd(GeoHolder geoHolder, CompName sentence)
+	public boolean generateAndAdd(GeoHolder geoHolder, CompName compName)
 			throws IOException
 	{
-		// TODO Auto-generated method stub
-		throw new IllegalStateException();
+		throw new IllegalArgumentException(
+				compName + " is not a valid pattern for " + this);
 	}
 
 	/*
@@ -58,7 +58,8 @@ public class RecursiveGeoGenerator implements GeoGenerator
 
 		geoHolder.generateCompNames(sourceSentence);
 
-		GeoHolder localHolder = new GeoHolder();
+		GeoHolder localHolder = new GeoHolder(geoHolder.getWidth(),
+				geoHolder.getHeight(), geoHolder.nextSampling());
 		SequentialNameMapping nameMapping = new SequentialNameMapping(
 				sourceSentence, sinkSentence);
 
@@ -66,8 +67,8 @@ public class RecursiveGeoGenerator implements GeoGenerator
 
 		for (Sentence rep : replacement)
 		{
-			GeoGenerator localGeo = GeoGeneratorLookup.get(rep);
-			boolean created = localGeo.generateAndAdd(localHolder, rep);
+			boolean created = GeoGeneratorLookup.generateAndAdd(localHolder,
+					rep);
 			if (!created)
 				return false;
 		}

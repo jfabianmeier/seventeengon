@@ -4,7 +4,9 @@
 package de.fabianmeier.seventeengon.naming;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -19,8 +21,23 @@ public class BasicName implements GeoName
 			"kappa", "lambda", "my", "ny", "xi", "omikron", "pi", "rho",
 			"sigma", "tau", "ypsilon", "phi", "psi", "omega"};
 
+	// private static String[] unicodeGreekLetters = new String[] {"\u03B1", // "\u03B2",
+
 	private static Set<String> greekLetterSet = new HashSet<String>(
 			Arrays.asList(greekLetters));
+
+	private static Map<String, Integer> unicodeNumber = new HashMap<String, Integer>();
+
+	static
+	{
+		int alphaUnicode = 0x03B1;
+
+		for (int i = 0; i < greekLetters.length; i++)
+		{
+			unicodeNumber.put(greekLetters[i], alphaUnicode + i);
+		}
+
+	}
 
 	/**
 	 * 
@@ -59,7 +76,13 @@ public class BasicName implements GeoName
 	@Override
 	public String toString()
 	{
-		return name;
+		if (!greekLetterSet.contains(name))
+			return name;
+		else
+		{
+			return Character.toString((char) (int) unicodeNumber.get(name));
+
+		}
 	}
 
 	@Override

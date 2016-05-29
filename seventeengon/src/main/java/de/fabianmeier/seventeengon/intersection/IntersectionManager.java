@@ -196,7 +196,8 @@ public class IntersectionManager
 
 		if (!fcirc.getStartPoint().equals(fcirc.getEndPoint()))
 		{
-			Line line = new Line(fcirc.getStartPoint(), fcirc.getEndPoint());
+			Line line = new Line(fcirc.getStartPoint(), fcirc.getEndPoint(), 0,
+					1);
 			intersectionPieces.add(arc.intersectWith(line));
 		}
 
@@ -282,33 +283,35 @@ public class IntersectionManager
 
 		Set<GeoObject> intersectionShapes = new HashSet<GeoObject>();
 
-		Arc circle1 = new Arc(fcirc1.getCentre(), fcirc1.getRadius(),
+		Arc arc1 = new Arc(fcirc1.getCentre(), fcirc1.getRadius(),
 				fcirc1.getStartAngle(), fcirc1.getEndAngle());
 
-		Arc circle2 = new Arc(fcirc2.getCentre(), fcirc2.getRadius(),
+		Arc arc2 = new Arc(fcirc2.getCentre(), fcirc2.getRadius(),
 				fcirc2.getStartAngle(), fcirc2.getEndAngle());
 
 		if (!fcirc2.getStartPoint().equals(fcirc2.getEndPoint()))
 		{
-			Line line2 = new Line(fcirc2.getStartPoint(), fcirc2.getEndPoint());
-			intersectionShapes.add(circle1.intersectWith(line2));
+			Line line2 = new Line(fcirc2.getStartPoint(), fcirc2.getEndPoint(),
+					0, 1);
+			intersectionShapes.add(arc1.intersectWith(line2));
 		}
 
 		if (!fcirc1.getStartPoint().equals(fcirc1.getEndPoint()))
 		{
-			Line line1 = new Line(fcirc1.getStartPoint(), fcirc2.getEndPoint());
+			Line line1 = new Line(fcirc1.getStartPoint(), fcirc1.getEndPoint(),
+					0, 1);
 			if (!fcirc2.getStartPoint().equals(fcirc2.getEndPoint()))
 			{
 				Line line2 = new Line(fcirc2.getStartPoint(),
-						fcirc2.getEndPoint());
-				intersectionShapes.add(circle1.intersectWith(line2));
+						fcirc2.getEndPoint(), 0, 1);
+				intersectionShapes.add(arc1.intersectWith(line2));
 
 				intersectionShapes.add(line1.intersectWith(line2));
 			}
-			intersectionShapes.add(line1.intersectWith(circle2));
+			intersectionShapes.add(line1.intersectWith(arc2));
 		}
 
-		intersectionShapes.add(circle1.intersectWith(circle2));
+		intersectionShapes.add(arc1.intersectWith(arc2));
 
 		Set<XYpoint> intersectionPoints = getAllXYPoints(intersectionShapes);
 
@@ -330,11 +333,11 @@ public class IntersectionManager
 
 		for (XYpoint point : intersectionPoints)
 		{
-			if (!point.intersectWith(circle2).isEmpty())
+			if (!point.intersectWith(arc2).isEmpty())
 				onCircle.add(point);
 		}
 
-		GeoObject preCircles = circlePieces(circle2, onCircle, fcirc1, fcirc2);
+		GeoObject preCircles = circlePieces(arc2, onCircle, fcirc1, fcirc2);
 
 		for (GeoObject geoObject : preCircles.getSubObjects())
 		{
@@ -460,40 +463,6 @@ public class IntersectionManager
 	public static GeoObject intersect(Line line1, Line line2)
 	{
 
-		Line longLine = new Line(line1.getPointA(), line1.getPointB());
-
-		if (!longLine.intersectWith(line2.getPointA()).isEmpty()
-				&& !longLine.intersectWith(line2.getPointB()).isEmpty())
-		{
-			double startLambda2 = line1.getLambda(line2.getStartPoint());
-			double endLambda2 = line1.getLambda(line2.getEndPoint());
-
-			if (startLambda2 > endLambda2)
-			{
-				double temp = startLambda2;
-				startLambda2 = endLambda2;
-				endLambda2 = temp;
-			}
-
-			double startLambda = Math.max(line1.getStartLambda(), startLambda2);
-			double endLambda = Math.min(line1.getEndLambda(), endLambda2);
-
-			if (DMan.lessOrEqual(startLambda, endLambda))
-			{
-				if (DMan.same(startLambda, endLambda))
-				{
-					return line1.getPointByLambda(startLambda);
-				}
-				else
-				{
-					return new Line(line1.getPointA(), line1.getPointB(),
-							startLambda, endLambda);
-				}
-			}
-
-			return CompositeGeoObject.getEmptyObject();
-		}
-
 		XYvector vector1 = new XYvector(line1.getPointA(), line1.getPointB());
 		XYvector vector2 = new XYvector(line2.getPointA(), line2.getPointB());
 
@@ -502,7 +471,44 @@ public class IntersectionManager
 
 		if (vector1.equals(vector2) || vector1.equals(vector2.multiplyBy(-1)))
 		{
+
+			// Line longLine = new Line(line1.getPointA(), line1.getPointB());
+
+			if (line1.containsPoint(line2.getStartPoint())
+					|| line1.containsPoint(line2.getEndPoint())
+					|| line2.containsPoint(line1.getStartPoint())
+					|| line2.containsPoint(line1.getEndPoint()))
+			{
+				double startLambda2 = line1.getLambda(line2.getStartPoint());
+				double endLambda2 = line1.getLambda(line2.getEndPoint());
+
+				if (startLambda2 > endLambda2)
+				{
+					double temp = startLambda2;
+					startLambda2 = endLambda2;
+					endLambda2 = temp;
+				}
+
+				double startLambda = Math.max(line1.getStartLambda(),
+						startLambda2);
+				double endLambda = Math.min(line1.getEndLambda(), endLambda2);
+
+				if (DMan.lessOrEqual(startLambda, endLambda))
+				{
+					if (DMan.same(startLambda, endLambda))
+					{
+						return line1.getPointByLambda(startLambda);
+					}
+					else
+					{
+						return new Line(line1.getPointA(), line1.getPointB(),
+								startLambda, endLambda);
+					}
+				}
+			}
+
 			return CompositeGeoObject.getEmptyObject();
+
 		}
 
 		double[][] coefficients = new double[2][2];
@@ -552,8 +558,6 @@ public class IntersectionManager
 		intersectionPieces.add(line.intersectWith(lineAB));
 		intersectionPieces.add(line.intersectWith(lineBC));
 		intersectionPieces.add(line.intersectWith(lineCA));
-
-		Set<GeoObject> back = new HashSet<GeoObject>();
 
 		if (intersectionPieces.size() == 0)
 			return CompositeGeoObject.getEmptyObject();
@@ -913,7 +917,15 @@ public class IntersectionManager
 		return x * x;
 	}
 
-	private static GeoObject triangulizeConvexSet(
+	/**
+	 * Triangulizes the convex set described by the set of points
+	 * 
+	 * @param intersectionPoints
+	 *            a number of points
+	 * @return a GeoObject (containing some triangles) representing the convex
+	 *         hull of the points.
+	 */
+	public static GeoObject triangulizeConvexSet(
 			Set<XYpoint> intersectionPoints)
 	{
 

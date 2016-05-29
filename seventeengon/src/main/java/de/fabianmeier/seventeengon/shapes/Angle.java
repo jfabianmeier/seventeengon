@@ -1,12 +1,13 @@
 package de.fabianmeier.seventeengon.shapes;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
-import de.fabianmeier.seventeengon.util.GeoVisible;
+import de.fabianmeier.seventeengon.util.NumericAngle;
 
 public class Angle extends AtomicGeoObject
 {
@@ -38,6 +39,28 @@ public class Angle extends AtomicGeoObject
 				vertex, direction2.multiplyBy(10000).shift(vertex));
 	}
 
+	/**
+	 * Generates a triangle
+	 * 
+	 * @param vertex
+	 *            second point
+	 * @param firstAngle
+	 *            first Angle
+	 * @param secondAngle
+	 *            second Angle
+	 */
+	public Angle(XYpoint vertex, NumericAngle firstAngle,
+			NumericAngle secondAngle)
+	{
+		this.vertex = vertex;
+
+		direction1 = new XYvector(1, firstAngle);
+		direction2 = new XYvector(1, secondAngle);
+
+		reprTriangle = new Triangle(direction1.multiplyBy(10000).shift(vertex),
+				vertex, direction2.multiplyBy(10000).shift(vertex));
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -45,12 +68,12 @@ public class Angle extends AtomicGeoObject
 	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
 	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
 	 */
-	@Override
-	public void draw(GeoCanvas canvas, String label, GeoVisible visi)
-	{
-		canvas.drawAngle(vertex, direction1, direction2, label, visi);
-
-	}
+	// @Override
+	// public void draw(GeoCanvas canvas, GeoVisible visi)
+	// {
+	// canvas.drawAngle(vertex, direction1, direction2, visi);
+	//
+	// }
 
 	@Override
 	public boolean equals(Object obj)
@@ -224,6 +247,38 @@ public class Angle extends AtomicGeoObject
 	public Set<XYpoint> getZeroDimensionalPart()
 	{
 		return new HashSet<XYpoint>();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#affineMap(de.fabianmeier.
+	 * seventeengon.shapes.XYvector, double)
+	 */
+	@Override
+	public Angle affineMap(XYvector shiftVector, double scale)
+	{
+		XYpoint vertexNew = vertex.affineMap(shiftVector, scale);
+		XYpoint dir1Point = direction1.shift(vertexNew);
+		XYpoint dir2Point = direction2.shift(vertexNew);
+
+		return new Angle(vertexNew, dir1Point, dir2Point);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getNameDrawingAngles()
+	 */
+	@Override
+	public List<Angle> getNameDrawingAngles()
+	{
+		List<Angle> back = new ArrayList<Angle>();
+
+		back.add(this);
+
+		return back;
 	}
 
 }

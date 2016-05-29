@@ -1,10 +1,13 @@
 package de.fabianmeier.seventeengon.geoobjects;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
 import de.fabianmeier.seventeengon.generator.GeoGenerator;
 import de.fabianmeier.seventeengon.generator.GeoGeneratorLookup;
@@ -12,7 +15,11 @@ import de.fabianmeier.seventeengon.naming.CompName;
 import de.fabianmeier.seventeengon.naming.CompNamePattern;
 import de.fabianmeier.seventeengon.naming.GeoName;
 import de.fabianmeier.seventeengon.naming.Sentence;
+import de.fabianmeier.seventeengon.shapes.CompositeGeoObject;
 import de.fabianmeier.seventeengon.shapes.GeoObject;
+import de.fabianmeier.seventeengon.shapes.Triangle;
+import de.fabianmeier.seventeengon.shapes.XYpoint;
+import de.fabianmeier.seventeengon.shapes.XYvector;
 import de.fabianmeier.seventeengon.util.GeoVisible;
 
 /**
@@ -25,12 +32,306 @@ import de.fabianmeier.seventeengon.util.GeoVisible;
  */
 public class GeoHolder
 {
-	private Map<CompName, GeoObject> geoMap = new HashMap<>();
-	private Map<CompName, GeoVisible> visiMap = new HashMap<>();
+	private final Map<CompName, GeoObject> geoMap = new HashMap<>();
+	private final double height;
+	private int samplingValue;
+	private final Map<CompName, GeoVisible> visiMap = new HashMap<>();
+	private final double width;
+
+	/**
+	 * 
+	 * @param width
+	 *            Width of the drawing area
+	 * @param height
+	 *            Height of the drawing area
+	 */
+	public GeoHolder(double width, double height, int seed)
+	{
+		this.width = width;
+		this.height = height;
+		samplingValue = seed;
+
+	}
+
+	/**
+	 * Copy Constructor
+	 * 
+	 * @param holder
+	 *            OriginalHolder
+	 */
+	public GeoHolder(GeoHolder holder)
+	{
+		this.height = holder.height;
+		this.width = holder.width;
+		this.samplingValue = holder.samplingValue;
+
+		this.geoMap.putAll(holder.geoMap);
+		this.visiMap.putAll(holder.visiMap);
+
+	}
+
+	private GeoHolder(GeoHolder geoHolder, XYvector shift, double scale)
+	{
+		this.width = geoHolder.width * scale;
+		this.height = geoHolder.height * scale;
+		samplingValue = geoHolder.samplingValue;
+
+		for (CompName compName : geoHolder.geoMap.keySet())
+		{
+			GeoObject affineGeo = geoHolder.get(compName).affineMap(shift,
+					scale);
+
+			affineGeo = affineGeo.intersectWith(getCanvasArea());
+
+			geoMap.put(compName, affineGeo);
+			visiMap.put(compName, geoHolder.visiMap.get(compName));
+		}
+
+	}
+
+	/**
+	 * Adds the geoObject under the name compName
+	 * 
+	 * @param compName
+	 *            CompName
+	 * @param geoObject
+	 *            GeoObject
+	 */
+	public void add(CompName compName, GeoObject geoObject)
+	{
+		if (!geoMap.containsKey(compName))
+			geoMap.put(compName, geoObject);
+		else
+			throw new IllegalArgumentException(
+					"Object " + compName + " already in " + this);
+	}
+
+	public void add(GeoName geoName, GeoObject geoObject)
+	{
+		add(new CompName(geoName), geoObject);
+	}
 
 	public void changeVisibility(CompName compName, GeoVisible geoVisible)
 	{
 		visiMap.put(compName, geoVisible);
+	}
+
+	public boolean contains(CompName compName)
+	{
+		return geoMap.containsKey(compName);
+	}
+
+	public boolean contains(GeoName geoName)
+	{
+		return contains(new CompName(geoName));
+	}
+
+	/**
+	 * Adds all elements with their respective names to the canvas.
+	 * 
+	 * @param canvas
+	 *            A GeoCanvas
+	 */
+	public void draw(GeoCanvas canvas)
+	{
+		canvas.drawAll(this);
+
+		// for (Entry<CompName, GeoObject> entry : geoMap.entrySet())
+		// {
+		// GeoVisible visi = visiMap.get(entry.getKey());
+		// if (visi == null)
+		// visi = GeoVisible.getStandard();
+		// entry.getValue().draw(canvas, entry.getKey().toString(), visi);
+		// }
+
+	}
+
+	/**
+	 * Generates the objects for the contained compName objects
+	 * 
+	 * @param sentence
+	 *            Sentence
+	 * @throws IOException
+	 *             If the compName objects cannot be generated or are not well
+	 *             formed.
+	 */
+	public boolean generateCompNames(Sentence sentence) throws IOException
+	{
+		List<CompName> compNameList = sentence.getCompositeNames();
+
+		for (CompName compName : compNameList)
+		{
+			if (!this.contains(compName) && compName.getGeoNames().size() > 1)
+			{
+				CompNamePattern compPattern = new CompNamePattern(compName);
+
+				GeoGenerator geoGen = GeoGeneratorLookup.get(compPattern);
+
+				if (!geoGen.generateAndAdd(this, compName))
+					return false;
+
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * 
+	 * @param compName
+	 *            compName
+	 * @return geoObject
+	 */
+	public GeoObject get(CompName compName)
+	{
+		if (geoMap.containsKey(compName))
+			return geoMap.get(compName);
+		else
+			throw new IllegalArgumentException(
+					"Object " + compName + " does not exist.");
+	}
+
+	/**
+	 * 
+	 * @param geoName
+	 *            geoName
+	 * @return The geoObject
+	 */
+	public GeoObject get(GeoName geoName)
+	{
+		return get(new CompName(geoName));
+	}
+
+	/**
+	 * 
+	 * @return The area of the canvas as GeoObject
+	 */
+	public GeoObject getCanvasArea()
+	{
+		Triangle area1 = new Triangle(new XYpoint(0, 0),
+				new XYpoint(0, getHeight()), new XYpoint(getWidth(), 0));
+
+		Triangle area2 = new Triangle(new XYpoint(getWidth(), getHeight()),
+				new XYpoint(0, getHeight()), new XYpoint(getWidth(), 0));
+
+		List<GeoObject> geoList = new ArrayList<GeoObject>();
+		geoList.add(area1);
+		geoList.add(area2);
+
+		return new CompositeGeoObject(geoList);
+
+	}
+
+	/**
+	 * 
+	 * @return A clipped version of the GeoHolder scaled back to the same size
+	 *         which contains all visible points
+	 */
+	public GeoHolder getClippedGeoHolder()
+	{
+		double leftBorder = width;
+		double rightBorder = 0;
+		double bottomBorder = height;
+		double topBorder = 0;
+
+		for (CompName comp : geoMap.keySet())
+		{
+			if (geoMap.get(comp) instanceof XYpoint
+					&& !getVisibility(comp).isInvisible())
+			{
+				XYpoint localPoint = (XYpoint) geoMap.get(comp);
+				if (localPoint.getX() < leftBorder)
+					leftBorder = localPoint.getX() * 0.99;
+				if (localPoint.getX() > rightBorder)
+					rightBorder = localPoint.getX() * 1.01;
+
+				if (localPoint.getY() < bottomBorder)
+					bottomBorder = localPoint.getY() * 0.99;
+				if (localPoint.getY() > topBorder)
+					topBorder = localPoint.getY() * 1.01;
+			}
+
+		}
+
+		if (leftBorder > rightBorder)
+			return this;
+
+		XYvector shiftVector = new XYvector(-leftBorder * 0.9,
+				-bottomBorder * 0.9);
+
+		double pseudoWidth = rightBorder - leftBorder;
+		double pseudoHeight = topBorder - bottomBorder;
+
+		double scale = 0;
+
+		double ratio = width / height;
+
+		if (pseudoWidth / pseudoHeight > ratio)
+		{
+			scale = width / pseudoWidth * 0.8;
+		}
+		else
+		{
+			scale = height / pseudoHeight * 0.8;
+		}
+
+		return new GeoHolder(this, shiftVector, scale);
+
+	}
+
+	/**
+	 * 
+	 * @return the set of used compNames
+	 */
+	public Collection<CompName> getCompNames()
+	{
+		return geoMap.keySet();
+	}
+
+	/**
+	 * @return the height
+	 */
+	public double getHeight()
+	{
+		return height;
+	}
+
+	/**
+	 * Returns a point under the name or an IOException if the element is not
+	 * present or not a point
+	 * 
+	 * @param compName
+	 *            The name of a possible XYpoint
+	 * @return The XYpoint, if not exception is thrown
+	 * @throws IOException
+	 *             if the object does not exist or is not instanceof XYpoint
+	 */
+	public XYpoint getPointOrIO(CompName compName) throws IOException
+	{
+		if (!contains(compName))
+			throw new IOException("Object " + compName + " does not exist.");
+
+		GeoObject geo = get(compName);
+
+		if (!(geo instanceof XYpoint))
+			throw new IOException("Object " + geo + " is not a XYpoint.");
+
+		return (XYpoint) geo;
+	}
+
+	/**
+	 * Returns a point under the name or an IOException if the element is not
+	 * present or not a point
+	 * 
+	 * @param geoName
+	 *            The name of a possible XYpoint
+	 * @return The XYpoint, if not exception is thrown
+	 * @throws IOException
+	 *             if the object does not exist or is not instanceof XYpoint
+	 */
+	public XYpoint getPointOrIO(GeoName geoName) throws IOException
+	{
+		return getPointOrIO(new CompName(geoName));
 	}
 
 	/**
@@ -51,111 +352,44 @@ public class GeoHolder
 
 	}
 
-	public GeoHolder()
+	/**
+	 * @return the width
+	 */
+	public double getWidth()
 	{
-
-	}
-
-	public boolean contains(GeoName geoName)
-	{
-		return contains(new CompName(geoName));
-	}
-
-	public boolean contains(CompName compName)
-	{
-		return geoMap.containsKey(compName);
-	}
-
-	public void add(GeoName geoName, GeoObject geoObject)
-	{
-		add(new CompName(geoName), geoObject);
+		return width;
 	}
 
 	/**
-	 * Adds the geoObject under the name compName
+	 * Increases the stored sampling value by one and returns it
 	 * 
-	 * @param compName
-	 *            CompName
-	 * @param geoObject
-	 *            GeoObject
+	 * @return As said above.
 	 */
-	public void add(CompName compName, GeoObject geoObject)
+	public int nextSampling()
 	{
-		if (!geoMap.containsKey(compName))
-			geoMap.put(compName, geoObject);
-		else
-			throw new IllegalArgumentException(
-					"Object " + compName + " already in " + this);
+		samplingValue++;
+		return samplingValue;
+
 	}
 
-	/**
-	 * 
-	 * @param geoName
-	 *            geoName
-	 * @return The geoObject
-	 */
-	public GeoObject get(GeoName geoName)
-	{
-		return get(new CompName(geoName));
-	}
+	private Set<GeoObject> blockedAreaSet = new HashSet<GeoObject>();
 
 	/**
-	 * 
-	 * @param compName
-	 *            compName
-	 * @return geoObject
+	 * @param geo
+	 *            A blocked area
 	 */
-	public GeoObject get(CompName compName)
+	public void addBlockedArea(GeoObject geo)
 	{
-		if (geoMap.containsKey(compName))
-			return geoMap.get(compName);
-		else
-			throw new IllegalArgumentException(
-					"Object " + compName + " does not exist.");
-	}
-
-	/**
-	 * Adds all elements with their respective names to the canvas.
-	 * 
-	 * @param canvas
-	 *            A GeoCanvas
-	 */
-	public void draw(GeoCanvas canvas)
-	{
-		for (Entry<CompName, GeoObject> entry : geoMap.entrySet())
-		{
-			GeoVisible visi = visiMap.get(entry.getKey());
-			if (visi == null)
-				visi = GeoVisible.getStandard();
-			entry.getValue().draw(canvas, entry.getKey().toString(), visi);
-		}
+		blockedAreaSet.add(geo);
 
 	}
 
 	/**
-	 * Generates the objects for the contained compName objects
-	 * 
-	 * @param sentence
-	 *            Sentence
-	 * @throws IOException
-	 *             If the compName objects cannot be generated or are not well
-	 *             formed.
+	 * @return The set of blocked areas
 	 */
-	public void generateCompNames(Sentence sentence) throws IOException
+	public Set<GeoObject> getBlockedAreas()
 	{
-		List<CompName> compNameList = sentence.getCompositeNames();
-
-		for (CompName compName : compNameList)
-		{
-			if (!this.contains(compName) && compName.getGeoNames().size() > 1)
-			{
-				GeoGenerator geoGen = GeoGeneratorLookup
-						.get(new CompNamePattern(compName));
-
-				geoGen.generateAndAdd(this, compName);
-
-			}
-		}
+		return blockedAreaSet;
 	}
 
 }

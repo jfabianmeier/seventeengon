@@ -3,9 +3,6 @@ package de.fabianmeier.seventeengon.shapes;
 import java.util.List;
 import java.util.Set;
 
-import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
-import de.fabianmeier.seventeengon.util.GeoVisible;
-
 public interface GeoObject
 {
 	/**
@@ -17,17 +14,15 @@ public interface GeoObject
 	 */
 	boolean containsPoint(XYpoint point);
 
-	/**
-	 * Draws the object
-	 * 
-	 * @param canvas
-	 *            A canvas object to draw on
-	 * @param label
-	 *            A label to be drawn to the object
-	 * @param visi
-	 *            A degree of visibility
-	 */
-	void draw(GeoCanvas canvas, String label, GeoVisible visi);
+	// /**
+	// * Draws the object
+	// *
+	// * @param canvas
+	// * A canvas object to draw on
+	// * @param visi
+	// * A degree of visibility
+	// */
+	// void draw(GeoCanvas canvas, GeoVisible visi);
 
 	/**
 	 * 
@@ -85,5 +80,22 @@ public interface GeoObject
 	 * @return All zero-dimensional parts, combined as point set
 	 */
 	Set<XYpoint> getZeroDimensionalPart();
+
+	/**
+	 * 
+	 * @param shiftVector
+	 *            shift
+	 * @param scale
+	 *            Scaling factor for central scaling from the origin
+	 * @return a first shifted, then scaled version of the GeoObject
+	 */
+	GeoObject affineMap(XYvector shiftVector, double scale);
+
+	/**
+	 * 
+	 * 
+	 * @return A set of angles in which the name can be drawn.
+	 */
+	List<Angle> getNameDrawingAngles();
 
 }

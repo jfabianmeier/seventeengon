@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
-import de.fabianmeier.seventeengon.util.GeoVisible;
 
 public class Triangle extends AtomicGeoObject
 {
@@ -41,14 +39,14 @@ public class Triangle extends AtomicGeoObject
 	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
 	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
 	 */
-	@Override
-	public void draw(GeoCanvas canvas, String label, GeoVisible visi)
-	{
-		canvas.drawLine(pointA, pointB, label, visi);
-		canvas.drawLine(pointB, pointC, null, visi);
-		canvas.drawLine(pointC, pointA, null, visi);
-
-	}
+	// @Override
+	// public void draw(GeoCanvas canvas, GeoVisible visi)
+	// {
+	// canvas.drawLine(pointA, pointB, visi);
+	// canvas.drawLine(pointB, pointC, visi.hideName());
+	// canvas.drawLine(pointC, pointA, visi.hideName());
+	//
+	// }
 
 	@Override
 	public boolean equals(Object obj)
@@ -231,6 +229,40 @@ public class Triangle extends AtomicGeoObject
 	public Set<XYpoint> getZeroDimensionalPart()
 	{
 		return new HashSet<XYpoint>();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#affineMap(de.fabianmeier.
+	 * seventeengon.shapes.XYvector, double)
+	 */
+	@Override
+	public Triangle affineMap(XYvector shiftVector, double scale)
+	{
+		XYpoint aNew = pointA.affineMap(shiftVector, scale);
+		XYpoint bNew = pointB.affineMap(shiftVector, scale);
+		XYpoint cNew = pointC.affineMap(shiftVector, scale);
+
+		return new Triangle(aNew, bNew, cNew);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getNameDrawingAngles()
+	 */
+	@Override
+	public List<Angle> getNameDrawingAngles()
+	{
+		List<Angle> back = new ArrayList<Angle>();
+		back.addAll((new Line(pointA, pointB, 0, 1).getNameDrawingAngles()));
+		back.addAll((new Line(pointB, pointC, 0, 1).getNameDrawingAngles()));
+		back.addAll((new Line(pointC, pointA, 0, 1).getNameDrawingAngles()));
+
+		return back;
 	}
 
 }

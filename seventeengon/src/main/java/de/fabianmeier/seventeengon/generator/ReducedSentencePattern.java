@@ -20,8 +20,8 @@ public class ReducedSentencePattern
 	/**
 	 * Creates a reduced sentence pattern (for better matching)
 	 * 
-	 * @param sentence
-	 *            Sentence
+	 * @param sentencePattern
+	 *            SentencePattern
 	 */
 	public ReducedSentencePattern(SentencePattern sentencePattern)
 	{

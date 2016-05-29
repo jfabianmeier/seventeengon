@@ -1,13 +1,13 @@
 package de.fabianmeier.seventeengon.shapes;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
-import de.fabianmeier.seventeengon.util.GeoVisible;
 import de.fabianmeier.seventeengon.util.NumericAngle;
 
 public class Arc extends AtomicGeoObject
@@ -73,13 +73,13 @@ public class Arc extends AtomicGeoObject
 	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
 	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
 	 */
-	@Override
-	public void draw(GeoCanvas canvas, String label, GeoVisible visi)
-	{
-		canvas.drawArc(getCentre(), getStartAngle(), getEndAngle(), label,
-				visi);
-
-	}
+	// @Override
+	// public void draw(GeoCanvas canvas, GeoVisible visi)
+	// {
+	// canvas.drawArc(getCentre(), getStartAngle(), getEndAngle(), radius,
+	// visi);
+	//
+	// }
 
 	@Override
 	public boolean equals(Object obj)
@@ -305,6 +305,66 @@ public class Arc extends AtomicGeoObject
 	public Set<XYpoint> getZeroDimensionalPart()
 	{
 		return new HashSet<XYpoint>();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#affineMap(de.fabianmeier.
+	 * seventeengon.shapes.XYvector, double)
+	 */
+	@Override
+	public Arc affineMap(XYvector shiftVector, double scale)
+	{
+		XYpoint centreNew = centre.affineMap(shiftVector, scale);
+		double radiusNew = radius * scale;
+
+		return new Arc(centreNew, radiusNew, startAngle, endAngle);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getNameDrawingAngles()
+	 */
+	@Override
+	public List<Angle> getNameDrawingAngles()
+	{
+		double angleDifference = NumericAngle.angleDifference(startAngle,
+				endAngle);
+
+		double stepSize = angleDifference / 8;
+
+		List<NumericAngle> drawNumAngles = new ArrayList<NumericAngle>();
+
+		for (int i = 0; i < 8; i++)
+		{
+			drawNumAngles.add(startAngle.addtoAngle(i * stepSize));
+		}
+
+		List<XYpoint> namingPoints = new ArrayList<XYpoint>();
+
+		for (NumericAngle num : drawNumAngles)
+		{
+			namingPoints.add((new XYvector(radius, num).shift(centre)));
+		}
+
+		List<Angle> back = new ArrayList<Angle>();
+
+		for (int i = 0; i < 8; i++)
+		{
+			XYpoint xy = namingPoints.get(i);
+			NumericAngle startAngle = drawNumAngles.get(i)
+					.addtoAngle(-Math.PI / 2);
+			NumericAngle endAngle = drawNumAngles.get(i)
+					.addtoAngle(Math.PI / 2);
+
+			back.add(new Angle(xy, startAngle, endAngle));
+		}
+
+		return back;
+
 	}
 
 }

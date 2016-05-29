@@ -3,14 +3,43 @@
  */
 package de.fabianmeier.seventeengon.svg;
 
+import java.awt.BasicStroke;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.text.AttributedString;
+import java.util.List;
 
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.svggen.SVGGraphics2DIOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
+import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
+import de.fabianmeier.seventeengon.naming.CompName;
+import de.fabianmeier.seventeengon.naming.GeoName;
+import de.fabianmeier.seventeengon.shapes.Angle;
+import de.fabianmeier.seventeengon.shapes.Arc;
+import de.fabianmeier.seventeengon.shapes.Circle;
+import de.fabianmeier.seventeengon.shapes.CompositeGeoObject;
+import de.fabianmeier.seventeengon.shapes.GeoObject;
+import de.fabianmeier.seventeengon.shapes.Line;
+import de.fabianmeier.seventeengon.shapes.Triangle;
 import de.fabianmeier.seventeengon.shapes.XYpoint;
 import de.fabianmeier.seventeengon.shapes.XYvector;
 import de.fabianmeier.seventeengon.util.GeoVisible;
@@ -22,8 +51,75 @@ import de.fabianmeier.seventeengon.util.NumericAngle;
  */
 public class SVGcanvas implements GeoCanvas
 {
+	private static final Logger LOG = LogManager.getLogger(SVGcanvas.class);
+
+	@SuppressWarnings("unused")
 	private final double width;
 	private final double height;
+	private final SVGGraphics2D svgGenerator;
+
+	/**
+	 * 
+	 * @param s
+	 *            Ein String, der dort angezeigt werden sollen
+	 * @return Die bounding box des Strings im dem aktuellen Graphics2D
+	 */
+	private XYvector getBoundingBox(GeoName geoName)
+	{
+
+		AttributedString attString = convertToAttributedString(geoName);
+
+		TextLayout textLayout = new TextLayout(attString.getIterator(),
+				svgGenerator.getFontRenderContext());
+		Rectangle2D.Float textBounds = (Rectangle2D.Float) textLayout
+				.getBounds();
+
+		return new XYvector(textBounds.getWidth(), textBounds.getHeight());
+
+		// FontMetrics fontMetrics = svgGenerator.getFontMetrics();
+
+		// Rectangle2D stringBounds = fontMetrics.getStringBounds(s,
+		// svgGenerator);
+
+		//
+		// AttributedString as = new AttributedString("I love you 104
+		// gazillion");
+		// as.addAttribute(TextAttribute.SUPERSCRIPT,
+		// TextAttribute.SUPERSCRIPT_SUPER, 13, 14);
+		// as.addAttribute(TextAttribute.FOREGROUND, Color.RED, 2, 6);
+		// g.drawString(as.getIterator(), 20, 20);
+
+		// TextLayout textLayout = new TextLayout(
+		// text.getIterator(),
+		// g.getFontRenderContext()
+		// );
+		// Rectangle2D.Float textBounds = ( Rectangle2D.Float )
+		// textLayout.getBounds();
+		//
+		// g.drawString( text.getIterator(), 50, 50 );
+		// // lets draw a bounding rect exactly around our text
+		// // to be sure we calculated it properly
+		// g.draw( new Rectangle2D.Float(
+		// 50 + textBounds.x, 50 + textBounds.y,
+		// textBounds.width, textBounds.height
+		// ) );
+
+		// return new XYvector(stringBounds.getWidth(),
+		// stringBounds.getHeight());
+	}
+
+	private AttributedString convertToAttributedString(GeoName geoName)
+	{
+		AttributedString attString = new AttributedString(geoName.toString());
+
+		if (geoName.toString().length() > 1)
+		{
+			attString.addAttribute(TextAttribute.SUPERSCRIPT,
+					TextAttribute.SUPERSCRIPT_SUB, 1,
+					geoName.toString().length());
+		}
+		return attString;
+	}
 
 	/**
 	 * Generates a canvas for svg generation
@@ -46,77 +142,131 @@ public class SVGcanvas implements GeoCanvas
 		Document document = domImpl.createDocument(svgNS, "svg", null);
 
 		// Create an instance of the SVG Generator.
-		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+		svgGenerator = new SVGGraphics2D(document);
+
+		svgGenerator.setSVGCanvasSize(new Dimension((int) width, (int) height));
+
+		svgGenerator.setClip(0, 0, (int) width, (int) height);
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoCanvas#drawLine(de.fabianmeier.
-	 * seventeengon.shapes.XYpoint, de.fabianmeier.seventeengon.shapes.XYpoint,
-	 * java.lang.String, de.fabianmeier.seventeengon.util.GeoVisible)
+	public void draw(Line line)
+	{
+
+		svgGenerator.draw(new Line2D.Double(line.getStartPoint().getX(),
+				height - line.getStartPoint().getY(), line.getEndPoint().getX(),
+				height - line.getEndPoint().getY()));
+
+	}
+
+	/**
+	 * @param label
+	 *            Label to draw
+	 * @param drawPoint
+	 *            point to which the label should be near
+	 * @param startAngle
+	 *            startAngle for the angle in which the label should be
+	 * @param endAngle
+	 *            endAngle for the angle in which the label should be
 	 */
-	@Override
-	public void drawLine(XYpoint start, XYpoint end, String label,
+	@SuppressWarnings("unused")
+	private void drawName(GeoName label, XYpoint drawPoint,
+			NumericAngle startAngle, NumericAngle endAngle)
+	{
+		NumericAngle middleAngle = startAngle.addtoAngle(
+				NumericAngle.angleDifference(startAngle, endAngle) / 2);
+
+		XYvector boundingBox = getBoundingBox(label);
+
+		XYvector angleVector = new XYvector(boundingBox.getxMove(),
+				middleAngle);
+
+		XYpoint targetPoint = angleVector.shift(drawPoint);
+
+		svgGenerator.drawString(convertToAttributedString(label).getIterator(),
+				(float) targetPoint.getX(),
+				(float) height - (float) targetPoint.getY());
+
+	}
+
+	/**
+	 * @param graphics
+	 *            A graphics object
+	 * @param visible
+	 *            A visibility description
+	 */
+	private static void setColourAndStroke(Graphics2D graphics,
 			GeoVisible visible)
 	{
-		// TODO Auto-generated method stub
+		final float dash1[] = {10.0f};
+		final BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
+				BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
+
+		if (visible.isDotted())
+			graphics.setStroke(dashed);
+
+		final BasicStroke filled = new BasicStroke(3);
+
+		if (visible.isMarked())
+			graphics.setStroke(filled);
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoCanvas#drawArc(de.fabianmeier.
-	 * seventeengon.shapes.XYpoint, de.fabianmeier.seventeengon.util.Angle,
-	 * de.fabianmeier.seventeengon.util.Angle, java.lang.String,
-	 * de.fabianmeier.seventeengon.util.GeoVisible)
-	 */
-	@Override
-	public void drawArc(XYpoint centre, NumericAngle startAngle,
-			NumericAngle endAngle, String label, GeoVisible visible)
+	public void draw(Arc arc)
 	{
-		// TODO Auto-generated method stub
+		NumericAngle startAngle = arc.getStartAngle();
+		NumericAngle endAngle = arc.getEndAngle();
+		XYpoint centre = arc.getCentre();
+		double radius = arc.getRadius();
+
+		if (!startAngle.equals(endAngle))
+		{
+
+			svgGenerator.draw(new Arc2D.Double(centre.getX() - radius,
+					height - centre.getY() - radius, 2 * radius, 2 * radius,
+					-startAngle.asDouble() * 180 / Math.PI,
+					-NumericAngle.angleDifference(startAngle, endAngle) * 180
+							/ Math.PI,
+					Arc2D.OPEN));
+		}
+		else
+		{
+
+			svgGenerator.draw(new Ellipse2D.Double(centre.getX() - radius,
+					height - centre.getY() - radius, 2 * radius, 2 * radius));
+		}
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoCanvas#drawPoint(de.fabianmeier
-	 * .seventeengon.shapes.XYpoint, java.lang.String,
-	 * de.fabianmeier.seventeengon.util.GeoVisible)
-	 */
-	@Override
-	public void drawPoint(XYpoint point, String label, GeoVisible visible)
+	public void draw(XYpoint point)
 	{
-		// TODO Auto-generated method stub
+
+		svgGenerator.fill(new Ellipse2D.Double(point.getX() - width / 200,
+				height - point.getY() - width / 200, width / 100, width / 100));
 
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Writes the output to a file
 	 * 
-	 * @see de.fabianmeier.seventeengon.geoobjects.GeoCanvas#fillTriangle(de.
-	 * fabianmeier.seventeengon.shapes.XYpoint,
-	 * de.fabianmeier.seventeengon.shapes.XYpoint,
-	 * de.fabianmeier.seventeengon.shapes.XYpoint, java.lang.String,
-	 * de.fabianmeier.seventeengon.util.GeoVisible)
+	 * @param svgFile
+	 *            The file
 	 */
-	@Override
-	public void fillTriangle(XYpoint a, XYpoint b, XYpoint c, String label,
-			GeoVisible visible)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
 	public void writeToFile(File svgFile)
 	{
+		boolean useCSS = true; // we want to use CSS style attributes
+
+		try
+		{
+			Writer out = new OutputStreamWriter(new FileOutputStream(svgFile),
+					"UTF-8");
+			svgGenerator.stream(out, useCSS);
+		}
+		catch (UnsupportedEncodingException | FileNotFoundException
+				| SVGGraphics2DIOException e)
+		{
+			LOG.error("Writing on " + svgFile + " failed.", e);
+		}
 
 	}
 
@@ -130,11 +280,271 @@ public class SVGcanvas implements GeoCanvas
 	 * de.fabianmeier.seventeengon.shapes.XYvector, java.lang.String,
 	 * de.fabianmeier.seventeengon.util.GeoVisible)
 	 */
-	@Override
-	public void drawAngle(XYpoint vertex, XYvector direction1,
-			XYvector direction2, String label, GeoVisible visi)
+	// @Override
+	// public void drawAngle(XYpoint vertex, XYvector direction1,
+	// XYvector direction2, GeoVisible visible)
+	// {
+	//
+	// setColourAndStroke(svgGenerator, visible);
+	//
+	// NumericAngle startAngle = direction1.getAngle();
+	// NumericAngle endAngle = direction2.getAngle();
+	//
+	// double radius = 40;
+	//
+	// if (!visible.isInvisible())
+	// {
+	// if (!startAngle.equals(endAngle))
+	// {
+	//
+	// svgGenerator.draw(new Arc2D.Double(vertex.getX() - radius,
+	// height - vertex.getY() - radius, 2 * radius, 2 * radius,
+	// -startAngle.asDouble() * 180 / Math.PI,
+	// -NumericAngle.angleDifference(startAngle, endAngle)
+	// * 180 / Math.PI,
+	// Arc2D.OPEN));
+	// }
+	// else
+	// {
+	//
+	// svgGenerator.draw(new Ellipse2D.Double(vertex.getX() - radius,
+	// height - vertex.getY() - radius, 2 * radius,
+	// 2 * radius));
+	// }
+
+	// NumericAngle middleAngle = startAngle.addtoAngle(
+	// NumericAngle.angleDifference(startAngle, endAngle) / 2);
+	//
+	// XYvector angleVector = new XYvector(radius, middleAngle);
+	//
+	// XYpoint drawPoint = angleVector.shift(vertex);
+	//
+	// if (!visible.isNameHidden())
+	// drawName(label, drawPoint, startAngle, endAngle);
+
+	// }
+	//
+	// }
+
+	private void draw(Angle angle)
 	{
-		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.geoobjects.GeoCanvas#draw(de.fabianmeier.
+	 * seventeengon.geoobjects.GeoHolder)
+	 */
+	@Override
+	public void drawAll(GeoHolder geoHolder)
+	{
+		GeoHolder fittedHolder = geoHolder.getClippedGeoHolder();
+
+		for (CompName compName : fittedHolder.getCompNames())
+		{
+			GeoObject geo = geoHolder.get(compName);
+			GeoVisible visibility = geoHolder.getVisibility(compName);
+
+			if (!visibility.isInvisible())
+			{
+				setColourAndStroke(svgGenerator, visibility);
+				draw(geo);
+			}
+		}
+
+		for (CompName compName : fittedHolder.getCompNames())
+		{
+			GeoObject geo = geoHolder.get(compName);
+			GeoVisible visibility = geoHolder.getVisibility(compName);
+
+			if (!(compName instanceof GeoName))
+				continue;
+
+			GeoName geoName = (GeoName) compName;
+
+			if (!visibility.isNameHidden())
+			{
+				List<Angle> nameDrawingAngles = geo.getNameDrawingAngles();
+
+				boolean success = false;
+				double factor = 1;
+
+				while (!success)
+				{
+
+					for (Angle angle : nameDrawingAngles)
+					{
+						boolean localSuccess = nameTry(fittedHolder, geoName,
+								angle, factor);
+
+						if (localSuccess)
+						{
+							success = true;
+							break;
+						}
+
+					}
+
+					factor *= 1.1;
+
+					if (factor > 4)
+						break;
+
+				}
+
+			}
+
+		}
+
+	}
+
+	private boolean intersectsWithVisibleObject(GeoHolder geoHolder,
+			GeoObject other)
+	{
+		for (CompName compName : geoHolder.getCompNames())
+		{
+			GeoObject geo = geoHolder.get(compName);
+			GeoVisible visibility = geoHolder.getVisibility(compName);
+
+			if (!visibility.isInvisible())
+			{
+				if (!other.intersectWith(geo).isEmpty())
+					return false;
+
+			}
+
+		}
+
+		for (GeoObject geo : geoHolder.getBlockedAreas())
+		{
+			if (!other.intersectWith(geo).isEmpty())
+				return false;
+		}
+
+		return true;
+
+	}
+
+	private GeoObject getRectangle(double left, double bottom, double width,
+			double height)
+	{
+		double right = left + width;
+		double top = bottom + height;
+		Triangle triangle1 = new Triangle(new XYpoint(left, bottom),
+				new XYpoint(right, bottom), new XYpoint(right, top));
+		Triangle triangle2 = new Triangle(new XYpoint(right, top),
+				new XYpoint(left, top), new XYpoint(left, bottom));
+
+		return new CompositeGeoObject(triangle1, triangle2);
+
+	}
+
+	/**
+	 * @param fittedHolder
+	 *            holder where the name should be drawn into
+	 * @param geoName
+	 *            a geoName
+	 * @param angle
+	 *            the angle to draw in
+	 * @param offset
+	 *            an offset to the angle boundary
+	 * @return if the addition of the geoName succeeded
+	 */
+	private boolean nameTry(GeoHolder fittedHolder, GeoName geoName,
+			Angle angle, double factor)
+	{
+		XYvector boundingBox = getBoundingBox(geoName);
+
+		XYvector direction1 = angle.getDirection1();
+		XYvector direction2 = angle.getDirection2();
+
+		double boundingWidth = boundingBox.getxMove();
+		double boundingHeight = boundingBox.getyMove();
+
+		XYvector midVector = null;
+
+		if (direction1.getxMove() > 0 && direction1.getyMove() > 0)
+		{
+			if (direction2.getyMove() < 0)
+			{
+				midVector = new XYvector(-boundingWidth / 2,
+						boundingHeight / 2);
+			}
+			else
+			{
+
+			}
+
+			// TODO: construct midVector.
+		}
+
+		midVector = midVector.multiplyBy(factor);
+
+		double startX = midVector.getxMove() - boundingBox.getxMove() / 2;
+		double startY = midVector.getyMove() - boundingBox.getyMove() / 2;
+
+		GeoObject rectangle = getRectangle(startX, startY,
+				boundingBox.getxMove(), boundingBox.getyMove());
+
+		if (intersectsWithVisibleObject(fittedHolder, rectangle))
+			return false;
+
+		fittedHolder.addBlockedArea(rectangle);
+
+		svgGenerator.drawString(
+				convertToAttributedString(geoName).getIterator(),
+				(float) startX, (float) height - (float) startY);
+
+		return true;
+
+	}
+
+	private void draw(Circle circle)
+	{
+		GeoObject boundary = circle.getBoundary();
+		draw(boundary);
+
+	}
+
+	private void draw(CompositeGeoObject geoObject)
+	{
+		for (GeoObject geo : geoObject.getSubObjects())
+		{
+			draw(geo);
+		}
+
+	}
+
+	private void draw(Triangle triangle)
+	{
+		draw(new Line(triangle.getPointA(), triangle.getPointB(), 0, 1));
+		draw(new Line(triangle.getPointB(), triangle.getPointC(), 0, 1));
+		draw(new Line(triangle.getPointC(), triangle.getPointA(), 0, 1));
+	}
+
+	/**
+	 * @param geo
+	 *            A geoObject
+	 */
+	private void draw(GeoObject geo)
+	{
+		if (geo instanceof Angle)
+			draw((Angle) geo);
+		if (geo instanceof Arc)
+			draw((Arc) geo);
+		if (geo instanceof Circle)
+			draw((Circle) geo);
+		if (geo instanceof CompositeGeoObject)
+			draw((CompositeGeoObject) geo);
+		if (geo instanceof Line)
+			draw((Line) geo);
+		if (geo instanceof Triangle)
+			draw((Triangle) geo);
+		if (geo instanceof XYpoint)
+			draw((XYpoint) geo);
 
 	}
 

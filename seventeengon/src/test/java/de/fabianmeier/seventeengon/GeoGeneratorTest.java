@@ -13,7 +13,6 @@ import org.junit.Test;
 import de.fabianmeier.seventeengon.generator.GeoGenerator;
 import de.fabianmeier.seventeengon.generator.GeoGeneratorLookup;
 import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
-import de.fabianmeier.seventeengon.geoobjects.SampleGenerator;
 import de.fabianmeier.seventeengon.geoobjects.TextualCanvas;
 import de.fabianmeier.seventeengon.naming.Sentence;
 
@@ -45,9 +44,7 @@ public class GeoGeneratorTest
 				.get(new Sentence("Sei A ein Punkt"));
 		TextualCanvas textCanvas = new TextualCanvas();
 
-		GeoHolder geoHolder = new GeoHolder();
-
-		SampleGenerator.reset();
+		GeoHolder geoHolder = new GeoHolder(2000, 1000, 20);
 
 		local.generateAndAdd(geoHolder, new Sentence("Sei B ein Punkt"));
 
@@ -76,10 +73,9 @@ public class GeoGeneratorTest
 				replacement);
 
 		Sentence sentence = new Sentence("Seien X und Y Punkte");
-		SampleGenerator.reset();
 		GeoGenerator local = GeoGeneratorLookup.get(sentence);
 
-		GeoHolder geoHolder = new GeoHolder();
+		GeoHolder geoHolder = new GeoHolder(2000, 1000, 20);
 		local.generateAndAdd(geoHolder, sentence);
 
 		TextualCanvas textCanvas = new TextualCanvas();
@@ -105,10 +101,9 @@ public class GeoGeneratorTest
 		TextualCanvas textCanvas = new TextualCanvas();
 
 		Sentence sentence = new Sentence("Sei EFX ein Dreieck");
-		SampleGenerator.reset();
 		GeoGenerator local = GeoGeneratorLookup.get(sentence);
 
-		GeoHolder geoHolder = new GeoHolder();
+		GeoHolder geoHolder = new GeoHolder(2000, 1000, 0);
 		local.generateAndAdd(geoHolder, sentence);
 
 		geoHolder.draw(textCanvas);
@@ -133,9 +128,8 @@ public class GeoGeneratorTest
 		TextualCanvas textCanvas = new TextualCanvas();
 
 		Sentence sentence = new Sentence("Sei HDI eine Dreieck");
-		SampleGenerator.reset();
 
-		GeoHolder geoHolder = new GeoHolder();
+		GeoHolder geoHolder = new GeoHolder(2000, 1000, 10);
 		GeoGeneratorLookup.generateAndAdd(geoHolder, sentence);
 
 		geoHolder.draw(textCanvas);

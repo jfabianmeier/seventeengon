@@ -1,6 +1,7 @@
 package de.fabianmeier.seventeengon.shapes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -8,9 +9,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-
-import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
-import de.fabianmeier.seventeengon.util.GeoVisible;
 
 /**
  * A GeoObjects which consists of a list of other GeoObjects. They may be
@@ -30,6 +28,11 @@ public class CompositeGeoObject implements GeoObject
 	public static GeoObject getEmptyObject()
 	{
 		return emptyObject;
+	}
+
+	public CompositeGeoObject(GeoObject... geoArray)
+	{
+		this(Arrays.asList(geoArray));
 	}
 
 	public CompositeGeoObject(Collection<? extends GeoObject> geoCollection)
@@ -56,21 +59,21 @@ public class CompositeGeoObject implements GeoObject
 		return false;
 	}
 
-	@Override
-	public void draw(GeoCanvas canvas, String label, GeoVisible visi)
-	{
-		boolean written = false;
-		for (GeoObject geo : subObjectList)
-		{
-			if (!written)
-				geo.draw(canvas, label, visi);
-			else
-				geo.draw(canvas, null, visi);
-
-			written = true;
-		}
-
-	}
+	// @Override
+	// public void draw(GeoCanvas canvas, GeoVisible visi)
+	// {
+	// boolean written = false;
+	// for (GeoObject geo : subObjectList)
+	// {
+	// if (!written)
+	// geo.draw(canvas, visi);
+	// else
+	// geo.draw(canvas, visi.hideName());
+	//
+	// written = true;
+	// }
+	//
+	// }
 
 	/*
 	 * (non-Javadoc)
@@ -217,6 +220,46 @@ public class CompositeGeoObject implements GeoObject
 	public String toString()
 	{
 		return "\\" + StringUtils.join(subObjectList, ",") + "/";
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#affineMap(de.fabianmeier.
+	 * seventeengon.shapes.XYvector, double)
+	 */
+	@Override
+	public CompositeGeoObject affineMap(XYvector shiftVector, double scale)
+	{
+		List<GeoObject> shiftedObjects = new ArrayList<GeoObject>();
+
+		for (GeoObject geo : subObjectList)
+		{
+			shiftedObjects.add(geo.affineMap(shiftVector, scale));
+		}
+
+		return new CompositeGeoObject(shiftedObjects);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getNameDrawingAngles()
+	 */
+	@Override
+	public List<Angle> getNameDrawingAngles()
+	{
+		List<Angle> back = new ArrayList<Angle>();
+
+		for (GeoObject geo : subObjectList)
+		{
+			back.addAll(geo.getNameDrawingAngles());
+		}
+
+		return back;
 
 	}
 

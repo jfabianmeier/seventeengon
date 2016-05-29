@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.fabianmeier.seventeengon.generator.GeoGeneratorLookup;
 import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
-import de.fabianmeier.seventeengon.geoobjects.SampleGenerator;
 import de.fabianmeier.seventeengon.naming.Sentence;
 
 /**
@@ -19,6 +21,12 @@ import de.fabianmeier.seventeengon.naming.Sentence;
  */
 public class ListProcessing
 {
+
+	private static final Logger LOG = LogManager
+			.getLogger(ListProcessing.class);
+
+	private static double width = 600;
+	private static double height = 400;
 	/**
 	 * 
 	 * @param rawSentenceList
@@ -43,12 +51,9 @@ public class ListProcessing
 			sentenceList.add(new Sentence(trimmedSentence));
 		}
 
-		GeoHolder holder = new GeoHolder();
-
-		SampleGenerator.reset();
-
 		for (int versuch = 0; versuch < 100; versuch++)
 		{
+			GeoHolder holder = new GeoHolder(width, height, versuch);
 			boolean runSuccess = true;
 			for (Sentence sentence : sentenceList)
 			{
@@ -64,10 +69,9 @@ public class ListProcessing
 			{
 				return holder;
 			}
-			else
-			{
-				holder = new GeoHolder();
-			}
+
+			LOG.debug("Try " + versuch + " in writing.");
+
 		}
 
 		throw new IOException("Construction of the geometric object failed.");

@@ -32,8 +32,6 @@ public class GeoGeneratorLookup
 		add(CircleGenerator.CIRCLE, new CircleGenerator());
 		add(LineGenerator.LINE, new LineGenerator());
 		add(LineGenerator.AB, new LineGenerator());
-		add(PointGenerator.CUT, new PointGenerator());
-		add(PointGenerator.INSIDE, new PointGenerator());
 		add(PointGenerator.INX, new PointGenerator());
 		add(PointGenerator.ONX, new PointGenerator());
 		add(PointGenerator.OUTSIDE, new PointGenerator());
@@ -44,6 +42,7 @@ public class GeoGeneratorLookup
 		add(SegmentGenerator.AB, new SegmentGenerator());
 		add(TriangleGenerator.TRIANGLE, new TriangleGenerator());
 		add(TriangleGenerator.ABC, new TriangleGenerator());
+		add(EqualityGenerator.ASSIGN, new EqualityGenerator());
 
 		// add(new Sentence("Sei P ein Punkt"), new PointGenerator());
 		// add(new Sentence("Sei ABC ein Dreieck"), new TriangleGenerator());
@@ -197,11 +196,14 @@ public class GeoGeneratorLookup
 	 * @param compPattern
 	 *            a CompPattern from the dictionary
 	 * @return the saved geoGenerator, otherwise an exception
+	 * @throws IOException
+	 *             If the compPattern is not contained in the Lookup
 	 */
 	public static GeoGenerator get(CompNamePattern compPattern)
+			throws IOException
 	{
 		if (!compLookUp.containsKey(compPattern))
-			throw new IllegalArgumentException(
+			throw new IOException(
 					"SentencePattern " + compPattern + " not defined.");
 
 		return compLookUp.get(compPattern);

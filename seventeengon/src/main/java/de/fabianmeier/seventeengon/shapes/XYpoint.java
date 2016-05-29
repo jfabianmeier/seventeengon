@@ -1,12 +1,13 @@
 package de.fabianmeier.seventeengon.shapes;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
-import de.fabianmeier.seventeengon.util.GeoVisible;
+import de.fabianmeier.seventeengon.util.NumericAngle;
 
 /**
  * This class describes a point in the plane with x and y coordinate. Points
@@ -38,19 +39,19 @@ public class XYpoint extends AtomicGeoObject
 		this.y = y;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
-	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
-	 */
-	@Override
-	public void draw(GeoCanvas canvas, String label, GeoVisible visi)
-	{
-		canvas.drawPoint(this, label, visi);
-
-	}
+	// /*
+	// * (non-Javadoc)
+	// *
+	// * @see
+	// * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
+	// * seventeengon.geoobjects.GeoCanvas, java.lang.String)
+	// */
+	// @Override
+	// public void draw(GeoCanvas canvas, GeoVisible visi)
+	// {
+	// canvas.drawPoint(this, visi);
+	//
+	// }
 
 	@Override
 	public boolean equals(Object obj)
@@ -187,6 +188,33 @@ public class XYpoint extends AtomicGeoObject
 		local.add(this);
 
 		return local;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#affineMap(de.fabianmeier.
+	 * seventeengon.shapes.XYvector, double)
+	 */
+	@Override
+	public XYpoint affineMap(XYvector shiftVector, double scale)
+	{
+		return new XYpoint((x + shiftVector.getxMove()) * scale,
+				(y + shiftVector.getyMove()) * scale);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getNameDrawingAngles()
+	 */
+	@Override
+	public List<Angle> getNameDrawingAngles()
+	{
+		List<Angle> back = new ArrayList<Angle>();
+		back.add(new Angle(this, new NumericAngle(0), new NumericAngle(0)));
+		return back;
 	}
 
 }

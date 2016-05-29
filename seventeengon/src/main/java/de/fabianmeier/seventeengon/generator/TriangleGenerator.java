@@ -4,8 +4,6 @@
 package de.fabianmeier.seventeengon.generator;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
 import de.fabianmeier.seventeengon.naming.CompName;
@@ -36,54 +34,19 @@ public class TriangleGenerator implements GeoGenerator
 	 * fabianmeier.seventeengon.geoobjects.GeoHolder, java.lang.String)
 	 */
 	@Override
-	public boolean generateAndAdd(GeoHolder geoHolder, Sentence input)
+	public boolean generateAndAdd(GeoHolder geoHolder, Sentence sentence)
 			throws IOException
+
 	{
-		List<CompName> points = new ArrayList<CompName>();
+		if (!geoHolder.generateCompNames(sentence))
+			return false;
 
-		CompName compName;
-
-		if (TRIANGLE.equals(new SentencePattern(input)))
+		if ((new SentencePattern(sentence)).equals(TRIANGLE))
 		{
-			compName = input.getCompositeNames().get(0);
+			return true;
 		}
-		else
-		{
-			throw new IOException("Wrong sentence pattern: " + input);
-		}
-		List<GeoName> geoPoints = compName.getGeoNames();
-		for (GeoName geoName : geoPoints)
-		{
-			points.add(new CompName(geoName));
-		}
-
-		if (points.size() != 3)
-			throw new IllegalArgumentException(
-					"Input " + input + " not suitable for triangle");
-
-		for (CompName point : points)
-			if (!geoHolder.contains(point))
-			{
-				try
-				{
-					GeoGeneratorLookup.generateAndAdd(geoHolder, new Sentence(
-							"Sei " + point.toString() + " ein Punkt"));
-				}
-				catch (IOException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-		XYpoint a = (XYpoint) geoHolder.get(points.get(0));
-		XYpoint b = (XYpoint) geoHolder.get(points.get(1));
-		XYpoint c = (XYpoint) geoHolder.get(points.get(2));
-
-		geoHolder.add(compName, new Triangle(a, b, c));
-
-		return true;
-
+		throw new IllegalArgumentException(
+				sentence + " is not defined operation.");
 	}
 
 	/*
@@ -95,11 +58,48 @@ public class TriangleGenerator implements GeoGenerator
 	 * de.fabianmeier.seventeengon.naming.CompName)
 	 */
 	@Override
-	public boolean generateAndAdd(GeoHolder geoHolder, CompName sentence)
+	public boolean generateAndAdd(GeoHolder geoHolder, CompName compName)
 			throws IOException
 	{
-		// TODO Auto-generated method stub
-		return false;
+		if ((new CompNamePattern(compName)).equals(ABC))
+		{
+			GeoName nameA = compName.getGeoNames().get(0);
+			GeoName nameB = compName.getGeoNames().get(1);
+			GeoName nameC = compName.getGeoNames().get(2);
+
+			if (!geoHolder.contains(nameA))
+			{
+				GeoGeneratorLookup.generateAndAdd(geoHolder,
+						new Sentence("Sei " + nameA + " ein Punkt"));
+
+			}
+
+			if (!geoHolder.contains(nameB))
+			{
+				GeoGeneratorLookup.generateAndAdd(geoHolder,
+						new Sentence("Sei " + nameB + " ein Punkt"));
+
+			}
+
+			if (!geoHolder.contains(nameC))
+			{
+				GeoGeneratorLookup.generateAndAdd(geoHolder, new Sentence(
+						"Sei " + nameC + " ein Punkt über " + nameA + nameB));
+
+			}
+
+			XYpoint pointA = geoHolder.getPointOrIO(nameA);
+			XYpoint pointB = geoHolder.getPointOrIO(nameB);
+			XYpoint pointC = geoHolder.getPointOrIO(nameC);
+
+			Triangle triangle = new Triangle(pointA, pointB, pointC);
+			geoHolder.add(compName, triangle);
+
+			return true;
+		}
+
+		throw new IllegalArgumentException(
+				compName + " is not defined operation.");
 	}
 
 }

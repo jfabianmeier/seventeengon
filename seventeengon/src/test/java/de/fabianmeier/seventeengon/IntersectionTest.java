@@ -37,7 +37,7 @@ public class IntersectionTest
 	public void testIntersectXYpointLine()
 	{
 		XYpoint point1 = new XYpoint(10, 30);
-		Line line = new Line(new XYpoint(0, 20), new XYpoint(20, 40));
+		Line line = new Line(new XYpoint(0, 20), new XYpoint(20, 40), -10, 10);
 
 		GeoObject back = line.intersectWith(point1);
 
@@ -92,7 +92,7 @@ public class IntersectionTest
 	@Test
 	public void testIntersectLineXYpoint()
 	{
-		Line line = new Line(new XYpoint(0, 10), new XYpoint(0, 20));
+		Line line = new Line(new XYpoint(0, 10), new XYpoint(0, 20), -10, 10);
 		XYpoint point1 = new XYpoint(0, 40);
 		XYpoint point2 = new XYpoint(10, 20);
 
@@ -103,13 +103,14 @@ public class IntersectionTest
 	@Test
 	public void testIntersectLineLine()
 	{
-		Line line = new Line(new XYpoint(0, 10), new XYpoint(0, 30));
-		Line line2 = new Line(new XYpoint(10, 0), new XYpoint(40, 0));
+		Line line = new Line(new XYpoint(0, 10), new XYpoint(0, 30), -10, 10);
+		Line line2 = new Line(new XYpoint(10, 0), new XYpoint(40, 0), -20, 20);
 
 		GeoObject cut = line.intersectWith(line2);
 		assertTrue(cut.containsPoint(new XYpoint(0, 0)));
 
-		Line line3 = new Line(new XYpoint(0, 43), new XYpoint(0, 40));
+		Line line3 = new Line(new XYpoint(0, 43), new XYpoint(0, 40), -100,
+				100);
 
 		cut = line.intersectWith(line3);
 
@@ -122,7 +123,7 @@ public class IntersectionTest
 	@Test
 	public void testIntersectLineCircle()
 	{
-		Line line = new Line(new XYpoint(10, 10), new XYpoint(10, 40));
+		Line line = new Line(new XYpoint(10, 10), new XYpoint(10, 40), -5, 5);
 		Arc circle = new Arc(new XYpoint(10, 10), 10);
 
 		GeoObject cut = circle.intersectWith(line);
@@ -134,7 +135,7 @@ public class IntersectionTest
 	@Test
 	public void testIntersectLineTriangle()
 	{
-		Line line = new Line(new XYpoint(0, 10), new XYpoint(0, 20));
+		Line line = new Line(new XYpoint(0, 10), new XYpoint(0, 20), -12, 20);
 		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10),
 				new XYpoint(10, 0));
 
@@ -149,7 +150,7 @@ public class IntersectionTest
 	{
 		Circle fcirc = new Circle(new XYpoint(0, 0), 10);
 
-		Line line = new Line(new XYpoint(0, 0), new XYpoint(0, 10));
+		Line line = new Line(new XYpoint(0, 0), new XYpoint(0, 10), -10, 10);
 
 		GeoObject cut = line.intersectWith(fcirc);
 
@@ -172,7 +173,7 @@ public class IntersectionTest
 	public void testIntersectCircleLine()
 	{
 		Arc circle = new Arc(new XYpoint(0, 0), 10);
-		Line line = new Line(new XYpoint(10, 0), new XYpoint(10, 20));
+		Line line = new Line(new XYpoint(10, 0), new XYpoint(10, 20), -10, 10);
 		GeoObject cut = line.intersectWith(circle);
 
 		assertTrue(pointAssert(cut, 10, 0));
@@ -241,7 +242,7 @@ public class IntersectionTest
 	@Test
 	public void testIntersectTriangleLine()
 	{
-		Line line = new Line(new XYpoint(0, 0), new XYpoint(10, 0));
+		Line line = new Line(new XYpoint(0, 0), new XYpoint(10, 0), -100, 1000);
 		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(10, 10),
 				new XYpoint(0, 10));
 
@@ -304,7 +305,7 @@ public class IntersectionTest
 	{
 		Circle fcirc = new Circle(new XYpoint(0, 0), 5);
 
-		Line line = new Line(new XYpoint(2, 10), new XYpoint(2, 0));
+		Line line = new Line(new XYpoint(2, 10), new XYpoint(2, 0), -10, 200);
 
 		GeoObject cut = line.intersectWith(fcirc);
 

@@ -1,13 +1,14 @@
 package de.fabianmeier.seventeengon.shapes;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
-import de.fabianmeier.seventeengon.util.GeoVisible;
+import de.fabianmeier.seventeengon.util.NumericAngle;
 
 /**
  * Directed line through pointA and pointB. The lambdas indicate the length.
@@ -37,24 +38,27 @@ public class Line extends AtomicGeoObject
 	 */
 	public Line(double xFactor, double yFactor, double constant)
 	{
+		XYpoint firstB = null;
 		if (DMan.same(xFactor, 0))
 		{
 			pointA = new XYpoint(0, constant / yFactor);
-			pointB = new XYpoint(1, constant / yFactor);
+			firstB = new XYpoint(1, constant / yFactor);
 		}
 		else
 		{
 			pointA = new XYpoint(constant / xFactor, 0);
 			if (DMan.same(yFactor, 0))
-				pointB = new XYpoint(constant / xFactor, 1);
+				firstB = new XYpoint(constant / xFactor, 1);
 			else
-				pointB = new XYpoint(1, constant / yFactor - xFactor / yFactor);
+				firstB = new XYpoint(1, constant / yFactor - xFactor / yFactor);
 		}
 
-		this.startLambda = -1000000;
-		this.endLambda = 1000000;
+		normedDirection = new XYvector(pointA, firstB).normed();
 
-		normedDirection = new XYvector(pointA, pointB).normed();
+		pointB = normedDirection.shift(pointA);
+
+		this.startLambda = -10000;
+		this.endLambda = 10000;
 
 	}
 
@@ -66,20 +70,20 @@ public class Line extends AtomicGeoObject
 	 * @param pointB
 	 *            second point
 	 */
-	public Line(XYpoint pointA, XYpoint pointB)
-	{
-
-		if (pointA.equals(pointB))
-			throw new IllegalArgumentException(
-					"Zwei gleiche Punkte " + pointA.toString());
-
-		this.pointA = pointA;
-		this.pointB = pointB;
-		this.startLambda = -10000000;
-		this.endLambda = 10000000;
-		normedDirection = new XYvector(pointA, pointB).normed();
-
-	}
+	// public Line(XYpoint pointA, XYpoint pointB)
+	// {
+	//
+	// if (pointA.equals(pointB))
+	// throw new IllegalArgumentException(
+	// "Zwei gleiche Punkte " + pointA.toString());
+	//
+	// this.pointA = pointA;
+	// this.pointB = pointB;
+	// this.startLambda = -10000000;
+	// this.endLambda = 10000000;
+	// normedDirection = new XYvector(pointA, pointB).normed();
+	//
+	// }
 
 	/**
 	 * A finite line, parametrised by pointA and pointB which equal 0 and 1 on
@@ -123,12 +127,12 @@ public class Line extends AtomicGeoObject
 	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
 	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
 	 */
-	@Override
-	public void draw(GeoCanvas canvas, String label, GeoVisible visi)
-	{
-		canvas.drawLine(getStartPoint(), getEndPoint(), label, visi);
-
-	}
+	// @Override
+	// public void draw(GeoCanvas canvas, GeoVisible visi)
+	// {
+	// canvas.drawLine(getStartPoint(), getEndPoint(), visi);
+	//
+	// }
 
 	@Override
 	public boolean equals(Object obj)
@@ -240,9 +244,9 @@ public class Line extends AtomicGeoObject
 	 */
 	public double getLambda(XYpoint point)
 	{
-		if ((new Line(pointA, pointB)).intersectWith(point).isEmpty())
-			throw new IllegalArgumentException(
-					"Punkt " + point + " nicht auf der Gerade " + this);
+		// if ((new Line(pointA, pointB)).intersectWith(point).isEmpty())
+		// throw new IllegalArgumentException(
+		// "Punkt " + point + " nicht auf der Gerade " + this);
 
 		if (DMan.same(pointA.getX(), pointB.getX()))
 		{
@@ -388,6 +392,57 @@ public class Line extends AtomicGeoObject
 	public Set<XYpoint> getZeroDimensionalPart()
 	{
 		return new HashSet<XYpoint>();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#affineMap(de.fabianmeier.
+	 * seventeengon.shapes.XYvector, double)
+	 */
+	@Override
+	public Line affineMap(XYvector shiftVector, double scale)
+	{
+		XYpoint aNew = pointA.affineMap(shiftVector, scale);
+		XYpoint bNew = pointB.affineMap(shiftVector, scale);
+
+		return new Line(aNew, bNew, startLambda, endLambda);
+
+	}
+
+	private XYpoint convexCombination(XYpoint a, XYpoint b, double lambda)
+	{
+		return new XYpoint(a.getX() * lambda + b.getX() * (1 - lambda),
+				a.getY() * lambda + a.getY() * (1 - lambda));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getNameDrawingAngles()
+	 */
+	@Override
+	public List<Angle> getNameDrawingAngles()
+	{
+		NumericAngle startAngle = (new XYvector(pointB, pointA)).getAngle();
+		NumericAngle endAngle = (new XYvector(pointA, pointB)).getAngle();
+		List<XYpoint> points = new ArrayList<XYpoint>();
+
+		points.add(convexCombination(getStartPoint(), getEndPoint(), 0.5));
+		points.add(convexCombination(getStartPoint(), getEndPoint(), 0.3));
+		points.add(convexCombination(getStartPoint(), getEndPoint(), 0.7));
+		points.add(convexCombination(getStartPoint(), getEndPoint(), 0.1));
+		points.add(convexCombination(getStartPoint(), getEndPoint(), 0.9));
+
+		List<Angle> back = new ArrayList<Angle>();
+
+		for (XYpoint point : points)
+		{
+			back.add(new Angle(point, startAngle, endAngle));
+		}
+
+		return back;
 	}
 
 }
