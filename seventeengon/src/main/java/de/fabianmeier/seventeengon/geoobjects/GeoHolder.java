@@ -84,7 +84,7 @@ public class GeoHolder
 			affineGeo = affineGeo.intersectWith(getCanvasArea());
 
 			geoMap.put(compName, affineGeo);
-			visiMap.put(compName, geoHolder.visiMap.get(compName));
+			visiMap.put(compName, geoHolder.getVisibility(compName));
 		}
 
 	}
@@ -113,6 +113,8 @@ public class GeoHolder
 
 	public void changeVisibility(CompName compName, GeoVisible geoVisible)
 	{
+		if (geoVisible == null)
+			throw new IllegalArgumentException("GeoVisible may not be null.");
 		visiMap.put(compName, geoVisible);
 	}
 

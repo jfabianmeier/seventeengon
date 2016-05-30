@@ -21,7 +21,8 @@ public class BasicName implements GeoName
 			"kappa", "lambda", "my", "ny", "xi", "omikron", "pi", "rho",
 			"sigma", "tau", "ypsilon", "phi", "psi", "omega"};
 
-	// private static String[] unicodeGreekLetters = new String[] {"\u03B1", // "\u03B2",
+	// private static String[] unicodeGreekLetters = new String[] {"\u03B1", //
+	// "\u03B2",
 
 	private static Set<String> greekLetterSet = new HashSet<String>(
 			Arrays.asList(greekLetters));
@@ -75,6 +76,13 @@ public class BasicName implements GeoName
 
 	@Override
 	public String toString()
+	{
+		return name;
+
+	}
+
+	@Override
+	public String toUnicodeString()
 	{
 		if (!greekLetterSet.contains(name))
 			return name;

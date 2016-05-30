@@ -31,6 +31,23 @@ public class IndexedName implements GeoName
 	}
 
 	@Override
+	public String toUnicodeString()
+	{
+		String back = basicName.toUnicodeString();
+
+		if (index != null)
+		{
+			back += index.toUnicodeString();
+		}
+		else
+		{
+			back += numericIndex;
+		}
+		return back;
+
+	}
+
+	@Override
 	public String toString()
 	{
 		String back = basicName.toString();

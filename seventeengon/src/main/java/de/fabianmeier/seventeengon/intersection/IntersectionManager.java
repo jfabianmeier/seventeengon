@@ -559,10 +559,10 @@ public class IntersectionManager
 		intersectionPieces.add(line.intersectWith(lineBC));
 		intersectionPieces.add(line.intersectWith(lineCA));
 
-		if (intersectionPieces.size() == 0)
-			return CompositeGeoObject.getEmptyObject();
-
 		Set<XYpoint> pointSet = getAllXYPoints(intersectionPieces);
+
+		if (pointSet.size() == 0)
+			return CompositeGeoObject.getEmptyObject();
 
 		if (pointSet.size() == 1)
 		{

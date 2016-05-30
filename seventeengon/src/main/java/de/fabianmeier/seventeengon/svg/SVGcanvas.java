@@ -31,6 +31,7 @@ import org.w3c.dom.Document;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
+import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.naming.CompName;
 import de.fabianmeier.seventeengon.naming.GeoName;
 import de.fabianmeier.seventeengon.shapes.Angle;
@@ -110,7 +111,8 @@ public class SVGcanvas implements GeoCanvas
 
 	private AttributedString convertToAttributedString(GeoName geoName)
 	{
-		AttributedString attString = new AttributedString(geoName.toString());
+		AttributedString attString = new AttributedString(
+				geoName.toUnicodeString());
 
 		if (geoName.toString().length() > 1)
 		{
@@ -464,7 +466,8 @@ public class SVGcanvas implements GeoCanvas
 		double boundingWidth = boundingBox.getxMove();
 		double boundingHeight = boundingBox.getyMove();
 
-		XYvector midVector = null;
+		XYvector midVector = getMidVector(direction1, direction2, boundingWidth,
+				boundingHeight);
 
 		if (direction1.getxMove() > 0 && direction1.getyMove() > 0)
 		{
@@ -499,6 +502,179 @@ public class SVGcanvas implements GeoCanvas
 				(float) startX, (float) height - (float) startY);
 
 		return true;
+
+	}
+
+	private XYvector getMidVector(XYvector direction1, XYvector direction2,
+			double boundingWidth, double boundingHeight)
+	{
+		int quadrant1 = getQuadrant(direction1);
+		int quadrant2 = getQuadrant(direction2);
+
+		if (quadrant2 < quadrant1)
+			quadrant2 += 4;
+
+		if (quadrant1 == quadrant2)
+		{
+			if (NumericAngle.angleDifference(direction1.getAngle(),
+					direction2.getAngle()) > Math.PI)
+			{
+				quadrant2 += 4;
+			}
+		}
+
+		if (quadrant2 - quadrant1 >= 2)
+		{
+			return getQuadrantVector(quadrant1 + 1, boundingWidth / 2,
+					boundingHeight / 2);
+		}
+		else if (quadrant1 - quadrant2 == 1)
+		{
+			if (quadrant1 == 1)
+			{
+				if (DMan.same(direction1.getyMove(), 0))
+					return getQuadrantVector(quadrant1, boundingWidth / 2,
+							boundingHeight / 2);
+				if (DMan.same(direction2.getyMove(), 0))
+					return getQuadrantVector(quadrant2, boundingWidth / 2,
+							boundingHeight / 2);
+
+				double wide = direction1.getxMove() / direction1.getyMove()
+						- direction2.getxMove() / direction2.getyMove();
+
+				double factor = boundingWidth / wide;
+
+				return new XYvector(
+						factor * (direction1.getxMove() / direction1.getyMove())
+								- boundingWidth / 2,
+						factor + boundingHeight / 2);
+			}
+			if (quadrant1 == 2)
+			{
+				if (DMan.same(direction1.getxMove(), 0))
+					return getQuadrantVector(quadrant1, boundingWidth / 2,
+							boundingHeight / 2);
+				if (DMan.same(direction2.getxMove(), 0))
+					return getQuadrantVector(quadrant2, boundingWidth / 2,
+							boundingHeight / 2);
+
+				double tall = -direction1.getyMove() / direction1.getxMove()
+						+ direction2.getyMove() / direction2.getxMove();
+
+				double factor = boundingHeight / tall;
+
+				return new XYvector(-factor - boundingWidth / 2,
+						direction1.getyMove() / direction1.getxMove() * factor
+								+ boundingHeight / 2);
+			}
+			if (quadrant1 == 3)
+			{
+				if (DMan.same(direction1.getyMove(), 0))
+					return getQuadrantVector(quadrant1, boundingWidth / 2,
+							boundingHeight / 2);
+				if (DMan.same(direction2.getyMove(), 0))
+					return getQuadrantVector(quadrant2, boundingWidth / 2,
+							boundingHeight / 2);
+
+				double wide = +direction1.getxMove() / direction1.getyMove()
+						- direction2.getxMove() / direction2.getyMove();
+
+				double factor = boundingWidth / wide;
+
+				return new XYvector(
+						factor * (direction1.getxMove() / direction1.getyMove())
+								- boundingWidth / 2,
+						-factor - boundingHeight / 2);
+			}
+			if (quadrant1 == 4)
+			{
+				if (DMan.same(direction1.getxMove(), 0))
+					return getQuadrantVector(quadrant1, boundingWidth / 2,
+							boundingHeight / 2);
+				if (DMan.same(direction2.getxMove(), 0))
+					return getQuadrantVector(quadrant2, boundingWidth / 2,
+							boundingHeight / 2);
+
+				double tall = -direction1.getyMove() / direction1.getxMove()
+						+ direction2.getyMove() / direction2.getxMove();
+
+				double factor = boundingHeight / tall;
+
+				return new XYvector(factor + boundingWidth / 2,
+						direction1.getyMove() / direction1.getxMove() * factor
+								- boundingHeight / 2);
+			}
+
+		}
+		else
+		{
+			throw new IllegalStateException("Not implemented.");
+
+		}
+
+		throw new IllegalStateException("Should not be reached");
+
+	}
+
+	/**
+	 * @param quadrant
+	 *            the quadrant
+	 * @param xOffset
+	 *            horizontal vector offset
+	 * @param yOffset
+	 *            vertical vector offset
+	 * @return the vector with the offset in the right quadrant
+	 */
+	private XYvector getQuadrantVector(int quadrant, double xOffset,
+			double yOffset)
+	{
+		quadrant = quadrant % 4;
+		if (quadrant == 0)
+			quadrant = 4;
+
+		switch (quadrant)
+		{
+			case 1 :
+				return new XYvector(xOffset, yOffset);
+			case 2 :
+				return new XYvector(-xOffset, yOffset);
+			case 3 :
+				return new XYvector(-xOffset, -yOffset);
+			case 4 :
+				return new XYvector(xOffset, -yOffset);
+			default :
+				throw new IllegalStateException("No quadrant");
+		}
+
+	}
+
+	/**
+	 * @param direction
+	 *            vector
+	 * @return the quadrant
+	 */
+	private int getQuadrant(XYvector direction)
+	{
+		NumericAngle num = direction.getAngle();
+
+		NumericAngle zero = new NumericAngle(0);
+		NumericAngle ninety = new NumericAngle(Math.PI / 2);
+		NumericAngle onehundredeighty = new NumericAngle(Math.PI);
+		NumericAngle twohundredseventy = new NumericAngle(3 * Math.PI / 2);
+
+		if (num.inBetween(zero, ninety))
+			return 1;
+
+		if (num.inBetween(ninety, onehundredeighty))
+			return 2;
+
+		if (num.inBetween(onehundredeighty, twohundredseventy))
+			return 3;
+
+		if (num.inBetween(twohundredseventy, zero))
+			return 4;
+
+		throw new IllegalStateException("Angle error.");
 
 	}
 
