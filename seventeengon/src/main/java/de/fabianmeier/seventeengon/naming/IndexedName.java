@@ -50,7 +50,7 @@ public class IndexedName implements GeoName
 	@Override
 	public String toString()
 	{
-		String back = basicName.toString();
+		String back = basicName.toString() + "_";
 
 		if (index != null)
 		{

@@ -362,10 +362,10 @@ public class SVGcanvas implements GeoCanvas
 			GeoObject geo = geoHolder.get(compName);
 			GeoVisible visibility = geoHolder.getVisibility(compName);
 
-			if (!(compName instanceof GeoName))
+			if (compName.getGeoNames().size() > 1)
 				continue;
 
-			GeoName geoName = (GeoName) compName;
+			GeoName geoName = compName.getGeoNames().get(0);
 
 			if (!visibility.isNameHidden())
 			{
@@ -517,7 +517,8 @@ public class SVGcanvas implements GeoCanvas
 		if (quadrant1 == quadrant2)
 		{
 			if (NumericAngle.angleDifference(direction1.getAngle(),
-					direction2.getAngle()) > Math.PI)
+					direction2.getAngle()) > Math.PI
+					|| direction1.getAngle().equals(direction2.getAngle()))
 			{
 				quadrant2 += 4;
 			}
