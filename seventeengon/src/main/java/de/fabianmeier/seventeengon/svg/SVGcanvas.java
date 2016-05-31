@@ -111,14 +111,13 @@ public class SVGcanvas implements GeoCanvas
 
 	private AttributedString convertToAttributedString(GeoName geoName)
 	{
-		AttributedString attString = new AttributedString(
-				geoName.toUnicodeString());
+		String unicodeString = geoName.toUnicodeString();
+		AttributedString attString = new AttributedString(unicodeString);
 
-		if (geoName.toString().length() > 1)
+		if (unicodeString.length() > 1)
 		{
 			attString.addAttribute(TextAttribute.SUPERSCRIPT,
-					TextAttribute.SUPERSCRIPT_SUB, 1,
-					geoName.toString().length());
+					TextAttribute.SUPERSCRIPT_SUB, 1, unicodeString.length());
 		}
 		return attString;
 	}
@@ -372,7 +371,7 @@ public class SVGcanvas implements GeoCanvas
 				List<Angle> nameDrawingAngles = geo.getNameDrawingAngles();
 
 				boolean success = false;
-				double factor = 1;
+				double factor = 1.3;
 
 				while (!success)
 				{
@@ -414,7 +413,7 @@ public class SVGcanvas implements GeoCanvas
 			if (!visibility.isInvisible())
 			{
 				if (!other.intersectWith(geo).isEmpty())
-					return false;
+					return true;
 
 			}
 
@@ -423,10 +422,10 @@ public class SVGcanvas implements GeoCanvas
 		for (GeoObject geo : geoHolder.getBlockedAreas())
 		{
 			if (!other.intersectWith(geo).isEmpty())
-				return false;
+				return true;
 		}
 
-		return true;
+		return false;
 
 	}
 
@@ -469,28 +468,15 @@ public class SVGcanvas implements GeoCanvas
 		XYvector midVector = getMidVector(direction1, direction2, boundingWidth,
 				boundingHeight);
 
-		if (direction1.getxMove() > 0 && direction1.getyMove() > 0)
-		{
-			if (direction2.getyMove() < 0)
-			{
-				midVector = new XYvector(-boundingWidth / 2,
-						boundingHeight / 2);
-			}
-			else
-			{
-
-			}
-
-			// TODO: construct midVector.
-		}
-
 		midVector = midVector.multiplyBy(factor);
 
-		double startX = midVector.getxMove() - boundingBox.getxMove() / 2;
-		double startY = midVector.getyMove() - boundingBox.getyMove() / 2;
+		double startX = angle.getVertex().getX() + midVector.getxMove()
+				- boundingBox.getxMove() / 2;
+		double startY = angle.getVertex().getY() + midVector.getyMove()
+				- boundingBox.getyMove() / 2;
 
-		GeoObject rectangle = getRectangle(startX, startY,
-				boundingBox.getxMove(), boundingBox.getyMove());
+		GeoObject rectangle = getRectangle(startX - 10, startY - 10,
+				boundingBox.getxMove() + 10, boundingBox.getyMove() + 10);
 
 		if (intersectsWithVisibleObject(fittedHolder, rectangle))
 			return false;

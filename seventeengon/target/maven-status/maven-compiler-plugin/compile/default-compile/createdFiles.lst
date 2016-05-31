@@ -19,10 +19,11 @@ de\fabianmeier\seventeengon\intersection\IntersectionManager$1.class
 de\fabianmeier\seventeengon\generator\CompositeGenerator.class
 de\fabianmeier\seventeengon\generator\GeoGeneratorLookup.class
 de\fabianmeier\seventeengon\geoobjects\GeoHolder.class
+de\fabianmeier\seventeengon\svg\Graphics2dHelper.class
 de\fabianmeier\seventeengon\shapes\DifferenceObject.class
-de\fabianmeier\seventeengon\geoobjects\SampleGenerator.class
 de\fabianmeier\seventeengon\naming\CompName.class
 de\fabianmeier\seventeengon\processing\ConsoleAccess.class
+de\fabianmeier\seventeengon\generator\EqualityGenerator.class
 de\fabianmeier\seventeengon\shapes\GeoObject.class
 de\fabianmeier\seventeengon\generator\AngleGenerator.class
 de\fabianmeier\seventeengon\intersection\EquationSolver.class
@@ -33,11 +34,13 @@ de\fabianmeier\seventeengon\generator\RecursiveGeoGenerator.class
 de\fabianmeier\seventeengon\naming\CompNamePattern.class
 de\fabianmeier\seventeengon\generator\ReducedSentencePattern.class
 de\fabianmeier\seventeengon\shapes\CompositeGeoObject.class
+de\fabianmeier\seventeengon\geoobjects\Measurement.class
 de\fabianmeier\seventeengon\intersection\DMan.class
 de\fabianmeier\seventeengon\intersection\IntersectionManager.class
 de\fabianmeier\seventeengon\util\GeoVisible.class
 de\fabianmeier\seventeengon\geoobjects\TextualCanvas.class
 de\fabianmeier\seventeengon\shapes\Line.class
+de\fabianmeier\seventeengon\processing\Interactive.class
 de\fabianmeier\seventeengon\generator\PointGenerator.class
 de\fabianmeier\seventeengon\generator\SegmentGenerator.class
 de\fabianmeier\seventeengon\util\NumericAngle.class
