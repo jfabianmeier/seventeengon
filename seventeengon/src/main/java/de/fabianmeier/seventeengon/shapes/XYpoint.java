@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.NumericAngle;
@@ -197,12 +198,38 @@ public class XYpoint extends AtomicGeoObject
 	 * de.fabianmeier.seventeengon.shapes.GeoObject#affineMap(de.fabianmeier.
 	 * seventeengon.shapes.XYvector, double)
 	 */
+	// @Override
+	// public XYpoint affineMap(XYvector shiftVector, double scale)
+	// {
+	// return new XYpoint((x + shiftVector.getxMove()) * scale,
+	// (y + shiftVector.getyMove()) * scale);
+	// }
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#preservingMap(de.fabianmeier
+	 * .seventeengon.geoobjects.PreservingMap)
+	 */
 	@Override
-	public XYpoint affineMap(XYvector shiftVector, double scale)
+	public XYpoint preservingMap(PreservingMap preMap)
 	{
-		return new XYpoint((x + shiftVector.getxMove()) * scale,
-				(y + shiftVector.getyMove()) * scale);
+		return preMap.mapPoint(this);
 	}
+
+	// @Override
+	// public XYpoint rotate(XYpoint around, double rotationAngle)
+	// {
+	// XYvector vector = new XYvector(around, this);
+	//
+	// NumericAngle vectorAngle = vector.getAngle();
+	// NumericAngle neuAngle = vectorAngle.addtoAngle(rotationAngle);
+	//
+	// XYvector neuVector = new XYvector(vector.getLength(), neuAngle);
+	// return neuVector.shift(around);
+	//
+	// }
 
 	/*
 	 * (non-Javadoc)
@@ -213,7 +240,14 @@ public class XYpoint extends AtomicGeoObject
 	public List<Angle> getNameDrawingAngles()
 	{
 		List<Angle> back = new ArrayList<Angle>();
-		back.add(new Angle(this, new NumericAngle(0), new NumericAngle(0)));
+		back.add(new Angle(this, new NumericAngle(0),
+				new NumericAngle(Math.PI * 0.6)));
+		back.add(new Angle(this, new NumericAngle(Math.PI * 0.6),
+				new NumericAngle(1.2 * Math.PI)));
+		back.add(new Angle(this, new NumericAngle(1.2 * Math.PI),
+				new NumericAngle(1.8 * Math.PI)));
+		back.add(new Angle(this, new NumericAngle(1.8 * Math.PI),
+				new NumericAngle(2.4 * Math.PI)));
 		return back;
 	}
 

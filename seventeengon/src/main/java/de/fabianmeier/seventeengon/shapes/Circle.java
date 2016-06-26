@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.NumericAngle;
 
@@ -247,13 +248,23 @@ public class Circle extends AtomicGeoObject
 	 * seventeengon.shapes.XYvector, double)
 	 */
 	@Override
-	public Circle affineMap(XYvector shiftVector, double scale)
+	public Circle preservingMap(PreservingMap preMap)
 	{
-		XYpoint centreNew = centre.affineMap(shiftVector, scale);
-		double radiusNew = radius * scale;
+		XYpoint centreNew = centre.preservingMap(preMap);
+		double radiusNew = radius * preMap.getScale();
 
 		return new Circle(centreNew, radiusNew, startAngle, endAngle);
 	}
+
+	// @Override
+	// public Circle rotate(XYpoint around, double rotationAngle)
+	// {
+	// XYpoint centreNew = centre.rotate(around, rotationAngle);
+	// double radiusNew = radius;
+	//
+	// return new Circle(centreNew, radiusNew, startAngle, endAngle);
+	//
+	// }
 
 	/*
 	 * (non-Javadoc)

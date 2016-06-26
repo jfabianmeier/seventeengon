@@ -19,7 +19,6 @@ import de.fabianmeier.seventeengon.shapes.CompositeGeoObject;
 import de.fabianmeier.seventeengon.shapes.GeoObject;
 import de.fabianmeier.seventeengon.shapes.Triangle;
 import de.fabianmeier.seventeengon.shapes.XYpoint;
-import de.fabianmeier.seventeengon.shapes.XYvector;
 import de.fabianmeier.seventeengon.util.GeoVisible;
 
 /**
@@ -70,16 +69,15 @@ public class GeoHolder
 
 	}
 
-	private GeoHolder(GeoHolder geoHolder, XYvector shift, double scale)
+	private GeoHolder(GeoHolder geoHolder, PreservingMap preMap)
 	{
-		this.width = geoHolder.width * scale;
-		this.height = geoHolder.height * scale;
+		this.width = geoHolder.width;
+		this.height = geoHolder.height;
 		samplingValue = geoHolder.samplingValue;
 
 		for (CompName compName : geoHolder.geoMap.keySet())
 		{
-			GeoObject affineGeo = geoHolder.get(compName).affineMap(shift,
-					scale);
+			GeoObject affineGeo = geoHolder.get(compName).preservingMap(preMap);
 
 			affineGeo = affineGeo.intersectWith(getCanvasArea());
 
@@ -88,6 +86,27 @@ public class GeoHolder
 		}
 
 	}
+
+	// private GeoHolder(GeoHolder geoHolder, XYpoint around, double
+	// rotationAngle)
+	// {
+	// // How to set width and height
+	// this.width = geoHolder.width;
+	// this.height = geoHolder.height;
+	// samplingValue = geoHolder.samplingValue;
+	//
+	// for (CompName compName : geoHolder.geoMap.keySet())
+	// {
+	// GeoObject affineGeo = geoHolder.get(compName).rotate(around,
+	// rotationAngle);
+	//
+	// affineGeo = affineGeo.intersectWith(getCanvasArea());
+	//
+	// geoMap.put(compName, affineGeo);
+	// visiMap.put(compName, geoHolder.getVisibility(compName));
+	// }
+	//
+	// }
 
 	/**
 	 * Adds the geoObject under the name compName
@@ -111,6 +130,14 @@ public class GeoHolder
 		add(new CompName(geoName), geoObject);
 	}
 
+	/**
+	 * change the visibility
+	 * 
+	 * @param compName
+	 *            a compName
+	 * @param geoVisible
+	 *            an object defining visibility
+	 */
 	public void changeVisibility(CompName compName, GeoVisible geoVisible)
 	{
 		if (geoVisible == null)
@@ -226,15 +253,84 @@ public class GeoHolder
 
 	/**
 	 * 
+	 * @return A small area in the middle of the canvas to sample points from.
+	 */
+	public GeoObject getSamplingArea()
+	{
+		return new Triangle(new XYpoint(getWidth() * 0.4, getHeight() * 0.4),
+				new XYpoint(getWidth() * 0.6, getHeight() * 0.4),
+				new XYpoint(getWidth() * 0.5, getHeight() * 0.6));
+
+	}
+
+	/**
+	 * 
 	 * @return A clipped version of the GeoHolder scaled back to the same size
 	 *         which contains all visible points
 	 */
-	public GeoHolder getClippedGeoHolder()
+	public GeoHolder turnAndFitIntoCanvas()
 	{
-		double leftBorder = width;
-		double rightBorder = 0;
-		double bottomBorder = height;
-		double topBorder = 0;
+
+		Set<XYpoint> shapingPoints = getShapingPoints();
+
+		PreservingMap preMap = RectangleFit.fitTo(width, height, shapingPoints);
+
+		// double leftBorder = width;
+		// double rightBorder = 0;
+		// double bottomBorder = height;
+		// double topBorder = 0;
+		//
+		// for (CompName comp : geoMap.keySet())
+		// {
+		// if (geoMap.get(comp) instanceof XYpoint
+		// && !getVisibility(comp).isInvisible())
+		// {
+		// XYpoint localPoint = (XYpoint) geoMap.get(comp);
+		// if (localPoint.getX() < leftBorder)
+		// leftBorder = localPoint.getX() * 0.99;
+		// if (localPoint.getX() > rightBorder)
+		// rightBorder = localPoint.getX() * 1.01;
+		//
+		// if (localPoint.getY() < bottomBorder)
+		// bottomBorder = localPoint.getY() * 0.99;
+		// if (localPoint.getY() > topBorder)
+		// topBorder = localPoint.getY() * 1.01;
+		// }
+		//
+		// }
+		//
+		// if (leftBorder > rightBorder)
+		// return this;
+		//
+		// XYvector shiftVector = new XYvector(-leftBorder * 0.8,
+		// -bottomBorder * 0.8);
+		//
+		// double pseudoWidth = rightBorder - leftBorder;
+		// double pseudoHeight = topBorder - bottomBorder;
+		//
+		// double scale = 0;
+		//
+		// double ratio = width / height;
+		//
+		// if (pseudoWidth / pseudoHeight > ratio)
+		// {
+		// scale = width / pseudoWidth * 0.8;
+		// }
+		// else
+		// {
+		// scale = height / pseudoHeight * 0.8;
+		// }
+
+		return new GeoHolder(this, preMap);
+
+	}
+
+	/**
+	 * @return set of visible points
+	 */
+	private Set<XYpoint> getShapingPoints()
+	{
+		Set<XYpoint> back = new HashSet<XYpoint>();
 
 		for (CompName comp : geoMap.keySet())
 		{
@@ -242,43 +338,12 @@ public class GeoHolder
 					&& !getVisibility(comp).isInvisible())
 			{
 				XYpoint localPoint = (XYpoint) geoMap.get(comp);
-				if (localPoint.getX() < leftBorder)
-					leftBorder = localPoint.getX() * 0.99;
-				if (localPoint.getX() > rightBorder)
-					rightBorder = localPoint.getX() * 1.01;
-
-				if (localPoint.getY() < bottomBorder)
-					bottomBorder = localPoint.getY() * 0.99;
-				if (localPoint.getY() > topBorder)
-					topBorder = localPoint.getY() * 1.01;
+				back.add(localPoint);
 			}
 
 		}
 
-		if (leftBorder > rightBorder)
-			return this;
-
-		XYvector shiftVector = new XYvector(-leftBorder * 0.9,
-				-bottomBorder * 0.9);
-
-		double pseudoWidth = rightBorder - leftBorder;
-		double pseudoHeight = topBorder - bottomBorder;
-
-		double scale = 0;
-
-		double ratio = width / height;
-
-		if (pseudoWidth / pseudoHeight > ratio)
-		{
-			scale = width / pseudoWidth * 0.8;
-		}
-		else
-		{
-			scale = height / pseudoHeight * 0.8;
-		}
-
-		return new GeoHolder(this, shiftVector, scale);
-
+		return back;
 	}
 
 	/**

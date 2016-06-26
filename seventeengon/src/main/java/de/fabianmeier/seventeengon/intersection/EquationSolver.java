@@ -3,8 +3,14 @@ package de.fabianmeier.seventeengon.intersection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class EquationSolver
 {
+	private static final Logger LOG = LogManager
+			.getLogger(EquationSolver.class);
+
 	/**
 	 * Solves a quadratic equation for the midnight formula ax^2+bx+c=0
 	 * 
@@ -118,7 +124,10 @@ public class EquationSolver
 		for (int i = 0; i < n; i++)
 		{
 			if (!DMan.same(expected[i], rhs[i]))
+			{
+				LOG.error("Mismatch: " + expected[i] + " vs. " + rhs[i]);
 				return false;
+			}
 		}
 
 		return true;

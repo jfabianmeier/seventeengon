@@ -7,7 +7,7 @@ public class DMan
 {
 
 	/**
-	 * if both a and b have the same double hash value
+	 * if a-b has the double hash value of 0
 	 * 
 	 * @param a
 	 *            double
@@ -17,7 +17,7 @@ public class DMan
 	 */
 	public static boolean same(double a, double b)
 	{
-		return doubleHash(a) == doubleHash(b);
+		return doubleHash(a - b) == doubleHash(0);
 	}
 
 	/**

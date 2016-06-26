@@ -3,6 +3,8 @@ package de.fabianmeier.seventeengon.shapes;
 import java.util.List;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
+
 public interface GeoObject
 {
 	/**
@@ -80,16 +82,18 @@ public interface GeoObject
 	 * @return All zero-dimensional parts, combined as point set
 	 */
 	Set<XYpoint> getZeroDimensionalPart();
+	//
+	// /**
+	// *
+	// * @param shiftVector
+	// * shift
+	// * @param scale
+	// * Scaling factor for central scaling from the origin
+	// * @return a first shifted, then scaled version of the GeoObject
+	// */
+	// GeoObject affineMap(XYvector shiftVector, double scale);
 
-	/**
-	 * 
-	 * @param shiftVector
-	 *            shift
-	 * @param scale
-	 *            Scaling factor for central scaling from the origin
-	 * @return a first shifted, then scaled version of the GeoObject
-	 */
-	GeoObject affineMap(XYvector shiftVector, double scale);
+	GeoObject preservingMap(PreservingMap preMap);
 
 	/**
 	 * 
@@ -97,5 +101,12 @@ public interface GeoObject
 	 * @return A set of angles in which the name can be drawn.
 	 */
 	List<Angle> getNameDrawingAngles();
+
+	// /**
+	// * @param around
+	// * @param rotationAngle
+	// * @return
+	// */
+	// GeoObject rotate(XYpoint around, double rotationAngle);
 
 }

@@ -10,6 +10,8 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
+
 /**
  * A GeoObjects which consists of a list of other GeoObjects. They may be
  * Composites as well.
@@ -231,18 +233,32 @@ public class CompositeGeoObject implements GeoObject
 	 * seventeengon.shapes.XYvector, double)
 	 */
 	@Override
-	public CompositeGeoObject affineMap(XYvector shiftVector, double scale)
+	public CompositeGeoObject preservingMap(PreservingMap preMap)
 	{
 		List<GeoObject> shiftedObjects = new ArrayList<GeoObject>();
 
 		for (GeoObject geo : subObjectList)
 		{
-			shiftedObjects.add(geo.affineMap(shiftVector, scale));
+			shiftedObjects.add(geo.preservingMap(preMap));
 		}
 
 		return new CompositeGeoObject(shiftedObjects);
 
 	}
+
+	// @Override
+	// public CompositeGeoObject rotate(XYpoint around, double rotationAngle)
+	// {
+	// List<GeoObject> shiftedObjects = new ArrayList<GeoObject>();
+	//
+	// for (GeoObject geo : subObjectList)
+	// {
+	// shiftedObjects.add(geo.rotate(around, rotationAngle));
+	// }
+	//
+	// return new CompositeGeoObject(shiftedObjects);
+	//
+	// }
 
 	/*
 	 * (non-Javadoc)

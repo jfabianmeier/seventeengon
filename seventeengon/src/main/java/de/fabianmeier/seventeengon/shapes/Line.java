@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.NumericAngle;
@@ -402,10 +403,10 @@ public class Line extends AtomicGeoObject
 	 * seventeengon.shapes.XYvector, double)
 	 */
 	@Override
-	public Line affineMap(XYvector shiftVector, double scale)
+	public Line preservingMap(PreservingMap preMap)
 	{
-		XYpoint aNew = pointA.affineMap(shiftVector, scale);
-		XYpoint bNew = pointB.affineMap(shiftVector, scale);
+		XYpoint aNew = pointA.preservingMap(preMap);
+		XYpoint bNew = pointB.preservingMap(preMap);
 
 		return new Line(aNew, bNew, startLambda, endLambda);
 
@@ -444,5 +445,21 @@ public class Line extends AtomicGeoObject
 
 		return back;
 	}
+
+	// /*
+	// * (non-Javadoc)
+	// *
+	// * @see
+	// de.fabianmeier.seventeengon.shapes.GeoObject#rotate(de.fabianmeier.
+	// * seventeengon.shapes.XYpoint, double)
+	// */
+	// @Override
+	// public Line rotate(XYpoint around, double rotationAngle)
+	// {
+	// XYpoint aNew = pointA.rotate(around, rotationAngle);
+	// XYpoint bNew = pointB.rotate(around, rotationAngle);
+	//
+	// return new Line(aNew, bNew, startLambda, endLambda);
+	// }
 
 }

@@ -71,7 +71,7 @@ public class Interactive
 
 				holder.draw(svgCanvas);
 
-				GeoHolder holderShift = holder.getClippedGeoHolder();
+				GeoHolder holderShift = holder.turnAndFitIntoCanvas();
 				GeoCanvas textCanvasShift = new TextualCanvas();
 
 				holderShift.draw(textCanvasShift);

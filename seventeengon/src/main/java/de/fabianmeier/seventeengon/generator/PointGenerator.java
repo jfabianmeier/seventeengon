@@ -316,7 +316,7 @@ public class PointGenerator implements GeoGenerator
 	private boolean samplePointFromArea(GeoHolder geoHolder, CompName point,
 			GeoObject area)
 	{
-		area = area.intersectWith(geoHolder.getCanvasArea());
+		area = area.intersectWith(geoHolder.getSamplingArea());
 
 		XYpoint xy = area.getSamplePoint(geoHolder.nextSampling());
 

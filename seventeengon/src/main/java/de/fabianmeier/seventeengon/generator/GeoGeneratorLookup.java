@@ -30,8 +30,7 @@ public class GeoGeneratorLookup
 		add(AngleGenerator.ANGLE, new AngleGenerator());
 		add(AngleGenerator.BAC, new AngleGenerator());
 		add(CircleGenerator.CIRCLE, new CircleGenerator());
-		add(LineGenerator.LINE, new LineGenerator());
-		add(LineGenerator.AB, new LineGenerator());
+
 		add(PointGenerator.INX, new PointGenerator());
 		add(PointGenerator.ONX, new PointGenerator());
 		add(PointGenerator.OUTSIDE, new PointGenerator());
@@ -43,6 +42,9 @@ public class GeoGeneratorLookup
 		add(TriangleGenerator.TRIANGLE, new TriangleGenerator());
 		add(TriangleGenerator.ABC, new TriangleGenerator());
 		add(EqualityGenerator.ASSIGN, new EqualityGenerator());
+		add(LineGenerator.LINE, new LineGenerator());
+
+		add(LineGenerator.AB, new LineGenerator());
 
 		// add(new Sentence("Sei P ein Punkt"), new PointGenerator());
 		// add(new Sentence("Sei ABC ein Dreieck"), new TriangleGenerator());

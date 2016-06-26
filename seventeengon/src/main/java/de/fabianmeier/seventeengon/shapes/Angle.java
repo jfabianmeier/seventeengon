@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.NumericAngle;
 
@@ -257,14 +258,26 @@ public class Angle extends AtomicGeoObject
 	 * seventeengon.shapes.XYvector, double)
 	 */
 	@Override
-	public Angle affineMap(XYvector shiftVector, double scale)
+	public Angle preservingMap(PreservingMap preMap)
 	{
-		XYpoint vertexNew = vertex.affineMap(shiftVector, scale);
-		XYpoint dir1Point = direction1.shift(vertexNew);
-		XYpoint dir2Point = direction2.shift(vertexNew);
+		XYpoint vertexNew = vertex.preservingMap(preMap);
+		XYpoint dir1Point = direction1.shift(vertex).preservingMap(preMap);
+		XYpoint dir2Point = direction2.shift(vertex).preservingMap(preMap);
 
 		return new Angle(vertexNew, dir1Point, dir2Point);
 	}
+
+	// @Override
+	// public Angle rotate(XYpoint around, double rotationAngle)
+	// {
+	// XYpoint dir1Point = direction1.shift(vertex).rotate(around,
+	// rotationAngle);
+	// XYpoint dir2Point = direction2.shift(vertex).rotate(around,
+	// rotationAngle);
+	// XYpoint vertexNew = vertex.rotate(around, rotationAngle);
+	//
+	// return new Angle(vertexNew, dir1Point, dir2Point);
+	// }
 
 	/*
 	 * (non-Javadoc)

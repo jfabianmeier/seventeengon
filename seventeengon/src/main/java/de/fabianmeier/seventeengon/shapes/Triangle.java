@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 
 public class Triangle extends AtomicGeoObject
@@ -90,6 +91,9 @@ public class Triangle extends AtomicGeoObject
 
 	private XYpoint getPoint(double factor1, double factor2)
 	{
+		factor1 = Math.round(factor1 * 1000) * 0.001;
+		factor2 = Math.round(factor2 * 1000) * 0.001;
+
 		XYvector vectorAB = new XYvector(pointA, pointB);
 		XYvector vectorAC = new XYvector(pointA, pointC);
 
@@ -239,15 +243,26 @@ public class Triangle extends AtomicGeoObject
 	 * seventeengon.shapes.XYvector, double)
 	 */
 	@Override
-	public Triangle affineMap(XYvector shiftVector, double scale)
+	public Triangle preservingMap(PreservingMap preMap)
 	{
-		XYpoint aNew = pointA.affineMap(shiftVector, scale);
-		XYpoint bNew = pointB.affineMap(shiftVector, scale);
-		XYpoint cNew = pointC.affineMap(shiftVector, scale);
+		XYpoint aNew = pointA.preservingMap(preMap);
+		XYpoint bNew = pointB.preservingMap(preMap);
+		XYpoint cNew = pointC.preservingMap(preMap);
 
 		return new Triangle(aNew, bNew, cNew);
 
 	}
+
+	// @Override
+	// public Triangle rotate(XYpoint around, double rotationAngle)
+	// {
+	// XYpoint aNew = pointA.rotate(around, rotationAngle);
+	// XYpoint bNew = pointB.rotate(around, rotationAngle);
+	// XYpoint cNew = pointC.rotate(around, rotationAngle);
+	//
+	// return new Triangle(aNew, bNew, cNew);
+	//
+	// }
 
 	/*
 	 * (non-Javadoc)
