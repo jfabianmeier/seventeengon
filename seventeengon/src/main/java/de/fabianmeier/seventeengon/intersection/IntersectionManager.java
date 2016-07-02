@@ -245,6 +245,9 @@ public class IntersectionManager
 		intersectionPieces.add(arc.intersectWith(lineBC));
 		intersectionPieces.add(arc.intersectWith(lineCA));
 
+		intersectionPieces.add(arc.getStartPoint());
+		intersectionPieces.add(arc.getEndPoint());
+
 		Set<XYpoint> intersectionPoints = getAllXYPoints(intersectionPieces);
 
 		return circlePieces(arc, intersectionPoints, arc, triangle);
@@ -436,6 +439,12 @@ public class IntersectionManager
 
 		intersectionPieces.add(line.intersectWith(circle));
 
+		if (fcirc.containsPoint(line.getEndPoint()))
+			intersectionPieces.add(line.getEndPoint());
+
+		if (fcirc.containsPoint(line.getStartPoint()))
+			intersectionPieces.add(line.getStartPoint());
+
 		if (intersectionPieces.size() == 0)
 			return CompositeGeoObject.getEmptyObject();
 
@@ -558,6 +567,12 @@ public class IntersectionManager
 		intersectionPieces.add(line.intersectWith(lineAB));
 		intersectionPieces.add(line.intersectWith(lineBC));
 		intersectionPieces.add(line.intersectWith(lineCA));
+
+		if (triangle.containsPoint(line.getEndPoint()))
+			intersectionPieces.add(line.getEndPoint());
+
+		if (triangle.containsPoint(line.getStartPoint()))
+			intersectionPieces.add(line.getStartPoint());
 
 		Set<XYpoint> pointSet = getAllXYPoints(intersectionPieces);
 
@@ -847,7 +862,7 @@ public class IntersectionManager
 		{
 			if (DMan.lessOrEqual(line.getStartLambda(), lambda[0])
 
-			&& DMan.lessOrEqual(lambda[0], line.getEndLambda()))
+					&& DMan.lessOrEqual(lambda[0], line.getEndLambda()))
 			{
 				return point;
 			}

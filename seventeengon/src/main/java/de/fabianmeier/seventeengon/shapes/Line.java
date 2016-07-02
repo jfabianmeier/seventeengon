@@ -357,16 +357,18 @@ public class Line extends AtomicGeoObject
 	 * @return the intersection of the line from startPoint to endPoint and this
 	 *         line.
 	 */
-	public Line subSegment(XYpoint startPoint, XYpoint endPoint)
+	public GeoObject subSegment(XYpoint startPoint, XYpoint endPoint)
 	{
 		Line otherLine = new Line(startPoint, endPoint, 0, 1);
 		GeoObject geo = this.intersectWith(otherLine);
 
-		if (geo instanceof Line)
-			return (Line) geo;
-		else
-			throw new IllegalArgumentException("Points " + startPoint + " or "
-					+ endPoint + " not on line " + this);
+		return geo;
+
+		// if (geo instanceof Line)
+		// return (Line) geo;
+		// else
+		// throw new IllegalArgumentException("Points " + startPoint + " or "
+		// + endPoint + " not on line " + this);
 		// double startL = getLambda(startPoint);
 		// double endL = getLambda(endPoint);
 		//

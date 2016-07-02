@@ -79,12 +79,39 @@ public class GeoHolder
 		{
 			GeoObject affineGeo = geoHolder.get(compName).preservingMap(preMap);
 
-			affineGeo = affineGeo.intersectWith(getCanvasArea());
+			affineGeo = cutToRectangle(affineGeo, width, height);
 
 			geoMap.put(compName, affineGeo);
 			visiMap.put(compName, geoHolder.getVisibility(compName));
 		}
 
+		int i = 0;
+		i = i + 1;
+
+	}
+
+	/**
+	 * 
+	 * @param affineGeo
+	 *            geoObject
+	 * @param width
+	 *            Width
+	 * @param height
+	 *            Height
+	 * @return The intersection of the GeoObject with the rectangle
+	 *         0,0,width,height
+	 */
+	public static GeoObject cutToRectangle(GeoObject affineGeo, double width,
+			double height)
+	{
+		Triangle triangle1 = new Triangle(new XYpoint(0, 0),
+				new XYpoint(2 * width, 0), new XYpoint(0, 2 * height));
+		Triangle triangle2 = new Triangle(new XYpoint(width, height),
+				new XYpoint(-width, height), new XYpoint(width, -height));
+
+		affineGeo = affineGeo.intersectWith(triangle1);
+		affineGeo = affineGeo.intersectWith(triangle2);
+		return affineGeo;
 	}
 
 	// private GeoHolder(GeoHolder geoHolder, XYpoint around, double
@@ -259,7 +286,7 @@ public class GeoHolder
 	{
 		return new Triangle(new XYpoint(getWidth() * 0.4, getHeight() * 0.4),
 				new XYpoint(getWidth() * 0.6, getHeight() * 0.4),
-				new XYpoint(getWidth() * 0.5, getHeight() * 0.6));
+				new XYpoint(getWidth() * 0.5, getHeight() * 0.7));
 
 	}
 

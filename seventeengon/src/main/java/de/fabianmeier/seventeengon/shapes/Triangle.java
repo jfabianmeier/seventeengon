@@ -137,7 +137,7 @@ public class Triangle extends AtomicGeoObject
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((pointA == null) ? 0 : pointA.hashCode());
+		result = ((pointA == null) ? 0 : pointA.hashCode());
 		result = prime * result + ((pointB == null) ? 0 : pointB.hashCode());
 		result = prime * result + ((pointC == null) ? 0 : pointC.hashCode());
 		return result;

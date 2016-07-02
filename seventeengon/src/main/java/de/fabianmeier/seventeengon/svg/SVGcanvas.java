@@ -106,7 +106,7 @@ public class SVGcanvas implements GeoCanvas
 
 		svgGenerator.setSVGCanvasSize(new Dimension((int) width, (int) height));
 
-		svgGenerator.setClip(0, 0, (int) width, (int) height);
+		// svgGenerator.setClip(0, 0, (int) width, (int) height);
 
 	}
 
@@ -149,12 +149,12 @@ public class SVGcanvas implements GeoCanvas
 		if (!startAngle.equals(endAngle))
 		{
 
+			double start = startAngle.asDouble() * 180 / Math.PI;
+			double extent = NumericAngle.angleDifference(startAngle, endAngle)
+					* 180 / Math.PI;
 			svgGenerator.draw(new Arc2D.Double(centre.getX() - radius,
 					height - centre.getY() - radius, 2 * radius, 2 * radius,
-					-startAngle.asDouble() * 180 / Math.PI,
-					-NumericAngle.angleDifference(startAngle, endAngle) * 180
-							/ Math.PI,
-					Arc2D.OPEN));
+					start, extent, Arc2D.OPEN));
 		}
 		else
 		{

@@ -247,8 +247,8 @@ public class PointGenerator implements GeoGenerator
 	private GeoObject getAreaOverLine(Line line, GeoHolder geoHolder)
 	{
 		XYpoint leftBottom = new XYpoint(0, 0);
-		XYpoint rightBottom = new XYpoint(0, geoHolder.getWidth());
-		XYpoint leftTop = new XYpoint(geoHolder.getHeight(), 0);
+		XYpoint rightBottom = new XYpoint(geoHolder.getWidth(), 0);
+		XYpoint leftTop = new XYpoint(0, geoHolder.getHeight());
 		XYpoint rightTop = new XYpoint(geoHolder.getWidth(),
 				geoHolder.getHeight());
 
