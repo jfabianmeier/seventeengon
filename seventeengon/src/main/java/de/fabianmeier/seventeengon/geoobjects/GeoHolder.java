@@ -111,6 +111,8 @@ public class GeoHolder
 
 		affineGeo = affineGeo.intersectWith(triangle1);
 		affineGeo = affineGeo.intersectWith(triangle2);
+
+		affineGeo = affineGeo.normalize();
 		return affineGeo;
 	}
 
@@ -180,26 +182,6 @@ public class GeoHolder
 	public boolean contains(GeoName geoName)
 	{
 		return contains(new CompName(geoName));
-	}
-
-	/**
-	 * Adds all elements with their respective names to the canvas.
-	 * 
-	 * @param canvas
-	 *            A GeoCanvas
-	 */
-	public void draw(GeoCanvas canvas)
-	{
-		canvas.drawAll(this);
-
-		// for (Entry<CompName, GeoObject> entry : geoMap.entrySet())
-		// {
-		// GeoVisible visi = visiMap.get(entry.getKey());
-		// if (visi == null)
-		// visi = GeoVisible.getStandard();
-		// entry.getValue().draw(canvas, entry.getKey().toString(), visi);
-		// }
-
 	}
 
 	/**
@@ -466,7 +448,7 @@ public class GeoHolder
 
 	}
 
-	private Set<GeoObject> blockedAreaSet = new HashSet<GeoObject>();
+	private Set<GeoObject> blockedAreaSet = null;
 
 	/**
 	 * @param geo
@@ -483,6 +465,23 @@ public class GeoHolder
 	 */
 	public Set<GeoObject> getBlockedAreas()
 	{
+		if (blockedAreaSet == null)
+		{
+			blockedAreaSet = new HashSet<GeoObject>();
+			blockedAreaSet.add(new Triangle(new XYpoint(0, -height),
+					new XYpoint(0, 2 * height),
+					new XYpoint(-width, height / 2)));
+			blockedAreaSet.add(new Triangle(new XYpoint(-width, 0),
+					new XYpoint(2 * width, 0),
+					new XYpoint(width / 2, -height)));
+			blockedAreaSet.add(new Triangle(new XYpoint(width, -height),
+					new XYpoint(width, 2 * height),
+					new XYpoint(2 * width, height / 2)));
+			blockedAreaSet.add(new Triangle(new XYpoint(-width, height),
+					new XYpoint(2 * width, height),
+					new XYpoint(width / 2, 2 * height)));
+
+		}
 		return blockedAreaSet;
 	}
 

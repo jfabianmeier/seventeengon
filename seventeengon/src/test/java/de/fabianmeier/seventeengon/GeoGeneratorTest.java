@@ -47,8 +47,7 @@ public class GeoGeneratorTest
 		GeoHolder geoHolder = new GeoHolder(2000, 1000, 20);
 
 		local.generateAndAdd(geoHolder, new Sentence("Sei B ein Punkt"));
-
-		geoHolder.draw(textCanvas);
+		textCanvas.drawAll(geoHolder, false);
 
 		System.out.println("Sei B ein Punkt:");
 		System.out.println(textCanvas);
@@ -79,7 +78,7 @@ public class GeoGeneratorTest
 		local.generateAndAdd(geoHolder, sentence);
 
 		TextualCanvas textCanvas = new TextualCanvas();
-		geoHolder.draw(textCanvas);
+		textCanvas.drawAll(geoHolder, false);
 
 		System.out.println(sentence);
 		System.out.println(textCanvas);
@@ -106,7 +105,7 @@ public class GeoGeneratorTest
 		GeoHolder geoHolder = new GeoHolder(2000, 1000, 0);
 		local.generateAndAdd(geoHolder, sentence);
 
-		geoHolder.draw(textCanvas);
+		textCanvas.drawAll(geoHolder, false);
 
 		System.out.println(sentence);
 		System.out.println(textCanvas);
@@ -132,7 +131,7 @@ public class GeoGeneratorTest
 		GeoHolder geoHolder = new GeoHolder(2000, 1000, 10);
 		GeoGeneratorLookup.generateAndAdd(geoHolder, sentence);
 
-		geoHolder.draw(textCanvas);
+		textCanvas.drawAll(geoHolder, false);
 
 		System.out.println(sentence);
 		System.out.println(textCanvas);

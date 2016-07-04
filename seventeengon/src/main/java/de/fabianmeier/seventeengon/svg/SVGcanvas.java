@@ -5,6 +5,7 @@ package de.fabianmeier.seventeengon.svg;
 
 import java.awt.BasicStroke;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
@@ -31,7 +32,6 @@ import org.w3c.dom.Document;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoCanvas;
 import de.fabianmeier.seventeengon.geoobjects.GeoHolder;
-import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.naming.CompName;
 import de.fabianmeier.seventeengon.naming.GeoName;
 import de.fabianmeier.seventeengon.shapes.Angle;
@@ -63,6 +63,8 @@ public class SVGcanvas implements GeoCanvas
 	private static void setColourAndStroke(Graphics2D graphics,
 			GeoVisible visible)
 	{
+		graphics.setFont(new Font("Cambria", Font.PLAIN, 11));
+
 		final float dash1[] = {10.0f};
 		final BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
 				BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
@@ -76,10 +78,10 @@ public class SVGcanvas implements GeoCanvas
 			graphics.setStroke(filled);
 
 	}
-	private final double height;
+	private final int height;
 	private final SVGGraphics2D svgGenerator;
 
-	private final double width;
+	private final int width;
 
 	/**
 	 * Generates a canvas for svg generation
@@ -91,8 +93,8 @@ public class SVGcanvas implements GeoCanvas
 	 */
 	public SVGcanvas(double width, double height)
 	{
-		this.width = width;
-		this.height = height;
+		this.width = (int) width;
+		this.height = (int) height;
 
 		DOMImplementation domImpl = GenericDOMImplementation
 				.getDOMImplementation();
@@ -307,61 +309,30 @@ public class SVGcanvas implements GeoCanvas
 	 * seventeengon.geoobjects.GeoHolder)
 	 */
 	@Override
-	public void drawAll(GeoHolder geoHolder)
+	public void drawAll(GeoHolder geoHolder, boolean turnAndFit)
 	{
-		GeoHolder fittedHolder = geoHolder.turnAndFitIntoCanvas();
+
+		GeoHolder fittedHolder = geoHolder;
+		if (turnAndFit)
+			fittedHolder = geoHolder.turnAndFitIntoCanvas();
+
+		drawGeoObjects(fittedHolder);
 
 		for (CompName compName : fittedHolder.getCompNames())
 		{
-			GeoObject geo = geoHolder.get(compName);
-			GeoVisible visibility = geoHolder.getVisibility(compName);
-
-			if (!visibility.isInvisible())
-			{
-				setColourAndStroke(svgGenerator, visibility);
-				draw(geo);
-			}
-		}
-
-		for (CompName compName : fittedHolder.getCompNames())
-		{
-			GeoObject geo = geoHolder.get(compName);
-			GeoVisible visibility = geoHolder.getVisibility(compName);
+			GeoObject geo = fittedHolder.get(compName);
+			GeoVisible visibility = fittedHolder.getVisibility(compName);
 
 			if (compName.getGeoNames().size() > 1)
 				continue;
 
 			GeoName geoName = compName.getGeoNames().get(0);
 
+			LOG.info("Picking " + geoName + " from " + compName);
+
 			if (!visibility.isNameHidden())
 			{
-				List<Angle> nameDrawingAngles = geo.getNameDrawingAngles();
-
-				boolean success = false;
-				double factor = 1;
-
-				while (!success)
-				{
-
-					for (Angle angle : nameDrawingAngles)
-					{
-						boolean localSuccess = nameTry(fittedHolder, geoName,
-								angle, factor);
-
-						if (localSuccess)
-						{
-							success = true;
-							break;
-						}
-
-					}
-
-					factor *= 1.1;
-
-					if (factor > 4)
-						break;
-
-				}
+				drawName(fittedHolder, geo, geoName);
 
 			}
 
@@ -369,34 +340,66 @@ public class SVGcanvas implements GeoCanvas
 
 	}
 
-	/**
-	 * @param label
-	 *            Label to draw
-	 * @param drawPoint
-	 *            point to which the label should be near
-	 * @param startAngle
-	 *            startAngle for the angle in which the label should be
-	 * @param endAngle
-	 *            endAngle for the angle in which the label should be
-	 */
-	@SuppressWarnings("unused")
-	private void drawName(GeoName label, XYpoint drawPoint,
-			NumericAngle startAngle, NumericAngle endAngle)
+	private void drawName(GeoHolder fittedHolder, GeoObject geo,
+			GeoName geoName)
 	{
-		NumericAngle middleAngle = startAngle.addtoAngle(
-				NumericAngle.angleDifference(startAngle, endAngle) / 2);
+		// Random rand = new Random();
+		// Color color = new Color(rand.nextInt(200) + rand.nextInt(200) * 256
+		// + rand.nextInt(200) * 65536 + 30);
+		// svgGenerator.setColor(color);
 
-		XYvector boundingBox = getBoundingBox(label);
+		LOG.info("Drawing name " + geoName + " for object " + geo);
 
-		XYvector angleVector = new XYvector(boundingBox.getxMove(),
-				middleAngle);
+		List<Angle> nameDrawingAngles = geo.getNameDrawingAngles();
 
-		XYpoint targetPoint = angleVector.shift(drawPoint);
+		boolean success = false;
+		double factor = 1.1;
 
-		svgGenerator.drawString(convertToAttributedString(label).getIterator(),
-				(float) targetPoint.getX(),
-				(float) height - (float) targetPoint.getY());
+		while (!success)
+		{
 
+			for (Angle angle : nameDrawingAngles)
+			{
+				boolean localSuccess = nameTry(fittedHolder, geoName, angle,
+						factor);
+
+				if (localSuccess)
+				{
+					success = true;
+					break;
+				}
+
+			}
+
+			factor *= 1.2;
+
+			if (factor > 14)
+			{
+				LOG.info("Failed to write " + geoName);
+				break;
+
+			}
+
+		}
+
+		// color = new Color(0);
+		// svgGenerator.setColor(color);
+
+	}
+
+	private void drawGeoObjects(GeoHolder fittedHolder)
+	{
+		for (CompName compName : fittedHolder.getCompNames())
+		{
+			GeoObject geo = fittedHolder.get(compName);
+			GeoVisible visibility = fittedHolder.getVisibility(compName);
+
+			if (!visibility.isInvisible())
+			{
+				setColourAndStroke(svgGenerator, visibility);
+				draw(geo);
+			}
+		}
 	}
 
 	/**
@@ -449,180 +452,6 @@ public class SVGcanvas implements GeoCanvas
 		// stringBounds.getHeight());
 	}
 
-	private XYvector getMidVector(XYvector direction1, XYvector direction2,
-			double boundingWidth, double boundingHeight)
-	{
-		int quadrant1 = getQuadrant(direction1);
-		int quadrant2 = getQuadrant(direction2);
-
-		if (quadrant2 < quadrant1)
-			quadrant2 += 4;
-
-		if (quadrant1 == quadrant2)
-		{
-			if (NumericAngle.angleDifference(direction1.getAngle(),
-					direction2.getAngle()) > Math.PI
-					|| direction1.getAngle().equals(direction2.getAngle()))
-			{
-				quadrant2 += 4;
-			}
-		}
-
-		if (quadrant2 - quadrant1 >= 2)
-		{
-			return getQuadrantVector(quadrant1 + 1, boundingWidth / 2,
-					boundingHeight / 2);
-		}
-		else if (quadrant2 - quadrant1 == 1)
-		{
-			if (quadrant1 == 1)
-			{
-				if (DMan.same(direction1.getyMove(), 0))
-					return getQuadrantVector(quadrant1, boundingWidth / 2,
-							boundingHeight / 2);
-				if (DMan.same(direction2.getyMove(), 0))
-					return getQuadrantVector(quadrant2, boundingWidth / 2,
-							boundingHeight / 2);
-
-				double wide = direction1.getxMove() / direction1.getyMove()
-						- direction2.getxMove() / direction2.getyMove();
-
-				double factor = boundingWidth / wide;
-
-				return new XYvector(
-						factor * (direction1.getxMove() / direction1.getyMove())
-								- boundingWidth / 2,
-						factor + boundingHeight / 2);
-			}
-			if (quadrant1 == 2)
-			{
-				if (DMan.same(direction1.getxMove(), 0))
-					return getQuadrantVector(quadrant1, boundingWidth / 2,
-							boundingHeight / 2);
-				if (DMan.same(direction2.getxMove(), 0))
-					return getQuadrantVector(quadrant2, boundingWidth / 2,
-							boundingHeight / 2);
-
-				double tall = -direction1.getyMove() / direction1.getxMove()
-						+ direction2.getyMove() / direction2.getxMove();
-
-				double factor = boundingHeight / tall;
-
-				return new XYvector(-factor - boundingWidth / 2,
-						direction1.getyMove() / direction1.getxMove() * factor
-								+ boundingHeight / 2);
-			}
-			if (quadrant1 == 3)
-			{
-				if (DMan.same(direction1.getyMove(), 0))
-					return getQuadrantVector(quadrant1, boundingWidth / 2,
-							boundingHeight / 2);
-				if (DMan.same(direction2.getyMove(), 0))
-					return getQuadrantVector(quadrant2, boundingWidth / 2,
-							boundingHeight / 2);
-
-				double wide = +direction1.getxMove() / direction1.getyMove()
-						- direction2.getxMove() / direction2.getyMove();
-
-				double factor = boundingWidth / wide;
-
-				return new XYvector(
-						factor * (direction1.getxMove() / direction1.getyMove())
-								- boundingWidth / 2,
-						-factor - boundingHeight / 2);
-			}
-			if (quadrant1 == 4)
-			{
-				if (DMan.same(direction1.getxMove(), 0))
-					return getQuadrantVector(quadrant1, boundingWidth / 2,
-							boundingHeight / 2);
-				if (DMan.same(direction2.getxMove(), 0))
-					return getQuadrantVector(quadrant2, boundingWidth / 2,
-							boundingHeight / 2);
-
-				double tall = -direction1.getyMove() / direction1.getxMove()
-						+ direction2.getyMove() / direction2.getxMove();
-
-				double factor = boundingHeight / tall;
-
-				return new XYvector(factor + boundingWidth / 2,
-						direction1.getyMove() / direction1.getxMove() * factor
-								- boundingHeight / 2);
-			}
-
-		}
-		else
-		{
-			throw new IllegalStateException("Not implemented.");
-
-		}
-
-		throw new IllegalStateException("Should not be reached");
-
-	}
-
-	/**
-	 * @param direction
-	 *            vector
-	 * @return the quadrant
-	 */
-	private int getQuadrant(XYvector direction)
-	{
-		NumericAngle num = direction.getAngle();
-
-		NumericAngle zero = new NumericAngle(0);
-		NumericAngle ninety = new NumericAngle(Math.PI / 2);
-		NumericAngle onehundredeighty = new NumericAngle(Math.PI);
-		NumericAngle twohundredseventy = new NumericAngle(3 * Math.PI / 2);
-
-		if (num.inBetween(zero, ninety))
-			return 1;
-
-		if (num.inBetween(ninety, onehundredeighty))
-			return 2;
-
-		if (num.inBetween(onehundredeighty, twohundredseventy))
-			return 3;
-
-		if (num.inBetween(twohundredseventy, zero))
-			return 4;
-
-		throw new IllegalStateException("Angle error.");
-
-	}
-
-	/**
-	 * @param quadrant
-	 *            the quadrant
-	 * @param xOffset
-	 *            horizontal vector offset
-	 * @param yOffset
-	 *            vertical vector offset
-	 * @return the vector with the offset in the right quadrant
-	 */
-	private XYvector getQuadrantVector(int quadrant, double xOffset,
-			double yOffset)
-	{
-		quadrant = quadrant % 4;
-		if (quadrant == 0)
-			quadrant = 4;
-
-		switch (quadrant)
-		{
-			case 1 :
-				return new XYvector(xOffset, yOffset);
-			case 2 :
-				return new XYvector(-xOffset, yOffset);
-			case 3 :
-				return new XYvector(-xOffset, -yOffset);
-			case 4 :
-				return new XYvector(xOffset, -yOffset);
-			default :
-				throw new IllegalStateException("No quadrant");
-		}
-
-	}
-
 	private GeoObject getRectangle(double left, double bottom, double width,
 			double height)
 	{
@@ -647,8 +476,11 @@ public class SVGcanvas implements GeoCanvas
 
 			if (!visibility.isInvisible())
 			{
-				if (!other.intersectWith(geo).isEmpty())
+				if (!other.intersectWith(geo.getBoundary()).isEmpty())
+				{
+					LOG.debug(other + " intersects with " + compName);
 					return true;
+				}
 
 			}
 
@@ -683,11 +515,19 @@ public class SVGcanvas implements GeoCanvas
 		XYvector direction1 = angle.getDirection1();
 		XYvector direction2 = angle.getDirection2();
 
-		double boundingWidth = boundingBox.getxMove();
-		double boundingHeight = boundingBox.getyMove();
+		// double boundingWidth = boundingBox.getxMove();
+		// double boundingHeight = boundingBox.getyMove();
 
-		XYvector midVector = getMidVector(direction1, direction2, boundingWidth,
-				boundingHeight);
+		double epsilon = (fittedHolder.getWidth() + fittedHolder.getHeight())
+				/ 200;
+
+		int rectangleWidth = (int) (boundingBox.getxMove() + 2 * epsilon);
+		int rectangleHeight = (int) (boundingBox.getyMove() + 2 * epsilon);
+
+		LOG.debug("Fitting " + geoName + " with factor " + factor);
+
+		XYvector midVector = NamePlacing.getMidVector(direction1, direction2,
+				rectangleWidth, rectangleHeight);
 
 		midVector = midVector.multiplyBy(factor);
 
@@ -696,11 +536,15 @@ public class SVGcanvas implements GeoCanvas
 		double startY = angle.getVertex().getY() + midVector.getyMove()
 				- boundingBox.getyMove() / 2;
 
-		GeoObject rectangle = getRectangle(
-				startX - fittedHolder.getWidth() / 100,
-				startY - fittedHolder.getWidth() / 100,
-				boundingBox.getxMove() + fittedHolder.getWidth() / 100,
-				boundingBox.getyMove() + fittedHolder.getWidth() / 100);
+		int rectangleX = (int) (startX - epsilon);
+		int rectangleY = (int) (startY - epsilon);
+
+		GeoObject rectangle = getRectangle(rectangleX, rectangleY,
+				rectangleWidth, rectangleHeight);
+
+		// svgGenerator.drawRect(rectangleX, height - rectangleY -
+		// rectangleHeight,
+		// rectangleWidth, rectangleHeight);
 
 		if (intersectsWithVisibleObject(fittedHolder, rectangle))
 			return false;
@@ -709,7 +553,7 @@ public class SVGcanvas implements GeoCanvas
 
 		svgGenerator.drawString(
 				convertToAttributedString(geoName).getIterator(),
-				(float) startX, (float) height - (float) startY);
+				(float) startX, height - (float) startY);
 
 		return true;
 

@@ -61,22 +61,6 @@ public class CompositeGeoObject implements GeoObject
 		return false;
 	}
 
-	// @Override
-	// public void draw(GeoCanvas canvas, GeoVisible visi)
-	// {
-	// boolean written = false;
-	// for (GeoObject geo : subObjectList)
-	// {
-	// if (!written)
-	// geo.draw(canvas, visi);
-	// else
-	// geo.draw(canvas, visi.hideName());
-	//
-	// written = true;
-	// }
-	//
-	// }
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -246,20 +230,6 @@ public class CompositeGeoObject implements GeoObject
 
 	}
 
-	// @Override
-	// public CompositeGeoObject rotate(XYpoint around, double rotationAngle)
-	// {
-	// List<GeoObject> shiftedObjects = new ArrayList<GeoObject>();
-	//
-	// for (GeoObject geo : subObjectList)
-	// {
-	// shiftedObjects.add(geo.rotate(around, rotationAngle));
-	// }
-	//
-	// return new CompositeGeoObject(shiftedObjects);
-	//
-	// }
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -276,6 +246,64 @@ public class CompositeGeoObject implements GeoObject
 		}
 
 		return back;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#normalize()
+	 */
+	@Override
+	public GeoObject normalize()
+	{
+		List<GeoObject> normalizedObjects = new ArrayList<GeoObject>();
+
+		for (GeoObject geo : subObjectList)
+		{
+			normalizedObjects.add(geo.normalize());
+		}
+
+		List<GeoObject> importantObjects = new ArrayList<GeoObject>();
+		List<XYpoint> pointList = new ArrayList<>();
+
+		for (GeoObject geo : normalizedObjects)
+		{
+			if (geo.isEmpty())
+				continue;
+
+			if (geo instanceof XYpoint)
+			{
+				pointList.add((XYpoint) geo);
+			}
+			else
+			{
+				importantObjects.add(geo);
+			}
+		}
+
+		for (XYpoint point : pointList)
+		{
+			boolean alreadyIncluded = false;
+
+			for (GeoObject geo : importantObjects)
+			{
+				if (geo.containsPoint(point))
+					alreadyIncluded = true;
+			}
+
+			if (!alreadyIncluded)
+				importantObjects.add(point);
+
+		}
+
+		if (importantObjects.isEmpty())
+			return CompositeGeoObject.emptyObject;
+
+		if (importantObjects.size() == 1)
+			return importantObjects.get(0);
+
+		return new CompositeGeoObject(importantObjects);
 
 	}
 

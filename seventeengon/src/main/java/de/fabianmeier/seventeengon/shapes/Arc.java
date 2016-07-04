@@ -1,6 +1,7 @@
 package de.fabianmeier.seventeengon.shapes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -66,21 +67,6 @@ public class Arc extends AtomicGeoObject
 		return angle.inBetween(startAngle, endAngle);
 
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
-	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
-	 */
-	// @Override
-	// public void draw(GeoCanvas canvas, GeoVisible visi)
-	// {
-	// canvas.drawArc(getCentre(), getStartAngle(), getEndAngle(), radius,
-	// visi);
-	//
-	// }
 
 	@Override
 	public boolean equals(Object obj)
@@ -232,30 +218,6 @@ public class Arc extends AtomicGeoObject
 		return geoObject.intersectWith(this);
 
 	}
-	//
-	// @Override
-	// public void paint(Graphics2D g2d)
-	// {
-	// // setColourAndStroke(g2d);
-	//
-	// if (!startAngle.equals(endAngle))
-	// {
-	//
-	// g2d.draw(new Arc2D.Double(centre.getX() - radius,
-	// centre.getY() - radius, 2 * radius, 2 * radius,
-	// -startAngle.asDouble() * 180 / Math.PI,
-	// -NumericAngle.angleDifference(startAngle, endAngle) * 180
-	// / Math.PI,
-	// Arc2D.OPEN));
-	// }
-	// else
-	// {
-	//
-	// g2d.draw(new Ellipse2D.Double(centre.getX() - radius,
-	// centre.getY() - radius, 2 * radius, 2 * radius));
-	// }
-	//
-	// }
 
 	@Override
 	public String toString()
@@ -324,15 +286,6 @@ public class Arc extends AtomicGeoObject
 		return new Arc(centreNew, radiusNew, startAngle, endAngle);
 	}
 
-	// @Override
-	// public Arc rotate(XYpoint around, double rotationAngle)
-	// {
-	// XYpoint centreNew = centre.rotate(around, rotationAngle);
-	// double radiusNew = radius;
-	//
-	// return new Arc(centreNew, radiusNew, startAngle, endAngle);
-	// }
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -348,7 +301,9 @@ public class Arc extends AtomicGeoObject
 
 		List<NumericAngle> drawNumAngles = new ArrayList<NumericAngle>();
 
-		for (int i = 0; i < 8; i++)
+		List<Integer> intList = Arrays.asList(4, 3, 5, 2, 6, 1, 7, 0);
+
+		for (int i : intList)
 		{
 			drawNumAngles.add(startAngle.addtoAngle(i * stepSize));
 		}

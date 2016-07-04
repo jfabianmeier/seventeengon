@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.Set;
 
 import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
-import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.NumericAngle;
 
 public class Angle extends AtomicGeoObject
@@ -17,7 +16,7 @@ public class Angle extends AtomicGeoObject
 	private final XYpoint vertex;
 	private final XYvector direction2;
 
-	private final Triangle reprTriangle;
+	// private final Triangle reprTriangle;
 
 	/**
 	 * Generates a triangle
@@ -36,8 +35,9 @@ public class Angle extends AtomicGeoObject
 		direction1 = new XYvector(vertex, onRay1).normed();
 		direction2 = new XYvector(vertex, onRay2).normed();
 
-		reprTriangle = new Triangle(direction1.multiplyBy(10000).shift(vertex),
-				vertex, direction2.multiplyBy(10000).shift(vertex));
+		// reprTriangle = new
+		// Triangle(direction1.multiplyBy(10000).shift(vertex),
+		// vertex, direction2.multiplyBy(10000).shift(vertex));
 	}
 
 	/**
@@ -58,23 +58,10 @@ public class Angle extends AtomicGeoObject
 		direction1 = new XYvector(1, firstAngle);
 		direction2 = new XYvector(1, secondAngle);
 
-		reprTriangle = new Triangle(direction1.multiplyBy(10000).shift(vertex),
-				vertex, direction2.multiplyBy(10000).shift(vertex));
+		// reprTriangle = new
+		// Triangle(direction1.multiplyBy(10000).shift(vertex),
+		// vertex, direction2.multiplyBy(10000).shift(vertex));
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
-	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
-	 */
-	// @Override
-	// public void draw(GeoCanvas canvas, GeoVisible visi)
-	// {
-	// canvas.drawAngle(vertex, direction1, direction2, visi);
-	//
-	// }
 
 	@Override
 	public boolean equals(Object obj)
@@ -164,49 +151,40 @@ public class Angle extends AtomicGeoObject
 	@Override
 	public GeoObject intersectWith(GeoObject geoObject)
 	{
-		if (geoObject instanceof XYpoint)
-		{
-			return IntersectionManager.intersect(reprTriangle,
-					(XYpoint) geoObject);
-		}
-		if (geoObject instanceof Line)
-		{
-			return IntersectionManager.intersect(reprTriangle,
-					(Line) geoObject);
-		}
-		if (geoObject instanceof Arc)
-		{
-			return IntersectionManager.intersect(reprTriangle, (Arc) geoObject);
-		}
-		if (geoObject instanceof Triangle)
-		{
-			return IntersectionManager.intersect(reprTriangle,
-					(Triangle) geoObject);
-		}
-		if (geoObject instanceof Circle)
-		{
-			return IntersectionManager.intersect(reprTriangle,
-					(Circle) geoObject);
-		}
 
-		return geoObject.intersectWith(this);
+		if (geoObject.containsPoint(vertex))
+			return this;
+		else
+			return CompositeGeoObject.getEmptyObject();
+
+		// if (geoObject instanceof XYpoint)
+		// {
+		// return IntersectionManager.intersect(reprTriangle,
+		// (XYpoint) geoObject);
+		// }
+		// if (geoObject instanceof Line)
+		// {
+		// return IntersectionManager.intersect(reprTriangle,
+		// (Line) geoObject);
+		// }
+		// if (geoObject instanceof Arc)
+		// {
+		// return IntersectionManager.intersect(reprTriangle, (Arc) geoObject);
+		// }
+		// if (geoObject instanceof Triangle)
+		// {
+		// return IntersectionManager.intersect(reprTriangle,
+		// (Triangle) geoObject);
+		// }
+		// if (geoObject instanceof Circle)
+		// {
+		// return IntersectionManager.intersect(reprTriangle,
+		// (Circle) geoObject);
+		// }
+		//
+		// return geoObject.intersectWith(this);
 
 	}
-
-	// public void paint(Graphics2D g2d)
-	// {
-	// // setColourAndStroke(g2d);
-	//
-	// Path2D path = new Path2D.Double();
-	//
-	// path.moveTo(pointRay1.getX(), pointRay1.getY());
-	// path.lineTo(vertex.getX(), vertex.getY());
-	// path.lineTo(pointC.getX(), pointC.getY());
-	//
-	// path.closePath();
-	//
-	// g2d.draw(path);
-	// }
 
 	@Override
 	public String toString()
@@ -223,7 +201,7 @@ public class Angle extends AtomicGeoObject
 	@Override
 	public GeoObject getBoundary()
 	{
-		return reprTriangle.getBoundary();
+		return vertex;
 
 	}
 
@@ -264,20 +242,8 @@ public class Angle extends AtomicGeoObject
 		XYpoint dir1Point = direction1.shift(vertex).preservingMap(preMap);
 		XYpoint dir2Point = direction2.shift(vertex).preservingMap(preMap);
 
-		return new Angle(vertexNew, dir1Point, dir2Point);
+		return new Angle(dir1Point, vertexNew, dir2Point);
 	}
-
-	// @Override
-	// public Angle rotate(XYpoint around, double rotationAngle)
-	// {
-	// XYpoint dir1Point = direction1.shift(vertex).rotate(around,
-	// rotationAngle);
-	// XYpoint dir2Point = direction2.shift(vertex).rotate(around,
-	// rotationAngle);
-	// XYpoint vertexNew = vertex.rotate(around, rotationAngle);
-	//
-	// return new Angle(vertexNew, dir1Point, dir2Point);
-	// }
 
 	/*
 	 * (non-Javadoc)

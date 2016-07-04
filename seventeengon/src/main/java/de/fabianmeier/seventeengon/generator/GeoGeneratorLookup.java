@@ -32,6 +32,7 @@ public class GeoGeneratorLookup
 		add(CircleGenerator.CIRCLE, new CircleGenerator());
 
 		add(PointGenerator.INX, new PointGenerator());
+		add(PointGenerator.CUT, new PointGenerator());
 		add(PointGenerator.ONX, new PointGenerator());
 		add(PointGenerator.OUTSIDE, new PointGenerator());
 		add(PointGenerator.OVER, new PointGenerator());

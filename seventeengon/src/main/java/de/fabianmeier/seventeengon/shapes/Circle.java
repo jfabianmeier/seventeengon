@@ -1,6 +1,7 @@
 package de.fabianmeier.seventeengon.shapes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -281,7 +282,9 @@ public class Circle extends AtomicGeoObject
 
 		List<NumericAngle> drawNumAngles = new ArrayList<NumericAngle>();
 
-		for (int i = 0; i < 8; i++)
+		List<Integer> intList = Arrays.asList(4, 3, 5, 2, 6, 1, 7);
+
+		for (int i : intList)
 		{
 			drawNumAngles.add(startAngle.addtoAngle(i * stepSize));
 		}

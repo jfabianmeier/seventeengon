@@ -64,22 +64,21 @@ public class Interactive
 						.sentenceProcessing(rawSentences);
 				GeoCanvas textCanvas = new TextualCanvas();
 
-				holder.draw(textCanvas);
+				textCanvas.drawAll(holder, false);
 
 				SVGcanvas svgCanvas = new SVGcanvas(holder.getWidth(),
 						holder.getHeight());
 
-				holder.draw(svgCanvas);
+				svgCanvas.drawAll(holder, false);
 
-				GeoHolder holderShift = holder.turnAndFitIntoCanvas();
 				GeoCanvas textCanvasShift = new TextualCanvas();
 
-				holderShift.draw(textCanvasShift);
+				textCanvasShift.drawAll(holder, true);
 
 				SVGcanvas svgCanvasShift = new SVGcanvas(holder.getWidth(),
 						holder.getHeight());
 
-				holderShift.draw(svgCanvasShift);
+				svgCanvasShift.drawAll(holder, true);
 
 				if (drawfile != null)
 					svgCanvas.writeToFile(drawfile);

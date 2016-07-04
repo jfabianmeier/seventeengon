@@ -448,20 +448,17 @@ public class Line extends AtomicGeoObject
 		return back;
 	}
 
-	// /*
-	// * (non-Javadoc)
-	// *
-	// * @see
-	// de.fabianmeier.seventeengon.shapes.GeoObject#rotate(de.fabianmeier.
-	// * seventeengon.shapes.XYpoint, double)
-	// */
-	// @Override
-	// public Line rotate(XYpoint around, double rotationAngle)
-	// {
-	// XYpoint aNew = pointA.rotate(around, rotationAngle);
-	// XYpoint bNew = pointB.rotate(around, rotationAngle);
-	//
-	// return new Line(aNew, bNew, startLambda, endLambda);
-	// }
+	/**
+	 * 
+	 * @return length of the line
+	 */
+	public double getLength()
+	{
+		double xdiff = getEndPoint().getX() - getStartPoint().getX();
+		double ydiff = getEndPoint().getY() - getStartPoint().getY();
+
+		return Math.sqrt(xdiff * xdiff + ydiff * ydiff);
+
+	}
 
 }

@@ -137,14 +137,6 @@ public class XYpoint extends AtomicGeoObject
 
 	}
 
-	// @Override
-	// public void paint(Graphics2D g2d)
-	// {
-	// // setColourAndStroke(g2d);
-	//
-	// g2d.fill(new Ellipse2D.Double(x - 1, y - 1, 2, 2));
-	// }
-
 	@Override
 	public String toString()
 	{
@@ -195,20 +187,6 @@ public class XYpoint extends AtomicGeoObject
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.fabianmeier.seventeengon.shapes.GeoObject#affineMap(de.fabianmeier.
-	 * seventeengon.shapes.XYvector, double)
-	 */
-	// @Override
-	// public XYpoint affineMap(XYvector shiftVector, double scale)
-	// {
-	// return new XYpoint((x + shiftVector.getxMove()) * scale,
-	// (y + shiftVector.getyMove()) * scale);
-	// }
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * de.fabianmeier.seventeengon.shapes.GeoObject#preservingMap(de.fabianmeier
 	 * .seventeengon.geoobjects.PreservingMap)
 	 */
@@ -217,19 +195,6 @@ public class XYpoint extends AtomicGeoObject
 	{
 		return preMap.mapPoint(this);
 	}
-
-	// @Override
-	// public XYpoint rotate(XYpoint around, double rotationAngle)
-	// {
-	// XYvector vector = new XYvector(around, this);
-	//
-	// NumericAngle vectorAngle = vector.getAngle();
-	// NumericAngle neuAngle = vectorAngle.addtoAngle(rotationAngle);
-	//
-	// XYvector neuVector = new XYvector(vector.getLength(), neuAngle);
-	// return neuVector.shift(around);
-	//
-	// }
 
 	/*
 	 * (non-Javadoc)
@@ -241,13 +206,21 @@ public class XYpoint extends AtomicGeoObject
 	{
 		List<Angle> back = new ArrayList<Angle>();
 		back.add(new Angle(this, new NumericAngle(0),
-				new NumericAngle(Math.PI * 0.6)));
-		back.add(new Angle(this, new NumericAngle(Math.PI * 0.6),
-				new NumericAngle(1.2 * Math.PI)));
-		back.add(new Angle(this, new NumericAngle(1.2 * Math.PI),
-				new NumericAngle(1.8 * Math.PI)));
-		back.add(new Angle(this, new NumericAngle(1.8 * Math.PI),
-				new NumericAngle(2.4 * Math.PI)));
+				new NumericAngle(Math.PI * 0.5)));
+		back.add(new Angle(this, new NumericAngle(Math.PI * 0.5),
+				new NumericAngle(1 * Math.PI)));
+		back.add(new Angle(this, new NumericAngle(1 * Math.PI),
+				new NumericAngle(1.5 * Math.PI)));
+		back.add(new Angle(this, new NumericAngle(1.5 * Math.PI),
+				new NumericAngle(2.0 * Math.PI)));
+		back.add(new Angle(this, new NumericAngle(Math.PI * 0.25),
+				new NumericAngle(Math.PI * 0.75)));
+		back.add(new Angle(this, new NumericAngle(Math.PI * 0.75),
+				new NumericAngle(1.25 * Math.PI)));
+		back.add(new Angle(this, new NumericAngle(1.25 * Math.PI),
+				new NumericAngle(1.75 * Math.PI)));
+		back.add(new Angle(this, new NumericAngle(1.75 * Math.PI),
+				new NumericAngle(0.25 * Math.PI)));
 		return back;
 	}
 

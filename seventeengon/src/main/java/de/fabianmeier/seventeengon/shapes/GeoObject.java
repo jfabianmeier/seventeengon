@@ -82,16 +82,6 @@ public interface GeoObject
 	 * @return All zero-dimensional parts, combined as point set
 	 */
 	Set<XYpoint> getZeroDimensionalPart();
-	//
-	// /**
-	// *
-	// * @param shiftVector
-	// * shift
-	// * @param scale
-	// * Scaling factor for central scaling from the origin
-	// * @return a first shifted, then scaled version of the GeoObject
-	// */
-	// GeoObject affineMap(XYvector shiftVector, double scale);
 
 	GeoObject preservingMap(PreservingMap preMap);
 
@@ -102,11 +92,11 @@ public interface GeoObject
 	 */
 	List<Angle> getNameDrawingAngles();
 
-	// /**
-	// * @param around
-	// * @param rotationAngle
-	// * @return
-	// */
-	// GeoObject rotate(XYpoint around, double rotationAngle);
+	/**
+	 * 
+	 * @return Eliminates unnecessary levels of composition, unnecessery
+	 *         zero-dimensional objects and empty subobjects
+	 */
+	GeoObject normalize();
 
 }

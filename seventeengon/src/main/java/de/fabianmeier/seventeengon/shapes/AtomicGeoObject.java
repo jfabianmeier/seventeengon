@@ -48,4 +48,15 @@ public abstract class AtomicGeoObject implements GeoObject
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#normalize()
+	 */
+	@Override
+	public GeoObject normalize()
+	{
+		return this;
+	}
+
 }

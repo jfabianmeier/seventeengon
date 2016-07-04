@@ -77,8 +77,10 @@ public interface GeoCanvas
 
 	/**
 	 * @param geoHolder
-	 *            a geoHolder object
+	 *            A geoHolder
+	 * @param turnAndFit
+	 *            If the result should be fitted into the rectangle.
 	 */
-	void drawAll(GeoHolder geoHolder);
+	void drawAll(GeoHolder geoHolder, boolean turnAndFit);
 
 }

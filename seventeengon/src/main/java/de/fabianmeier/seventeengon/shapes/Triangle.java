@@ -170,26 +170,10 @@ public class Triangle extends AtomicGeoObject
 
 	}
 
-	// @Override
-	// public void paint(Graphics2D g2d)
-	// {
-	// // setColourAndStroke(g2d);
-	//
-	// Path2D path = new Path2D.Double();
-	//
-	// path.moveTo(pointA.getX(), pointA.getY());
-	// path.lineTo(pointB.getX(), pointB.getY());
-	// path.lineTo(pointC.getX(), pointC.getY());
-	//
-	// path.closePath();
-	//
-	// g2d.draw(path);
-	// }
-
 	@Override
 	public String toString()
 	{
-		String localLabel = "ABC";
+		String localLabel = "Triangle";
 
 		return localLabel + "(" + pointA.toString() + "; " + pointB.toString()
 				+ "; " + pointC.toString() + ")";
