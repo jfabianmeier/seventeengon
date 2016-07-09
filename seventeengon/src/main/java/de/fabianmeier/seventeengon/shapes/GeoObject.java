@@ -99,4 +99,10 @@ public interface GeoObject
 	 */
 	GeoObject normalize();
 
+	/**
+	 * @param geo2
+	 * @return
+	 */
+	double distanceTo(GeoObject geo);
+
 }

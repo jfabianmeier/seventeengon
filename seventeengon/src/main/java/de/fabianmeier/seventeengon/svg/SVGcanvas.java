@@ -20,7 +20,9 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.text.AttributedString;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
@@ -141,7 +143,7 @@ public class SVGcanvas implements GeoCanvas
 	 * @param arc
 	 *            An arc
 	 */
-	public void draw(Arc arc)
+	private void draw(Arc arc)
 	{
 		NumericAngle startAngle = arc.getStartAngle();
 		NumericAngle endAngle = arc.getEndAngle();
@@ -216,7 +218,7 @@ public class SVGcanvas implements GeoCanvas
 	 * @param line
 	 *            A Line
 	 */
-	public void draw(Line line)
+	private void draw(Line line)
 	{
 
 		svgGenerator.draw(new Line2D.Double(line.getStartPoint().getX(),
@@ -224,62 +226,6 @@ public class SVGcanvas implements GeoCanvas
 				height - line.getEndPoint().getY()));
 
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoCanvas#drawAngle(de.fabianmeier
-	 * .seventeengon.shapes.XYpoint,
-	 * de.fabianmeier.seventeengon.shapes.XYvector,
-	 * de.fabianmeier.seventeengon.shapes.XYvector, java.lang.String,
-	 * de.fabianmeier.seventeengon.util.GeoVisible)
-	 */
-	// @Override
-	// public void drawAngle(XYpoint vertex, XYvector direction1,
-	// XYvector direction2, GeoVisible visible)
-	// {
-	//
-	// setColourAndStroke(svgGenerator, visible);
-	//
-	// NumericAngle startAngle = direction1.getAngle();
-	// NumericAngle endAngle = direction2.getAngle();
-	//
-	// double radius = 40;
-	//
-	// if (!visible.isInvisible())
-	// {
-	// if (!startAngle.equals(endAngle))
-	// {
-	//
-	// svgGenerator.draw(new Arc2D.Double(vertex.getX() - radius,
-	// height - vertex.getY() - radius, 2 * radius, 2 * radius,
-	// -startAngle.asDouble() * 180 / Math.PI,
-	// -NumericAngle.angleDifference(startAngle, endAngle)
-	// * 180 / Math.PI,
-	// Arc2D.OPEN));
-	// }
-	// else
-	// {
-	//
-	// svgGenerator.draw(new Ellipse2D.Double(vertex.getX() - radius,
-	// height - vertex.getY() - radius, 2 * radius,
-	// 2 * radius));
-	// }
-
-	// NumericAngle middleAngle = startAngle.addtoAngle(
-	// NumericAngle.angleDifference(startAngle, endAngle) / 2);
-	//
-	// XYvector angleVector = new XYvector(radius, middleAngle);
-	//
-	// XYpoint drawPoint = angleVector.shift(vertex);
-	//
-	// if (!visible.isNameHidden())
-	// drawName(label, drawPoint, startAngle, endAngle);
-
-	// }
-	//
-	// }
 
 	private void draw(Triangle triangle)
 	{
@@ -293,7 +239,7 @@ public class SVGcanvas implements GeoCanvas
 	 * @param point
 	 *            A Point
 	 */
-	public void draw(XYpoint point)
+	private void draw(XYpoint point)
 	{
 
 		svgGenerator.fill(new Ellipse2D.Double(point.getX() - width / 200,
@@ -309,14 +255,14 @@ public class SVGcanvas implements GeoCanvas
 	 * seventeengon.geoobjects.GeoHolder)
 	 */
 	@Override
-	public void drawAll(GeoHolder geoHolder, boolean turnAndFit)
+	public double drawAll(GeoHolder geoHolder, boolean turnAndFit)
 	{
 
 		GeoHolder fittedHolder = geoHolder;
 		if (turnAndFit)
 			fittedHolder = geoHolder.turnAndFitIntoCanvas();
 
-		drawGeoObjects(fittedHolder);
+		double quality = drawGeoObjects(fittedHolder);
 
 		for (CompName compName : fittedHolder.getCompNames())
 		{
@@ -332,15 +278,53 @@ public class SVGcanvas implements GeoCanvas
 
 			if (!visibility.isNameHidden())
 			{
-				drawName(fittedHolder, geo, geoName);
+				quality -= drawName(fittedHolder, geo, geoName);
 
 			}
 
 		}
 
+		return quality;
+
 	}
 
-	private void drawName(GeoHolder fittedHolder, GeoObject geo,
+	private double drawGeoObjects(GeoHolder fittedHolder)
+	{
+		Set<GeoObject> visibleObjects = new HashSet<GeoObject>();
+		for (CompName compName : fittedHolder.getCompNames())
+		{
+			GeoObject geo = fittedHolder.get(compName);
+			GeoVisible visibility = fittedHolder.getVisibility(compName);
+
+			if (!visibility.isInvisible())
+			{
+				setColourAndStroke(svgGenerator, visibility);
+				draw(geo);
+				visibleObjects.add(geo);
+			}
+		}
+
+		double minimalPositiveDistance = fittedHolder.getWidth()
+				+ fittedHolder.getHeight();
+
+		for (GeoObject geo1 : visibleObjects)
+			for (GeoObject geo2 : visibleObjects)
+			{
+				double dist = geo1.distanceTo(geo2);
+
+				if (geo1.intersectWith(geo2).isEmpty()
+						&& dist < minimalPositiveDistance)
+				{
+					minimalPositiveDistance = dist;
+				}
+
+			}
+
+		return minimalPositiveDistance;
+
+	}
+
+	private double drawName(GeoHolder fittedHolder, GeoObject geo,
 			GeoName geoName)
 	{
 		// Random rand = new Random();
@@ -373,7 +357,7 @@ public class SVGcanvas implements GeoCanvas
 
 			factor *= 1.2;
 
-			if (factor > 14)
+			if (factor > 4)
 			{
 				LOG.info("Failed to write " + geoName);
 				break;
@@ -382,24 +366,11 @@ public class SVGcanvas implements GeoCanvas
 
 		}
 
+		return factor - 1.2;
+
 		// color = new Color(0);
 		// svgGenerator.setColor(color);
 
-	}
-
-	private void drawGeoObjects(GeoHolder fittedHolder)
-	{
-		for (CompName compName : fittedHolder.getCompNames())
-		{
-			GeoObject geo = fittedHolder.get(compName);
-			GeoVisible visibility = fittedHolder.getVisibility(compName);
-
-			if (!visibility.isInvisible())
-			{
-				setColourAndStroke(svgGenerator, visibility);
-				draw(geo);
-			}
-		}
 	}
 
 	/**
@@ -420,36 +391,6 @@ public class SVGcanvas implements GeoCanvas
 
 		return new XYvector(textBounds.getWidth(), textBounds.getHeight());
 
-		// FontMetrics fontMetrics = svgGenerator.getFontMetrics();
-
-		// Rectangle2D stringBounds = fontMetrics.getStringBounds(s,
-		// svgGenerator);
-
-		//
-		// AttributedString as = new AttributedString("I love you 104
-		// gazillion");
-		// as.addAttribute(TextAttribute.SUPERSCRIPT,
-		// TextAttribute.SUPERSCRIPT_SUPER, 13, 14);
-		// as.addAttribute(TextAttribute.FOREGROUND, Color.RED, 2, 6);
-		// g.drawString(as.getIterator(), 20, 20);
-
-		// TextLayout textLayout = new TextLayout(
-		// text.getIterator(),
-		// g.getFontRenderContext()
-		// );
-		// Rectangle2D.Float textBounds = ( Rectangle2D.Float )
-		// textLayout.getBounds();
-		//
-		// g.drawString( text.getIterator(), 50, 50 );
-		// // lets draw a bounding rect exactly around our text
-		// // to be sure we calculated it properly
-		// g.draw( new Rectangle2D.Float(
-		// 50 + textBounds.x, 50 + textBounds.y,
-		// textBounds.width, textBounds.height
-		// ) );
-
-		// return new XYvector(stringBounds.getWidth(),
-		// stringBounds.getHeight());
 	}
 
 	private GeoObject getRectangle(double left, double bottom, double width,

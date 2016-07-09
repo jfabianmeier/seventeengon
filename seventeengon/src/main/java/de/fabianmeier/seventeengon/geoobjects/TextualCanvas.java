@@ -41,7 +41,7 @@ public class TextualCanvas implements GeoCanvas
 	 * seventeengon.geoobjects.GeoHolder, boolean)
 	 */
 	@Override
-	public void drawAll(GeoHolder geoHolder, boolean turnAndFit)
+	public double drawAll(GeoHolder geoHolder, boolean turnAndFit)
 	{
 		GeoHolder fittedHolder = geoHolder;
 		if (turnAndFit)
@@ -57,6 +57,8 @@ public class TextualCanvas implements GeoCanvas
 					+ visibility);
 
 		}
+
+		return 1;
 
 	}
 

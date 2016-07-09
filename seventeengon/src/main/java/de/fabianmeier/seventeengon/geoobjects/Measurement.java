@@ -30,6 +30,19 @@ public class Measurement
 	}
 
 	/**
+	 * 
+	 * @param point1
+	 *            point1
+	 * @param point2
+	 *            point2
+	 * @return distance
+	 */
+	public static double distance(XYpoint point1, XYpoint point2)
+	{
+		return (new XYvector(point1, point2)).getLength();
+	}
+
+	/**
 	 * Measures the orthogonal distance of the point to the line
 	 * 
 	 * @param point
@@ -41,14 +54,6 @@ public class Measurement
 	public static double distance(XYpoint point, Line line)
 	{
 		return Math.abs(orientedDistance(point, line));
-	}
-
-	/**
-	 * 
-	 */
-	public static double distance(XYpoint point1, XYpoint point2)
-	{
-		return (new XYvector(point1, point2)).getLength();
 	}
 
 	/**

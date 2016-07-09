@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.fabianmeier.seventeengon.geoobjects.GeoDistance;
 import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
 
 /**
@@ -305,6 +306,19 @@ public class CompositeGeoObject implements GeoObject
 
 		return new CompositeGeoObject(importantObjects);
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#distanceTo(de.fabianmeier.
+	 * seventeengon.shapes.GeoObject)
+	 */
+	@Override
+	public double distanceTo(GeoObject geo)
+	{
+		return GeoDistance.distance(this, geo);
 	}
 
 }

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import de.fabianmeier.seventeengon.geoobjects.GeoDistance;
+
 public abstract class AtomicGeoObject implements GeoObject
 {
 
@@ -57,6 +59,19 @@ public abstract class AtomicGeoObject implements GeoObject
 	public GeoObject normalize()
 	{
 		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.fabianmeier.seventeengon.shapes.GeoObject#distanceTo(de.fabianmeier.
+	 * seventeengon.shapes.GeoObject)
+	 */
+	@Override
+	public double distanceTo(GeoObject geo)
+	{
+		return GeoDistance.distance(this, geo);
 	}
 
 }
