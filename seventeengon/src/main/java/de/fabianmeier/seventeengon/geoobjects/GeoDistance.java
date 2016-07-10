@@ -10,6 +10,8 @@ import de.fabianmeier.seventeengon.shapes.GeoObject;
 import de.fabianmeier.seventeengon.shapes.Line;
 import de.fabianmeier.seventeengon.shapes.Triangle;
 import de.fabianmeier.seventeengon.shapes.XYpoint;
+import de.fabianmeier.seventeengon.shapes.XYvector;
+import de.fabianmeier.seventeengon.util.NumericAngle;
 
 /**
  * @author JFM
@@ -169,8 +171,15 @@ public class GeoDistance
 	 */
 	private static double specialDistance(Arc first, Arc second)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		double distByCentre1 = Math.abs(second.getRadius() - specialDistance(second.getCentre(), first));
+		double distByCentre2 = Math.abs(first.getRadius() - specialDistance(first.getCentre(), second));
+		double dist1 = specialDistance(first.getStartPoint(), second);
+		double dist2 = specialDistance(first.getEndPoint(), second);
+		double dist3 = specialDistance(second.getStartPoint(), first);
+		double dist4 = specialDistance(second.getEndPoint(), first);
+
+		return Math.min(Math.min(distByCentre1, distByCentre2),
+				Math.min(Math.min(dist1, dist2), Math.min(dist3, dist4)));
 	}
 
 	/**
@@ -182,8 +191,14 @@ public class GeoDistance
 	 */
 	private static double specialDistance(Line first, Arc second)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		double distByCentre = Math.abs(second.getRadius() - specialDistance(second.getCentre(), first));
+		double dist1 = specialDistance(first.getStartPoint(), second);
+		double dist2 = specialDistance(first.getEndPoint(), second);
+		double dist3 = specialDistance(second.getStartPoint(), first);
+		double dist4 = specialDistance(second.getEndPoint(), first);
+
+		return Math.min(distByCentre, Math.min(Math.min(dist1, dist2), Math.min(dist3, dist4)));
+
 	}
 
 	/**
@@ -195,8 +210,13 @@ public class GeoDistance
 	 */
 	private static double specialDistance(Line first, Line second)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		double dist1 = specialDistance(first.getStartPoint(), second);
+		double dist2 = specialDistance(first.getEndPoint(), second);
+		double dist3 = specialDistance(second.getStartPoint(), first);
+		double dist4 = specialDistance(second.getEndPoint(), first);
+
+		return Math.min(Math.min(dist1, dist2), Math.min(dist3, dist4));
+
 	}
 
 	/**
@@ -208,8 +228,16 @@ public class GeoDistance
 	 */
 	private static double specialDistance(XYpoint first, Arc second)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		XYvector centreVector = new XYvector(second.getCentre(), first);
+
+		NumericAngle firstAngle = centreVector.getAngle();
+
+		if (second.containsAngle(firstAngle))
+		{
+			return Math.abs(second.getRadius() - centreVector.getLength());
+		}
+
+		return Math.min(specialDistance(second.getStartPoint(), first), specialDistance(second.getEndPoint(), first));
 	}
 
 	/**
@@ -221,21 +249,34 @@ public class GeoDistance
 	 */
 	private static double specialDistance(XYpoint first, Line second)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		XYvector lineVector = new XYvector(second.getStartPoint(), second.getEndPoint());
+		XYvector reverseLineVector = new XYvector(second.getEndPoint(), second.getStartPoint());
+
+		XYvector startVector = new XYvector(second.getStartPoint(), first);
+		XYvector endVector = new XYvector(second.getEndPoint(), first);
+
+		double startAngle = lineVector.getAngleDifference(startVector);
+		double endAngle = reverseLineVector.getAngleDifference(endVector);
+
+		if (startAngle < -Math.PI / 2 || startAngle > Math.PI / 2)
+			return specialDistance(second.getStartPoint(), first);
+
+		if (endAngle < -Math.PI / 2 || endAngle > Math.PI / 2)
+			return specialDistance(second.getEndPoint(), first);
+
+		return Measurement.distance(first, second);
 	}
 
 	/**
 	 * @param first
 	 *            a point
 	 * @param second
-	 *            apoint
+	 *            a point
 	 * @return the distance of both
 	 */
 	private static double specialDistance(XYpoint first, XYpoint second)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		return (new XYvector(first, second)).getLength();
 	}
 
 }
