@@ -27,26 +27,20 @@ import de.fabianmeier.seventeengon.shapes.XYvector;
 public class PointGenerator implements GeoGenerator
 {
 
-	public static final SentencePattern CUT = new SentencePattern(
-			"Sei P im Schnitt von X und Y");
+	public static final SentencePattern CUT = new SentencePattern("Sei P im Schnitt von X und Y");
 
-	public static final SentencePattern INX = new SentencePattern(
-			"Sei P ein Punkt in X");
+	public static final SentencePattern INX = new SentencePattern("Sei P ein Punkt in X");
 
-	public static final SentencePattern ONX = new SentencePattern(
-			"Sei P ein Punkt auf X");
+	public static final SentencePattern ONX = new SentencePattern("Sei P ein Punkt auf X");
 
-	public static final SentencePattern OUTSIDE = new SentencePattern(
-			"Sei P ein Punkt außerhalb von X");
+	public static final SentencePattern OUTSIDE = new SentencePattern("Sei P ein Punkt außerhalb von X");
 
-	public static final SentencePattern OVER = new SentencePattern(
-			"Sei P ein Punkt über AB");
+	public static final SentencePattern OVER = new SentencePattern("Sei P ein Punkt über AB");
 
 	public static final SentencePattern OVERINSIDE = new SentencePattern(
 			"Sei P ein Punkt im Schnitt von X und Y über AB");
 
-	public static final SentencePattern SIMPLE = new SentencePattern(
-			"Sei P ein Punkt");
+	public static final SentencePattern SIMPLE = new SentencePattern("Sei P ein Punkt");
 
 	/*
 	 * (non-Javadoc)
@@ -57,8 +51,7 @@ public class PointGenerator implements GeoGenerator
 	 * de.fabianmeier.seventeengon.naming.CompName)
 	 */
 	@Override
-	public boolean generateAndAdd(GeoHolder geoHolder, CompName compName)
-			throws IOException
+	public boolean generateAndAdd(GeoHolder geoHolder, CompName compName) throws IOException
 	{
 		// TODO Auto-generated method stub
 		return false;
@@ -72,8 +65,7 @@ public class PointGenerator implements GeoGenerator
 	 * seventeengon.geoobjects.GeoHolder, java.lang.String)
 	 */
 	@Override
-	public boolean generateAndAdd(GeoHolder geoHolder, Sentence sentence)
-			throws IOException
+	public boolean generateAndAdd(GeoHolder geoHolder, Sentence sentence) throws IOException
 	{
 		if (!geoHolder.generateCompNames(sentence))
 			return false;
@@ -81,23 +73,18 @@ public class PointGenerator implements GeoGenerator
 		if ((new SentencePattern(sentence)).equals(SIMPLE))
 		{
 			List<CompName> compNames = sentence.getCompositeNames();
-
 			CompName point = compNames.get(0);
 
-			return samplePointFromArea(geoHolder, point,
-					geoHolder.getCanvasArea());
+			return samplePointFromArea(geoHolder, point, geoHolder.getCanvasArea());
 		}
 
 		if ((new SentencePattern(sentence)).equals(ONX))
 		{
 			List<CompName> compNames = sentence.getCompositeNames();
-
 			CompName point = compNames.get(0);
 			CompName objName = compNames.get(1);
-
 			if (!geoHolder.contains(objName))
-				throw new IOException(
-						"The name " + objName + " does not exist.");
+				throw new IOException("The name " + objName + " does not exist.");
 
 			GeoObject area = geoHolder.get(objName).getBoundary();
 
@@ -107,13 +94,10 @@ public class PointGenerator implements GeoGenerator
 		if ((new SentencePattern(sentence)).equals(INX))
 		{
 			List<CompName> compNames = sentence.getCompositeNames();
-
 			CompName point = compNames.get(0);
 			CompName objName = compNames.get(1);
-
 			if (!geoHolder.contains(objName))
-				throw new IOException(
-						"The name " + objName + " does not exist.");
+				throw new IOException("The name " + objName + " does not exist.");
 
 			GeoObject area = geoHolder.get(objName).getFilledObject();
 
@@ -123,17 +107,14 @@ public class PointGenerator implements GeoGenerator
 		if ((new SentencePattern(sentence)).equals(CUT))
 		{
 			List<CompName> compNames = sentence.getCompositeNames();
-
 			CompName objName1 = compNames.get(1);
 			CompName objName2 = compNames.get(2);
 
 			if (!geoHolder.contains(objName1))
-				throw new IOException(
-						"The name " + objName1 + " does not exist.");
+				throw new IOException("The name " + objName1 + " does not exist.");
 
 			if (!geoHolder.contains(objName2))
-				throw new IOException(
-						"The name " + objName2 + " does not exist.");
+				throw new IOException("The name " + objName2 + " does not exist.");
 
 			CompName point = compNames.get(0);
 
@@ -146,22 +127,16 @@ public class PointGenerator implements GeoGenerator
 		if ((new SentencePattern(sentence)).equals(OVER))
 		{
 			List<CompName> compNames = sentence.getCompositeNames();
-
 			CompName objName1 = compNames.get(1);
-
 			if (!geoHolder.contains(objName1))
-				throw new IOException(
-						"The name " + objName1 + " does not exist.");
+				throw new IOException("The name " + objName1 + " does not exist.");
 
 			CompName point = compNames.get(0);
-
 			GeoObject geoLine = geoHolder.get(objName1);
-
 			if (!(geoLine instanceof Line))
 				throw new IOException(objName1 + " does not represent Line");
 
 			Line line = (Line) geoLine;
-
 			GeoObject combinedArea = getAreaOverLine(line, geoHolder);
 
 			return samplePointFromArea(geoHolder, point, combinedArea);
@@ -170,24 +145,19 @@ public class PointGenerator implements GeoGenerator
 		if ((new SentencePattern(sentence)).equals(OVERINSIDE))
 		{
 			List<CompName> compNames = sentence.getCompositeNames();
-
 			CompName X = compNames.get(1);
-
 			if (!geoHolder.contains(X))
 				throw new IOException("The name " + X + " does not exist.");
 
 			CompName Y = compNames.get(2);
-
 			if (!geoHolder.contains(Y))
 				throw new IOException("The name " + Y + " does not exist.");
 
 			CompName AB = compNames.get(3);
-
 			if (!geoHolder.contains(Y))
 				throw new IOException("The name " + AB + " does not exist.");
 
 			GeoObject geoLine = geoHolder.get(AB);
-
 			if (!(geoLine instanceof Line))
 				throw new IOException(AB + " does not represent Line");
 
@@ -206,31 +176,22 @@ public class PointGenerator implements GeoGenerator
 		if ((new SentencePattern(sentence)).equals(OUTSIDE))
 		{
 			List<CompName> compNames = sentence.getCompositeNames();
-
 			CompName objName1 = compNames.get(1);
-
 			if (!geoHolder.contains(objName1))
-				throw new IOException(
-						"The name " + objName1 + " does not exist.");
+				throw new IOException("The name " + objName1 + " does not exist.");
 
 			CompName point = compNames.get(0);
-
-			DifferenceObject diff = new DifferenceObject(
-					geoHolder.getCanvasArea(), geoHolder.get(objName1));
-
+			DifferenceObject diff = new DifferenceObject(geoHolder.getCanvasArea(), geoHolder.get(objName1));
 			XYpoint xy = diff.getSamplePoint(geoHolder.nextSampling());
-
 			if (xy != null)
 			{
 				geoHolder.add(point, xy);
 				return true;
-			}
-			else
+			} else
 				return false;
 		}
 
-		throw new IllegalArgumentException(
-				sentence + " is not a valid pattern for " + this);
+		throw new IllegalArgumentException(sentence + " is not a valid pattern for " + this);
 
 	}
 
@@ -249,17 +210,13 @@ public class PointGenerator implements GeoGenerator
 		XYpoint leftBottom = new XYpoint(0, 0);
 		XYpoint rightBottom = new XYpoint(geoHolder.getWidth(), 0);
 		XYpoint leftTop = new XYpoint(0, geoHolder.getHeight());
-		XYpoint rightTop = new XYpoint(geoHolder.getWidth(),
-				geoHolder.getHeight());
+		XYpoint rightTop = new XYpoint(geoHolder.getWidth(), geoHolder.getHeight());
 
-		double longDistance = 3 * geoHolder.getWidth()
-				+ 3 * geoHolder.getHeight();
+		double longDistance = 3 * geoHolder.getWidth() + 3 * geoHolder.getHeight();
 
-		XYvector direction = new XYvector(line.getStartPoint(),
-				line.getEndPoint()).normed();
+		XYvector direction = new XYvector(line.getStartPoint(), line.getEndPoint()).normed();
 
-		Line prolongedLine = new Line(line.getStartPoint(),
-				direction.shift(line.getStartPoint()), -longDistance,
+		Line prolongedLine = new Line(line.getStartPoint(), direction.shift(line.getStartPoint()), -longDistance,
 				longDistance);
 
 		Line leftLine = new Line(leftBottom, leftTop, 0, 1);
@@ -269,14 +226,10 @@ public class PointGenerator implements GeoGenerator
 
 		Set<XYpoint> cornerPoints = new HashSet<XYpoint>();
 
-		cornerPoints.addAll(
-				prolongedLine.intersectWith(leftLine).getZeroDimensionalPart());
-		cornerPoints.addAll(prolongedLine.intersectWith(rightLine)
-				.getZeroDimensionalPart());
-		cornerPoints.addAll(
-				prolongedLine.intersectWith(topLine).getZeroDimensionalPart());
-		cornerPoints.addAll(prolongedLine.intersectWith(bottomLine)
-				.getZeroDimensionalPart());
+		cornerPoints.addAll(prolongedLine.intersectWith(leftLine).getZeroDimensionalPart());
+		cornerPoints.addAll(prolongedLine.intersectWith(rightLine).getZeroDimensionalPart());
+		cornerPoints.addAll(prolongedLine.intersectWith(topLine).getZeroDimensionalPart());
+		cornerPoints.addAll(prolongedLine.intersectWith(bottomLine).getZeroDimensionalPart());
 
 		if (Measurement.aboveLine(leftBottom, prolongedLine))
 			cornerPoints.add(leftBottom);
@@ -292,29 +245,20 @@ public class PointGenerator implements GeoGenerator
 
 		return IntersectionManager.triangulizeConvexSet(cornerPoints);
 
-		// XYpoint startPoint = line.getStartPoint();
-		// XYpoint endPoint = line.getEndPoint();
-		// XYvector direction = (new XYvector(startPoint, endPoint)).normed();
-		// XYvector orthogonalDirection = new XYvector(-direction.getyMove(),
-		// direction.getxMove());
-		//
-		// XYpoint overStart = orthogonalDirection.multiplyBy(10000)
-		// .shift(startPoint);
-		// XYpoint overEnd =
-		// orthogonalDirection.multiplyBy(10000).shift(endPoint);
-		//
-		// Triangle firstTriangle = new Triangle(startPoint, endPoint,
-		// overStart);
-		// Triangle secondTriangle = new Triangle(startPoint, endPoint,
-		// overEnd);
-		//
-		// GeoObject combinedArea = new CompositeGeoObject(firstTriangle,
-		// secondTriangle);
-		// return combinedArea;
 	}
 
-	private boolean samplePointFromArea(GeoHolder geoHolder, CompName point,
-			GeoObject area)
+	/**
+	 * 
+	 * @param geoHolder
+	 *            a geoHolder
+	 * @param point
+	 *            a compName
+	 * @param area
+	 *            an area
+	 * @return adds a point from intersection of area and the sampling area to
+	 *         the geoHolder an returns true, if not possible false
+	 */
+	private boolean samplePointFromArea(GeoHolder geoHolder, CompName point, GeoObject area)
 	{
 		area = area.intersectWith(geoHolder.getSamplingArea());
 
@@ -324,8 +268,7 @@ public class PointGenerator implements GeoGenerator
 		{
 			geoHolder.add(point, xy);
 			return true;
-		}
-		else
+		} else
 			return false;
 	}
 

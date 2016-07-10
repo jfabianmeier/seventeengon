@@ -29,18 +29,15 @@ public class RectangleFit
 	 *            the points which should be fitted
 	 * @return the Map to maps the points into the rectangle
 	 */
-	public static PreservingMap fitTo(double width, double height,
-			Set<XYpoint> points)
+	public static PreservingMap fitTo(double width, double height, Set<XYpoint> points)
 	{
 
 		if (points.size() == 0)
-			return new PreservingMap(new XYpoint(0, 0), new XYpoint(0, 1),
-					new XYpoint(0, 0), new XYpoint(0, 1));
+			return new PreservingMap(new XYpoint(0, 0), new XYpoint(0, 1), new XYpoint(0, 0), new XYpoint(0, 1));
 
 		if (points.size() == 1)
 		{
-			return new PreservingMap(new XYpoint(0, 0),
-					points.iterator().next(), new XYpoint(0, 0),
+			return new PreservingMap(new XYpoint(0, 0), points.iterator().next(), new XYpoint(0, 0),
 					new XYpoint(width / 2, height / 2));
 
 		}
@@ -55,8 +52,7 @@ public class RectangleFit
 
 		XYpoint initPoint = points.iterator().next();
 
-		XYpoint initMapPoint = PreservingMap.scaleFrom(new XYpoint(0, 0),
-				scaleRatio, bestPreMap.mapPoint(initPoint));
+		XYpoint initMapPoint = PreservingMap.scaleFrom(new XYpoint(0, 0), scaleRatio, bestPreMap.mapPoint(initPoint));
 
 		double left = initMapPoint.getX();
 		double bottom = initMapPoint.getY();
@@ -65,8 +61,7 @@ public class RectangleFit
 
 		for (XYpoint point : points)
 		{
-			XYpoint mapPoint = PreservingMap.scaleFrom(new XYpoint(0, 0),
-					scaleRatio, bestPreMap.mapPoint(point));
+			XYpoint mapPoint = PreservingMap.scaleFrom(new XYpoint(0, 0), scaleRatio, bestPreMap.mapPoint(point));
 
 			if (mapPoint.getX() < left)
 				left = mapPoint.getX();
@@ -84,17 +79,15 @@ public class RectangleFit
 		List<XYpoint> pointList = new ArrayList<XYpoint>(points);
 
 		XYpoint firstPoint = pointList.get(0);
-		XYpoint scaledShiftedFirstImage = getShiftedAndScaledPoint(bestPreMap,
-				leftBottomCorner, scaleRatio, rightTopCorner, firstPoint, width,
-				height);
+		XYpoint scaledShiftedFirstImage = getShiftedAndScaledPoint(bestPreMap, leftBottomCorner, scaleRatio,
+				rightTopCorner, firstPoint, width, height);
 
 		XYpoint secondPoint = pointList.get(1);
-		XYpoint scaledShiftedSecondImage = getShiftedAndScaledPoint(bestPreMap,
-				leftBottomCorner, scaleRatio, rightTopCorner, secondPoint,
-				width, height);
+		XYpoint scaledShiftedSecondImage = getShiftedAndScaledPoint(bestPreMap, leftBottomCorner, scaleRatio,
+				rightTopCorner, secondPoint, width, height);
 
-		PreservingMap backPre = new PreservingMap(firstPoint, secondPoint,
-				scaledShiftedFirstImage, scaledShiftedSecondImage);
+		PreservingMap backPre = new PreservingMap(firstPoint, secondPoint, scaledShiftedFirstImage,
+				scaledShiftedSecondImage);
 
 		// XYpoint zero = new XYpoint(0, 0);
 		// XYpoint zeroImage = bestPreMap.mapPoint(zero);
@@ -123,17 +116,33 @@ public class RectangleFit
 
 	}
 
-	private static XYpoint getShiftedAndScaledPoint(PreservingMap bestPreMap,
-			XYpoint leftBottom, double scaleRatio, XYpoint rightTop,
-			XYpoint firstPoint, double width, double height)
+	/**
+	 * Takes firstPoint and maps it to its final image
+	 * 
+	 * @param bestPreMap
+	 *            the preMap that is used first
+	 * @param leftBottom
+	 *            the leftBottom of the point set
+	 * @param scaleRatio
+	 *            the scaling ratio
+	 * @param rightTop
+	 *            the rightTop of the point set
+	 * @param firstPoint
+	 *            the point to be mapped
+	 * @param width
+	 *            the width of canvas
+	 * @param height
+	 *            the height of the canvas
+	 * @return the mapped point
+	 */
+	private static XYpoint getShiftedAndScaledPoint(PreservingMap bestPreMap, XYpoint leftBottom, double scaleRatio,
+			XYpoint rightTop, XYpoint firstPoint, double width, double height)
 	{
 		XYpoint firstImage = bestPreMap.mapPoint(firstPoint);
 
-		XYpoint scaledFirstImage = PreservingMap.scaleFrom(new XYpoint(0, 0),
-				scaleRatio, firstImage);
+		XYpoint scaledFirstImage = PreservingMap.scaleFrom(new XYpoint(0, 0), scaleRatio, firstImage);
 
-		XYpoint newCorner = new XYpoint(
-				0.5 * (width - rightTop.getX() + leftBottom.getX()),
+		XYpoint newCorner = new XYpoint(0.5 * (width - rightTop.getX() + leftBottom.getX()),
 				0.5 * (height - rightTop.getY() + leftBottom.getY()));
 
 		XYvector shiftVector = new XYvector(leftBottom, newCorner);
@@ -143,14 +152,25 @@ public class RectangleFit
 		return shiftedScaledFirstImage;
 	}
 
-	private static double getScaleRatio(double width, double height,
-			Set<XYpoint> points, PreservingMap bestPreMap)
+	/**
+	 * 
+	 * @param width
+	 *            width of the image
+	 * @param height
+	 *            height of the image
+	 * @param points
+	 *            the set of points
+	 * @param preMap
+	 *            the map to map the points
+	 * @return the scaling factor that fits the mapped points into the image
+	 */
+	private static double getScaleRatio(double width, double height, Set<XYpoint> points, PreservingMap preMap)
 	{
 		Set<XYpoint> unscaledPoints = new HashSet<XYpoint>(points);
 
 		for (XYpoint point : points)
 		{
-			XYpoint neuPoint = bestPreMap.mapPoint(point);
+			XYpoint neuPoint = preMap.mapPoint(point);
 			unscaledPoints.add(neuPoint);
 		}
 
@@ -162,8 +182,7 @@ public class RectangleFit
 		if (width / unscaledWidth < height / unscaledHeight)
 		{
 			scaleRatio = width / unscaledWidth;
-		}
-		else
+		} else
 		{
 			scaleRatio = height / unscaledHeight;
 		}
@@ -172,14 +191,23 @@ public class RectangleFit
 		return scaleRatio;
 	}
 
-	private static PreservingMap getBestPreMap(double width, double height,
-			Set<XYpoint> points)
+	/**
+	 * 
+	 * @param width
+	 *            width of the image
+	 * @param height
+	 *            height of the image
+	 * @param points
+	 *            set of points
+	 * @return a preMap that has a good fit with the width/height ratio of the
+	 *         image
+	 */
+	private static PreservingMap getBestPreMap(double width, double height, Set<XYpoint> points)
 	{
-		double bestFit = Math
-				.abs(width / height - getWidthToHeightRatio(points));
+		double bestFit = Math.abs(width / height - getWidthToHeightRatio(points));
 
-		PreservingMap bestPreMap = new PreservingMap(new XYpoint(0, 0),
-				new XYpoint(0, 1), new XYpoint(0, 0), new XYpoint(0, 1));
+		PreservingMap bestPreMap = new PreservingMap(new XYpoint(0, 0), new XYpoint(0, 1), new XYpoint(0, 0),
+				new XYpoint(0, 1));
 
 		XYpoint standardA = new XYpoint(0, 0);
 
@@ -187,6 +215,7 @@ public class RectangleFit
 
 		standardBList.add(new XYpoint(0, height));
 		standardBList.add(new XYpoint(width, height));
+		standardBList.add(new XYpoint(width, height / 2));
 		standardBList.add(new XYpoint(width, 0));
 
 		for (XYpoint standardB : standardBList)
@@ -196,10 +225,8 @@ public class RectangleFit
 				for (XYpoint neuB : points)
 					if (neuA != neuB)
 					{
-						PreservingMap preMap = new PreservingMap(neuA, neuB,
-								standardA, standardB);
-						Set<XYpoint> unscaledPoints = new HashSet<XYpoint>(
-								points);
+						PreservingMap preMap = new PreservingMap(neuA, neuB, standardA, standardB);
+						Set<XYpoint> unscaledPoints = new HashSet<XYpoint>(points);
 
 						for (XYpoint point : points)
 						{

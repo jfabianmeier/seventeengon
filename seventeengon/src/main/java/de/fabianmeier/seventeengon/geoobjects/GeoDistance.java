@@ -62,16 +62,11 @@ public class GeoDistance
 		{
 			Triangle triangle = (Triangle) first;
 
-			Line AB = new Line(triangle.getPointA(), triangle.getPointB(), 0,
-					1);
-			Line BC = new Line(triangle.getPointB(), triangle.getPointC(), 0,
-					1);
-			Line CA = new Line(triangle.getPointC(), triangle.getPointA(), 0,
-					1);
+			Line AB = new Line(triangle.getPointA(), triangle.getPointB(), 0, 1);
+			Line BC = new Line(triangle.getPointB(), triangle.getPointC(), 0, 1);
+			Line CA = new Line(triangle.getPointC(), triangle.getPointA(), 0, 1);
 
-			return Math.min(
-					Math.min(distance(AB, second), distance(BC, second)),
-					distance(CA, second));
+			return Math.min(Math.min(distance(AB, second), distance(BC, second)), distance(CA, second));
 
 		}
 
@@ -79,23 +74,18 @@ public class GeoDistance
 		{
 			Triangle triangle = (Triangle) second;
 
-			Line AB = new Line(triangle.getPointA(), triangle.getPointB(), 0,
-					1);
-			Line BC = new Line(triangle.getPointB(), triangle.getPointC(), 0,
-					1);
-			Line CA = new Line(triangle.getPointC(), triangle.getPointA(), 0,
-					1);
+			Line AB = new Line(triangle.getPointA(), triangle.getPointB(), 0, 1);
+			Line BC = new Line(triangle.getPointB(), triangle.getPointC(), 0, 1);
+			Line CA = new Line(triangle.getPointC(), triangle.getPointA(), 0, 1);
 
-			return Math.min(Math.min(distance(AB, first), distance(BC, first)),
-					distance(CA, first));
+			return Math.min(Math.min(distance(AB, first), distance(BC, first)), distance(CA, first));
 		}
 
 		if (first instanceof Circle)
 		{
 			Circle circle = (Circle) first;
 
-			Arc arc = new Arc(circle.getCentre(), circle.getRadius(),
-					circle.getStartAngle(), circle.getEndAngle());
+			Arc arc = new Arc(circle.getCentre(), circle.getRadius(), circle.getStartAngle(), circle.getEndAngle());
 
 			return distance(arc, second);
 
@@ -105,8 +95,7 @@ public class GeoDistance
 		{
 			Circle circle = (Circle) second;
 
-			Arc arc = new Arc(circle.getCentre(), circle.getRadius(),
-					circle.getStartAngle(), circle.getEndAngle());
+			Arc arc = new Arc(circle.getCentre(), circle.getRadius(), circle.getStartAngle(), circle.getEndAngle());
 
 			return distance(arc, first);
 
@@ -167,12 +156,16 @@ public class GeoDistance
 			return specialDistance((Arc) first, (Arc) second);
 		}
 
+		throw new IllegalStateException("This should never happen.");
+
 	}
 
 	/**
 	 * @param first
+	 *            an arc
 	 * @param second
-	 * @return
+	 *            an arc
+	 * @return the distance of both
 	 */
 	private static double specialDistance(Arc first, Arc second)
 	{
@@ -182,8 +175,10 @@ public class GeoDistance
 
 	/**
 	 * @param first
+	 *            a line
 	 * @param second
-	 * @return
+	 *            an arc
+	 * @return the distance of both
 	 */
 	private static double specialDistance(Line first, Arc second)
 	{
@@ -193,8 +188,10 @@ public class GeoDistance
 
 	/**
 	 * @param first
+	 *            a line
 	 * @param second
-	 * @return
+	 *            a line
+	 * @return the distance of both
 	 */
 	private static double specialDistance(Line first, Line second)
 	{
@@ -204,8 +201,10 @@ public class GeoDistance
 
 	/**
 	 * @param first
+	 *            a point
 	 * @param second
-	 * @return
+	 *            an arc
+	 * @return the distance of both
 	 */
 	private static double specialDistance(XYpoint first, Arc second)
 	{
@@ -215,8 +214,10 @@ public class GeoDistance
 
 	/**
 	 * @param first
+	 *            a point
 	 * @param second
-	 * @return
+	 *            a line
+	 * @return the distance of both
 	 */
 	private static double specialDistance(XYpoint first, Line second)
 	{
@@ -226,8 +227,10 @@ public class GeoDistance
 
 	/**
 	 * @param first
+	 *            a point
 	 * @param second
-	 * @return
+	 *            apoint
+	 * @return the distance of both
 	 */
 	private static double specialDistance(XYpoint first, XYpoint second)
 	{

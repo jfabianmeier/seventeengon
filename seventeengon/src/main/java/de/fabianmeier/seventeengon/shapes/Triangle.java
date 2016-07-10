@@ -9,6 +9,12 @@ import java.util.Set;
 import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 
+/**
+ * A triangle.
+ * 
+ * @author jfabi
+ *
+ */
 public class Triangle extends AtomicGeoObject
 {
 
@@ -17,7 +23,7 @@ public class Triangle extends AtomicGeoObject
 	private final XYpoint pointC;
 
 	/**
-	 * Generates a triangle
+	 * Generates a triangle.
 	 * 
 	 * @param a
 	 *            first point
@@ -33,22 +39,6 @@ public class Triangle extends AtomicGeoObject
 		pointC = c;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
-	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
-	 */
-	// @Override
-	// public void draw(GeoCanvas canvas, GeoVisible visi)
-	// {
-	// canvas.drawLine(pointA, pointB, visi);
-	// canvas.drawLine(pointB, pointC, visi.hideName());
-	// canvas.drawLine(pointC, pointA, visi.hideName());
-	//
-	// }
-
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -63,22 +53,19 @@ public class Triangle extends AtomicGeoObject
 		{
 			if (other.pointA != null)
 				return false;
-		}
-		else if (!pointA.equals(other.pointA))
+		} else if (!pointA.equals(other.pointA))
 			return false;
 		if (pointB == null)
 		{
 			if (other.pointB != null)
 				return false;
-		}
-		else if (!pointB.equals(other.pointB))
+		} else if (!pointB.equals(other.pointB))
 			return false;
 		if (pointC == null)
 		{
 			if (other.pointC != null)
 				return false;
-		}
-		else if (!pointC.equals(other.pointC))
+		} else if (!pointC.equals(other.pointC))
 			return false;
 		return true;
 	}
@@ -89,9 +76,17 @@ public class Triangle extends AtomicGeoObject
 		return 2;
 	}
 
+	/**
+	 * 
+	 * @param factor1
+	 *            first coefficient 0->1
+	 * @param factor2
+	 *            second coefficient 0->1
+	 * @return a corresponding point
+	 */
 	private XYpoint getPoint(double factor1, double factor2)
 	{
-	
+
 		XYvector vectorAB = new XYvector(pointA, pointB);
 		XYvector vectorAC = new XYvector(pointA, pointC);
 
@@ -108,16 +103,28 @@ public class Triangle extends AtomicGeoObject
 
 	}
 
+	/**
+	 * 
+	 * @return first vertex of triangle
+	 */
 	public XYpoint getPointA()
 	{
 		return pointA;
 	}
 
+	/**
+	 * 
+	 * @return second vertex of triangle
+	 */
 	public XYpoint getPointB()
 	{
 		return pointB;
 	}
 
+	/**
+	 * 
+	 * @return third vertex of the triangle
+	 */
 	public XYpoint getPointC()
 	{
 		return pointC;
@@ -173,8 +180,7 @@ public class Triangle extends AtomicGeoObject
 	{
 		String localLabel = "Triangle";
 
-		return localLabel + "(" + pointA.toString() + "; " + pointB.toString()
-				+ "; " + pointC.toString() + ")";
+		return localLabel + "(" + pointA.toString() + "; " + pointB.toString() + "; " + pointC.toString() + ")";
 	}
 
 	/*
@@ -234,17 +240,6 @@ public class Triangle extends AtomicGeoObject
 		return new Triangle(aNew, bNew, cNew);
 
 	}
-
-	// @Override
-	// public Triangle rotate(XYpoint around, double rotationAngle)
-	// {
-	// XYpoint aNew = pointA.rotate(around, rotationAngle);
-	// XYpoint bNew = pointB.rotate(around, rotationAngle);
-	// XYpoint cNew = pointC.rotate(around, rotationAngle);
-	//
-	// return new Triangle(aNew, bNew, cNew);
-	//
-	// }
 
 	/*
 	 * (non-Javadoc)

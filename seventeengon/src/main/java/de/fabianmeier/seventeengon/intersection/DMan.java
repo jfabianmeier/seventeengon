@@ -3,6 +3,14 @@ package de.fabianmeier.seventeengon.intersection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Defines a concept of equality by giving rounding hashes. Two values are
+ * considered equal if they round to the same number. This concept is an
+ * equivalence relation, but of course not continuous.
+ * 
+ * @author jfabi
+ *
+ */
 public class DMan
 {
 
@@ -56,6 +64,14 @@ public class DMan
 		return back;
 	}
 
+	/**
+	 * 
+	 * @param a
+	 *            value
+	 * @param b
+	 *            value
+	 * @return if a<=b in comparing the hashes
+	 */
 	public static boolean lessOrEqual(double a, double b)
 	{
 		return (doubleHash(b) >= doubleHash(a));

@@ -28,7 +28,7 @@ public class ConsoleAccess
 
 	private static final Logger LOG = LogManager.getLogger(ConsoleAccess.class);
 
-	private static File OUTPUT = new File("C:\\Dropbox\\testSVG");
+	private static File output = new File("C:\\Dropbox\\testSVG");
 
 	/**
 	 * @param args
@@ -41,21 +41,18 @@ public class ConsoleAccess
 		if (args.length == 0)
 		{
 			LOG.info("Eingabesätze: \n");
-			BufferedReader br = new BufferedReader(
-					new InputStreamReader(System.in));
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 			try
 			{
 				String result = br.readLine();
 				rawSentences = constructSentences(result.split("\\s"));
-			}
-			catch (IOException e)
+			} catch (IOException e)
 			{
 				LOG.info("Einlesen gescheitert", e);
 			}
 
-		}
-		else
+		} else
 		{
 
 			rawSentences = constructSentences(args);
@@ -78,12 +75,11 @@ public class ConsoleAccess
 
 			GeoHolder holder = ListProcessing.sentenceProcessing(rawSentences);
 
-			SVGcanvas firstSvgCanvas = new SVGcanvas(holder.getWidth(),
-					holder.getHeight());
+			SVGcanvas firstSvgCanvas = new SVGcanvas(holder.getWidth(), holder.getHeight());
 
 			firstSvgCanvas.drawAll(holder, false);
 
-			firstSvgCanvas.writeToFile(new File(OUTPUT, "raw" + fileName));
+			firstSvgCanvas.writeToFile(new File(output, "raw" + fileName));
 
 			GeoCanvas textCanvas = new TextualCanvas();
 
@@ -91,22 +87,25 @@ public class ConsoleAccess
 
 			LOG.info(textCanvas.toString());
 
-			SVGcanvas svgCanvas = new SVGcanvas(holder.getWidth(),
-					holder.getHeight());
+			SVGcanvas svgCanvas = new SVGcanvas(holder.getWidth(), holder.getHeight());
 
 			svgCanvas.drawAll(holder, true);
 
-			svgCanvas.writeToFile(new File(OUTPUT, fileName));
+			svgCanvas.writeToFile(new File(output, fileName));
 
-		}
-		catch (IOException e)
+		} catch (IOException e)
 		{
-			LOG.error("Processing failed for reason: "
-					+ ExceptionUtils.getStackTrace(e));
+			LOG.error("Processing failed for reason: " + ExceptionUtils.getStackTrace(e));
 		}
 
 	}
 
+	/**
+	 * 
+	 * @param args
+	 *            the array of words
+	 * @return a list of sentences ending with .
+	 */
 	private static List<String> constructSentences(String[] args)
 	{
 		List<String> rawSentences = new ArrayList<String>();
@@ -120,8 +119,7 @@ public class ConsoleAccess
 				runningSentence += arg;
 				rawSentences.add(runningSentence.trim());
 				runningSentence = "";
-			}
-			else
+			} else
 			{
 				runningSentence += arg + " ";
 			}

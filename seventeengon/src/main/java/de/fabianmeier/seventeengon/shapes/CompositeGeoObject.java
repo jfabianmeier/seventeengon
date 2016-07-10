@@ -24,20 +24,35 @@ public class CompositeGeoObject implements GeoObject
 {
 	// int drawingVisibility = 1;
 
-	private static GeoObject emptyObject = new CompositeGeoObject(
-			new ArrayList<GeoObject>());
+	private static GeoObject emptyObject = new CompositeGeoObject(new ArrayList<GeoObject>());
 	private List<GeoObject> subObjectList = new ArrayList<>();
 
+	/**
+	 * 
+	 * @return a singleton object without points
+	 */
 	public static GeoObject getEmptyObject()
 	{
 		return emptyObject;
 	}
 
+	/**
+	 * Constructs a CompositeGeoObject from a param array
+	 * 
+	 * @param geoArray
+	 *            a param array
+	 */
 	public CompositeGeoObject(GeoObject... geoArray)
 	{
 		this(Arrays.asList(geoArray));
 	}
 
+	/**
+	 * Constructs a CompositeGeoObject from a list
+	 * 
+	 * @param geoCollection
+	 *            a collection of objects
+	 */
 	public CompositeGeoObject(Collection<? extends GeoObject> geoCollection)
 	{
 		subObjectList = new ArrayList<GeoObject>(geoCollection);
@@ -138,11 +153,9 @@ public class CompositeGeoObject implements GeoObject
 			}
 		}
 
-		Random rand = new Random(
-				sampleNumber + getDimension() + getSubObjects().size());
+		Random rand = new Random(sampleNumber + getDimension() + getSubObjects().size());
 
-		GeoObject chosen = maxDimObjects
-				.get(rand.nextInt(maxDimObjects.size()));
+		GeoObject chosen = maxDimObjects.get(rand.nextInt(maxDimObjects.size()));
 		return chosen.getSamplePoint(sampleNumber);
 
 	}
@@ -276,8 +289,7 @@ public class CompositeGeoObject implements GeoObject
 			if (geo instanceof XYpoint)
 			{
 				pointList.add((XYpoint) geo);
-			}
-			else
+			} else
 			{
 				importantObjects.add(geo);
 			}

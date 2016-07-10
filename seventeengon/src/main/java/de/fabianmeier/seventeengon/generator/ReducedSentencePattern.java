@@ -18,7 +18,7 @@ public class ReducedSentencePattern
 	private final int compCount;
 
 	/**
-	 * Creates a reduced sentence pattern (for better matching)
+	 * Creates a reduced sentence pattern (for better matching).
 	 * 
 	 * @param sentencePattern
 	 *            SentencePattern
@@ -36,7 +36,7 @@ public class ReducedSentencePattern
 
 	/**
 	 * Provides an even wider equivalence relation for two
-	 * ReducedSentencePatterns
+	 * ReducedSentencePatterns.
 	 * 
 	 * @param rsp
 	 *            rsp
@@ -52,10 +52,7 @@ public class ReducedSentencePattern
 		Set<String> local = new HashSet<String>(reducedNameSet);
 		local.retainAll(rsp.reducedNameSet);
 
-		if (local.size() >= 3)
-			return true;
-		else
-			return false;
+		return local.size() >= 3;
 
 	}
 
@@ -65,8 +62,7 @@ public class ReducedSentencePattern
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + compCount;
-		result = prime * result
-				+ ((reducedNameSet == null) ? 0 : reducedNameSet.hashCode());
+		result = prime * result + ((reducedNameSet == null) ? 0 : reducedNameSet.hashCode());
 		return result;
 	}
 
@@ -86,8 +82,7 @@ public class ReducedSentencePattern
 		{
 			if (other.reducedNameSet != null)
 				return false;
-		}
-		else if (!reducedNameSet.equals(other.reducedNameSet))
+		} else if (!reducedNameSet.equals(other.reducedNameSet))
 			return false;
 		return true;
 	}

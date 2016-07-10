@@ -43,6 +43,8 @@ public class GeoHolder
 	 *            Width of the drawing area
 	 * @param height
 	 *            Height of the drawing area
+	 * @param seed
+	 *            the seed for the sampling
 	 */
 	public GeoHolder(double width, double height, int seed)
 	{
@@ -53,7 +55,7 @@ public class GeoHolder
 	}
 
 	/**
-	 * Copy Constructor
+	 * Copy Constructor.
 	 * 
 	 * @param holder
 	 *            OriginalHolder
@@ -69,6 +71,14 @@ public class GeoHolder
 
 	}
 
+	/**
+	 * creates a new geoHolder that is twisted and turned by the preMap.
+	 * 
+	 * @param geoHolder
+	 *            a geoHolder
+	 * @param preMap
+	 *            a map of the plane
+	 */
 	private GeoHolder(GeoHolder geoHolder, PreservingMap preMap)
 	{
 		this.width = geoHolder.width;
@@ -85,9 +95,6 @@ public class GeoHolder
 			visiMap.put(compName, geoHolder.getVisibility(compName));
 		}
 
-		int i = 0;
-		i = i + 1;
-
 	}
 
 	/**
@@ -101,13 +108,11 @@ public class GeoHolder
 	 * @return The intersection of the GeoObject with the rectangle
 	 *         0,0,width,height
 	 */
-	public static GeoObject cutToRectangle(GeoObject affineGeo, double width,
-			double height)
+	public static GeoObject cutToRectangle(GeoObject affineGeo, double width, double height)
 	{
-		Triangle triangle1 = new Triangle(new XYpoint(0, 0),
-				new XYpoint(2 * width, 0), new XYpoint(0, 2 * height));
-		Triangle triangle2 = new Triangle(new XYpoint(width, height),
-				new XYpoint(-width, height), new XYpoint(width, -height));
+		Triangle triangle1 = new Triangle(new XYpoint(0, 0), new XYpoint(2 * width, 0), new XYpoint(0, 2 * height));
+		Triangle triangle2 = new Triangle(new XYpoint(width, height), new XYpoint(-width, height),
+				new XYpoint(width, -height));
 
 		affineGeo = affineGeo.intersectWith(triangle1);
 		affineGeo = affineGeo.intersectWith(triangle2);
@@ -116,29 +121,8 @@ public class GeoHolder
 		return affineGeo;
 	}
 
-	// private GeoHolder(GeoHolder geoHolder, XYpoint around, double
-	// rotationAngle)
-	// {
-	// // How to set width and height
-	// this.width = geoHolder.width;
-	// this.height = geoHolder.height;
-	// samplingValue = geoHolder.samplingValue;
-	//
-	// for (CompName compName : geoHolder.geoMap.keySet())
-	// {
-	// GeoObject affineGeo = geoHolder.get(compName).rotate(around,
-	// rotationAngle);
-	//
-	// affineGeo = affineGeo.intersectWith(getCanvasArea());
-	//
-	// geoMap.put(compName, affineGeo);
-	// visiMap.put(compName, geoHolder.getVisibility(compName));
-	// }
-	//
-	// }
-
 	/**
-	 * Adds the geoObject under the name compName
+	 * Adds the geoObject under the name compName.
 	 * 
 	 * @param compName
 	 *            CompName
@@ -148,19 +132,29 @@ public class GeoHolder
 	public void add(CompName compName, GeoObject geoObject)
 	{
 		if (!geoMap.containsKey(compName))
+		{
 			geoMap.put(compName, geoObject);
-		else
-			throw new IllegalArgumentException(
-					"Object " + compName + " already in " + this);
+		} else
+		{
+			throw new IllegalArgumentException("Object " + compName + " already in " + this);
+		}
 	}
 
+	/**
+	 * Adds the object under the specified name.
+	 * 
+	 * @param geoName
+	 *            A geoName
+	 * @param geoObject
+	 *            a GeoObject
+	 */
 	public void add(GeoName geoName, GeoObject geoObject)
 	{
 		add(new CompName(geoName), geoObject);
 	}
 
 	/**
-	 * change the visibility
+	 * change the visibility.
 	 * 
 	 * @param compName
 	 *            a compName
@@ -170,28 +164,43 @@ public class GeoHolder
 	public void changeVisibility(CompName compName, GeoVisible geoVisible)
 	{
 		if (geoVisible == null)
+		{
 			throw new IllegalArgumentException("GeoVisible may not be null.");
+		}
 		visiMap.put(compName, geoVisible);
 	}
 
+	/**
+	 * 
+	 * @param compName
+	 *            compName
+	 * @return if the compName is defined in this GeoHolder
+	 */
 	public boolean contains(CompName compName)
 	{
 		return geoMap.containsKey(compName);
 	}
 
+	/**
+	 * 
+	 * @param geoName
+	 *            a geoName
+	 * @return if the geoName is defined in this GeoHolder
+	 */
 	public boolean contains(GeoName geoName)
 	{
 		return contains(new CompName(geoName));
 	}
 
 	/**
-	 * Generates the objects for the contained compName objects
+	 * Generates the objects for the contained compName objects.
 	 * 
 	 * @param sentence
 	 *            Sentence
 	 * @throws IOException
 	 *             If the compName objects cannot be generated or are not well
 	 *             formed.
+	 * @return if the generation of compNames succeeded
 	 */
 	public boolean generateCompNames(Sentence sentence) throws IOException
 	{
@@ -206,7 +215,9 @@ public class GeoHolder
 				GeoGenerator geoGen = GeoGeneratorLookup.get(compPattern);
 
 				if (!geoGen.generateAndAdd(this, compName))
+				{
 					return false;
+				}
 
 			}
 		}
@@ -223,10 +234,12 @@ public class GeoHolder
 	public GeoObject get(CompName compName)
 	{
 		if (geoMap.containsKey(compName))
+		{
 			return geoMap.get(compName);
-		else
-			throw new IllegalArgumentException(
-					"Object " + compName + " does not exist.");
+		} else
+		{
+			throw new IllegalArgumentException("Object " + compName + " does not exist.");
+		}
 	}
 
 	/**
@@ -246,11 +259,10 @@ public class GeoHolder
 	 */
 	public GeoObject getCanvasArea()
 	{
-		Triangle area1 = new Triangle(new XYpoint(0, 0),
-				new XYpoint(0, getHeight()), new XYpoint(getWidth(), 0));
+		Triangle area1 = new Triangle(new XYpoint(0, 0), new XYpoint(0, getHeight()), new XYpoint(getWidth(), 0));
 
-		Triangle area2 = new Triangle(new XYpoint(getWidth(), getHeight()),
-				new XYpoint(0, getHeight()), new XYpoint(getWidth(), 0));
+		Triangle area2 = new Triangle(new XYpoint(getWidth(), getHeight()), new XYpoint(0, getHeight()),
+				new XYpoint(getWidth(), 0));
 
 		List<GeoObject> geoList = new ArrayList<GeoObject>();
 		geoList.add(area1);
@@ -267,8 +279,7 @@ public class GeoHolder
 	public GeoObject getSamplingArea()
 	{
 		return new Triangle(new XYpoint(getWidth() * 0.4, getHeight() * 0.4),
-				new XYpoint(getWidth() * 0.6, getHeight() * 0.4),
-				new XYpoint(getWidth() * 0.5, getHeight() * 0.7));
+				new XYpoint(getWidth() * 0.6, getHeight() * 0.4), new XYpoint(getWidth() * 0.5, getHeight() * 0.7));
 
 	}
 
@@ -284,52 +295,6 @@ public class GeoHolder
 
 		PreservingMap preMap = RectangleFit.fitTo(width, height, shapingPoints);
 
-		// double leftBorder = width;
-		// double rightBorder = 0;
-		// double bottomBorder = height;
-		// double topBorder = 0;
-		//
-		// for (CompName comp : geoMap.keySet())
-		// {
-		// if (geoMap.get(comp) instanceof XYpoint
-		// && !getVisibility(comp).isInvisible())
-		// {
-		// XYpoint localPoint = (XYpoint) geoMap.get(comp);
-		// if (localPoint.getX() < leftBorder)
-		// leftBorder = localPoint.getX() * 0.99;
-		// if (localPoint.getX() > rightBorder)
-		// rightBorder = localPoint.getX() * 1.01;
-		//
-		// if (localPoint.getY() < bottomBorder)
-		// bottomBorder = localPoint.getY() * 0.99;
-		// if (localPoint.getY() > topBorder)
-		// topBorder = localPoint.getY() * 1.01;
-		// }
-		//
-		// }
-		//
-		// if (leftBorder > rightBorder)
-		// return this;
-		//
-		// XYvector shiftVector = new XYvector(-leftBorder * 0.8,
-		// -bottomBorder * 0.8);
-		//
-		// double pseudoWidth = rightBorder - leftBorder;
-		// double pseudoHeight = topBorder - bottomBorder;
-		//
-		// double scale = 0;
-		//
-		// double ratio = width / height;
-		//
-		// if (pseudoWidth / pseudoHeight > ratio)
-		// {
-		// scale = width / pseudoWidth * 0.8;
-		// }
-		// else
-		// {
-		// scale = height / pseudoHeight * 0.8;
-		// }
-
 		return new GeoHolder(this, preMap);
 
 	}
@@ -343,8 +308,7 @@ public class GeoHolder
 
 		for (CompName comp : geoMap.keySet())
 		{
-			if (geoMap.get(comp) instanceof XYpoint
-					&& !getVisibility(comp).isInvisible())
+			if (geoMap.get(comp) instanceof XYpoint && !getVisibility(comp).isInvisible())
 			{
 				XYpoint localPoint = (XYpoint) geoMap.get(comp);
 				back.add(localPoint);
@@ -374,7 +338,7 @@ public class GeoHolder
 
 	/**
 	 * Returns a point under the name or an IOException if the element is not
-	 * present or not a point
+	 * present or not a point.
 	 * 
 	 * @param compName
 	 *            The name of a possible XYpoint
@@ -385,19 +349,23 @@ public class GeoHolder
 	public XYpoint getPointOrIO(CompName compName) throws IOException
 	{
 		if (!contains(compName))
+		{
 			throw new IOException("Object " + compName + " does not exist.");
+		}
 
 		GeoObject geo = get(compName);
 
 		if (!(geo instanceof XYpoint))
+		{
 			throw new IOException("Object " + geo + " is not a XYpoint.");
+		}
 
 		return (XYpoint) geo;
 	}
 
 	/**
 	 * Returns a point under the name or an IOException if the element is not
-	 * present or not a point
+	 * present or not a point.
 	 * 
 	 * @param geoName
 	 *            The name of a possible XYpoint
@@ -419,10 +387,14 @@ public class GeoHolder
 	public GeoVisible getVisibility(CompName compName)
 	{
 		if (visiMap.containsKey(compName))
+		{
 			return visiMap.get(compName);
+		}
 
 		if (geoMap.containsKey(compName))
+		{
 			return GeoVisible.getStandard();
+		}
 
 		throw new IllegalArgumentException("Not registered name: " + compName);
 
@@ -437,7 +409,7 @@ public class GeoHolder
 	}
 
 	/**
-	 * Increases the stored sampling value by one and returns it
+	 * Increases the stored sampling value by one and returns it.
 	 * 
 	 * @return As said above.
 	 */
@@ -468,17 +440,13 @@ public class GeoHolder
 		if (blockedAreaSet == null)
 		{
 			blockedAreaSet = new HashSet<GeoObject>();
-			blockedAreaSet.add(new Triangle(new XYpoint(0, -height),
-					new XYpoint(0, 2 * height),
-					new XYpoint(-width, height / 2)));
-			blockedAreaSet.add(new Triangle(new XYpoint(-width, 0),
-					new XYpoint(2 * width, 0),
-					new XYpoint(width / 2, -height)));
-			blockedAreaSet.add(new Triangle(new XYpoint(width, -height),
-					new XYpoint(width, 2 * height),
+			blockedAreaSet.add(
+					new Triangle(new XYpoint(0, -height), new XYpoint(0, 2 * height), new XYpoint(-width, height / 2)));
+			blockedAreaSet.add(
+					new Triangle(new XYpoint(-width, 0), new XYpoint(2 * width, 0), new XYpoint(width / 2, -height)));
+			blockedAreaSet.add(new Triangle(new XYpoint(width, -height), new XYpoint(width, 2 * height),
 					new XYpoint(2 * width, height / 2)));
-			blockedAreaSet.add(new Triangle(new XYpoint(-width, height),
-					new XYpoint(2 * width, height),
+			blockedAreaSet.add(new Triangle(new XYpoint(-width, height), new XYpoint(2 * width, height),
 					new XYpoint(width / 2, 2 * height)));
 
 		}

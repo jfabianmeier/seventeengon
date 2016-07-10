@@ -3,6 +3,12 @@ package de.fabianmeier.seventeengon.util;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.shapes.AtomicGeoObject;
 
+/**
+ * Represents an absolute angle in radian.
+ * 
+ * @author jfabi
+ *
+ */
 public class NumericAngle
 {
 	private double normalizedAngle;
@@ -46,12 +52,17 @@ public class NumericAngle
 		if (getClass() != obj.getClass())
 			return false;
 		NumericAngle other = (NumericAngle) obj;
-		if (DMan.doubleHash(normalizedAngle) != DMan
-				.doubleHash(other.normalizedAngle))
+		if (DMan.doubleHash(normalizedAngle) != DMan.doubleHash(other.normalizedAngle))
 			return false;
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param shift
+	 *            a shift in radian
+	 * @return the new absolute angle
+	 */
 	public NumericAngle addtoAngle(double shift)
 	{
 		return new NumericAngle(normalizedAngle + shift);
@@ -73,27 +84,6 @@ public class NumericAngle
 
 		normalizedAngle = angle;
 	}
-
-	// /**
-	// * The angle of the vector to the x-axis
-	// *
-	// * @param vector
-	// * A non-zero vector
-	// */
-	// public Angle(XYvector vector)
-	// {
-	// if (vector.equals(XYvector.nullVector()))
-	// throw new IllegalArgumentException(
-	// "Null vector does not describe an angle.");
-	//
-	// double xNormed = vector.getxMove() / vector.getLength();
-	// double yNormed = vector.getyMove() / vector.getLength();
-	//
-	// normalizedAngle = Math.acos(xNormed);
-	// if (yNormed < 0)
-	// normalizedAngle = 2 * Math.PI - normalizedAngle;
-	//
-	// }
 
 	/**
 	 * 
@@ -119,16 +109,28 @@ public class NumericAngle
 		return DMan.lessOrEqual(shiftedAngle, shiftedEndAngle);
 	}
 
+	/**
+	 * 
+	 * @return the angle as double between 0 and 2pi
+	 */
 	public double asDouble()
 	{
 		return normalizedAngle;
 	}
 
+	/**
+	 * 
+	 * @return the cosine of the angle
+	 */
 	public double cos()
 	{
 		return Math.cos(normalizedAngle);
 	}
 
+	/**
+	 * 
+	 * @return the sine of the angle
+	 */
 	public double sin()
 	{
 		return Math.sin(normalizedAngle);

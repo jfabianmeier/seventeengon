@@ -1,5 +1,11 @@
 package de.fabianmeier.seventeengon.naming;
 
+/**
+ * A name with a number or another GeoName as index
+ * 
+ * @author jfabi
+ *
+ */
 public class IndexedName implements GeoName
 {
 	private BasicName basicName;
@@ -22,8 +28,7 @@ public class IndexedName implements GeoName
 				index = new BasicName(split[1]);
 			else
 				numericIndex = Integer.parseInt(split[1]);
-		}
-		else
+		} else
 		{
 			throw new IllegalArgumentException("Name does not contain _");
 		}
@@ -38,8 +43,7 @@ public class IndexedName implements GeoName
 		if (index != null)
 		{
 			back += index.toUnicodeString();
-		}
-		else
+		} else
 		{
 			back += numericIndex;
 		}
@@ -55,8 +59,7 @@ public class IndexedName implements GeoName
 		if (index != null)
 		{
 			back += index.toString();
-		}
-		else
+		} else
 		{
 			back += numericIndex;
 		}

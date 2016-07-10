@@ -9,6 +9,12 @@ import java.util.Locale;
 
 import de.fabianmeier.seventeengon.geoobjects.GeoDistance;
 
+/**
+ * Represents one building block of the geoObjects
+ * 
+ * @author jfabi
+ *
+ */
 public abstract class AtomicGeoObject implements GeoObject
 {
 
@@ -20,8 +26,7 @@ public abstract class AtomicGeoObject implements GeoObject
 	 */
 	public static String showValue(double x)
 	{
-		DecimalFormat df = new DecimalFormat("#.####",
-				DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		DecimalFormat df = new DecimalFormat("#.####", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 		df.setRoundingMode(RoundingMode.CEILING);
 		return df.format(x);
 	}

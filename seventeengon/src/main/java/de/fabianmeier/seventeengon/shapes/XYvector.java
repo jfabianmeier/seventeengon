@@ -3,6 +3,12 @@ package de.fabianmeier.seventeengon.shapes;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.util.NumericAngle;
 
+/**
+ * A two-dimensional vector
+ * 
+ * @author jfabi
+ *
+ */
 public class XYvector
 {
 
@@ -18,54 +24,114 @@ public class XYvector
 	private final double xMove;
 	private final double yMove;
 
+	/**
+	 * 
+	 * @return the x part
+	 */
 	public double getxMove()
 	{
 		return xMove;
 	}
 
+	/**
+	 * 
+	 * @return the y part
+	 */
 	public double getyMove()
 	{
 		return yMove;
 	}
 
+	/**
+	 * a vector from start to end.
+	 * 
+	 * @param start
+	 *            start
+	 * @param end
+	 *            end
+	 */
 	public XYvector(XYpoint start, XYpoint end)
 	{
 		xMove = end.getX() - start.getX();
 		yMove = end.getY() - start.getY();
 	}
 
+	/**
+	 * a vector of given radius and angle
+	 * 
+	 * @param radius
+	 *            radius
+	 * @param angle
+	 *            angle
+	 */
 	public XYvector(double radius, NumericAngle angle)
 	{
 		xMove = radius * angle.cos();
 		yMove = radius * angle.sin();
 	}
 
+	/**
+	 * A vector of given coordinates
+	 * 
+	 * @param xMove
+	 *            x
+	 * @param yMove
+	 *            y
+	 */
 	public XYvector(double xMove, double yMove)
 	{
 		this.xMove = xMove;
 		this.yMove = yMove;
 	}
 
+	/**
+	 * 
+	 * @param other
+	 *            another vector
+	 * @return the scalar product
+	 */
 	public double scalarProduct(XYvector other)
 	{
 		return xMove * other.xMove + yMove * other.yMove;
 	}
 
+	/**
+	 * 
+	 * @param a
+	 *            a point
+	 * @return the shifted point (by this vector)
+	 */
 	public XYpoint shift(XYpoint a)
 	{
 		return new XYpoint(a.getX() + xMove, a.getY() + yMove);
 	}
 
+	/**
+	 * 
+	 * @param factor
+	 *            a scalar factor
+	 * @return the stretched vector
+	 */
 	public XYvector multiplyBy(double factor)
 	{
 		return new XYvector(factor * xMove, factor * yMove);
 	}
 
+	/**
+	 * 
+	 * @param vector
+	 *            vector
+	 * @return the sum of this and the other vector
+	 */
 	public XYvector addTo(XYvector vector)
 	{
 		return new XYvector(xMove + vector.xMove, yMove + vector.yMove);
 	}
 
+	/**
+	 * 
+	 * @return the length of the vector
+	 */
 	public double getLength()
 	{
 		return Math.sqrt(xMove * xMove + yMove * yMove);
@@ -88,6 +154,10 @@ public class XYvector
 
 	}
 
+	/**
+	 * 
+	 * @return the normed vector (length 1)
+	 */
 	public XYvector normed()
 	{
 		return this.multiplyBy(1 / getLength());

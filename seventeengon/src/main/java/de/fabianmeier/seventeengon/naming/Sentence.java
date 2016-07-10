@@ -36,10 +36,15 @@ public class Sentence
 
 	}
 
+	/**
+	 * 
+	 * @param part
+	 *            a string
+	 * @return if this string represents a word in German
+	 */
 	private static boolean isSentenceWord(String part)
 	{
-		return !BasicName.isBasicName(part)
-				&& part.matches("[A-ZÄÖÜ]?[a-zäöüß]+,?");
+		return !BasicName.isBasicName(part) && part.matches("[A-ZÄÖÜ]?[a-zäöüß]+,?");
 	}
 
 	private final List<Object> parts = new ArrayList<Object>();
@@ -49,7 +54,7 @@ public class Sentence
 	private final String sentence;
 
 	/**
-	 * Creates a Sentence
+	 * Creates a Sentence.
 	 * 
 	 * @param sentence
 	 *            a sentence (if invalid, an Exception is thrown)
@@ -65,13 +70,11 @@ public class Sentence
 			{
 				parts.add(part);
 				words.add(part);
-			}
-			else
+			} else
 			{
 				List<String> compParts = CompName.getCompNamePieces(part);
 				if (compParts == null)
-					throw new IllegalArgumentException(
-							part + " no valid CompName");
+					throw new IllegalArgumentException(part + " no valid CompName");
 				CompName comp = new CompName(part);
 				parts.add(comp);
 				compNames.add(comp);
@@ -96,6 +99,10 @@ public class Sentence
 		return words;
 	}
 
+	/**
+	 * 
+	 * @return all parts, words and composite names as list of Object
+	 */
 	public List<Object> getParts()
 	{
 		return parts;

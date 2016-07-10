@@ -5,6 +5,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A composite name of geoNames and special symbols.
+ * 
+ * @author jfabi
+ *
+ */
 public class CompName
 {
 
@@ -12,6 +18,11 @@ public class CompName
 
 	private final String compName;
 
+	/**
+	 * 
+	 * @param geoName
+	 *            a geoName
+	 */
 	public CompName(GeoName geoName)
 	{
 		this(geoName.toString());
@@ -22,8 +33,7 @@ public class CompName
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((compName == null) ? 0 : compName.hashCode());
+		result = prime * result + ((compName == null) ? 0 : compName.hashCode());
 		return result;
 	}
 
@@ -41,8 +51,7 @@ public class CompName
 		{
 			if (other.compName != null)
 				return false;
-		}
-		else if (!compName.equals(other.compName))
+		} else if (!compName.equals(other.compName))
 			return false;
 		return true;
 	}
@@ -113,22 +122,44 @@ public class CompName
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param name
+	 *            a string representing a compoName
+	 * @param runningIndex
+	 *            the index where to look
+	 * @return sequence of non-word characters starting from that position (can
+	 *         be empty)
+	 */
 	private static String getNonGeoName(String name, int runningIndex)
 	{
 		String internalName = name.substring(runningIndex);
 		Pattern p = Pattern.compile("^\\W*");
 		Matcher m = p.matcher(internalName);
 		if (!m.find())
-			throw new IllegalStateException(
-					internalName + " does not begin anywhere!?!");
+			throw new IllegalStateException(internalName + " does not begin anywhere!?!");
 		return m.group(0);
 	}
 
+	/**
+	 * 
+	 * @param geoName
+	 *            string starting with a geoName
+	 * @return the geoName at the beginning
+	 */
 	private static GeoName getGeoName(String geoName)
 	{
 		return getGeoName(geoName, 0);
 	}
 
+	/**
+	 * 
+	 * @param input
+	 *            input String
+	 * @param startIndex
+	 *            start Index to search from
+	 * @return the GeoName starting at that position.
+	 */
 	private static GeoName getGeoName(String input, int startIndex)
 	{
 		BasicName basicName = null;
@@ -152,19 +183,15 @@ public class CompName
 		if (BasicName.isBasicName(startPart))
 		{
 			basicName = new BasicName(startPart);
-		}
-		else
+		} else
 			return null;
 
-		if (investigateString.length() <= startPart.length()
-				|| !(investigateString.charAt(startPart.length()) == '_'))
+		if (investigateString.length() <= startPart.length() || !(investigateString.charAt(startPart.length()) == '_'))
 		{
 			return basicName;
-		}
-		else
+		} else
 		{
-			String secondPart = investigateString
-					.substring(startPart.length() + 1);
+			String secondPart = investigateString.substring(startPart.length() + 1);
 
 			int indexLength = 1;
 
@@ -184,8 +211,7 @@ public class CompName
 				indexLength = m2.group(0).length();
 			}
 
-			return new IndexedName(investigateString.substring(0,
-					startPart.length() + 1 + indexLength));
+			return new IndexedName(investigateString.substring(0, startPart.length() + 1 + indexLength));
 		}
 
 	}
@@ -203,8 +229,7 @@ public class CompName
 		List<String> pieces = getCompNamePieces(compName);
 
 		if (pieces == null)
-			throw new IllegalArgumentException(
-					compName + " is no valid CompName");
+			throw new IllegalArgumentException(compName + " is no valid CompName");
 
 		for (int i = 0; i < pieces.size() / 2; i++)
 		{
@@ -213,6 +238,10 @@ public class CompName
 
 	}
 
+	/**
+	 * 
+	 * @return The list of all GeoNames
+	 */
 	public List<GeoName> getGeoNames()
 	{
 		return geoNames;

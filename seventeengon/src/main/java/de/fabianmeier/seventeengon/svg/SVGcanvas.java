@@ -62,14 +62,13 @@ public class SVGcanvas implements GeoCanvas
 	 * @param visible
 	 *            A visibility description
 	 */
-	private static void setColourAndStroke(Graphics2D graphics,
-			GeoVisible visible)
+	private static void setColourAndStroke(Graphics2D graphics, GeoVisible visible)
 	{
 		graphics.setFont(new Font("Cambria", Font.PLAIN, 11));
 
-		final float dash1[] = {10.0f};
-		final BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
-				BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
+		final float[] dash1 = { 10.0f };
+		final BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1,
+				0.0f);
 
 		if (visible.isDotted())
 			graphics.setStroke(dashed);
@@ -80,13 +79,14 @@ public class SVGcanvas implements GeoCanvas
 			graphics.setStroke(filled);
 
 	}
+
 	private final int height;
 	private final SVGGraphics2D svgGenerator;
 
 	private final int width;
 
 	/**
-	 * Generates a canvas for svg generation
+	 * Generates a canvas for svg generation.
 	 * 
 	 * @param width
 	 *            width
@@ -98,8 +98,7 @@ public class SVGcanvas implements GeoCanvas
 		this.width = (int) width;
 		this.height = (int) height;
 
-		DOMImplementation domImpl = GenericDOMImplementation
-				.getDOMImplementation();
+		DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
 
 		// Create an instance of org.w3c.dom.Document.
 		String svgNS = "http://www.w3.org/2000/svg";
@@ -114,6 +113,12 @@ public class SVGcanvas implements GeoCanvas
 
 	}
 
+	/**
+	 * 
+	 * @param geoName
+	 *            a geoName
+	 * @return an AttributedString with sub and superscripts
+	 */
 	private AttributedString convertToAttributedString(GeoName geoName)
 	{
 		String unicodeString = geoName.toUnicodeString();
@@ -121,14 +126,13 @@ public class SVGcanvas implements GeoCanvas
 
 		if (unicodeString.length() > 1)
 		{
-			attString.addAttribute(TextAttribute.SUPERSCRIPT,
-					TextAttribute.SUPERSCRIPT_SUB, 1, unicodeString.length());
+			attString.addAttribute(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUB, 1, unicodeString.length());
 		}
 		return attString;
 	}
 
 	/**
-	 * The drawing is empty
+	 * The drawing is empty.
 	 * 
 	 * @param angle
 	 *            An angle
@@ -154,17 +158,14 @@ public class SVGcanvas implements GeoCanvas
 		{
 
 			double start = startAngle.asDouble() * 180 / Math.PI;
-			double extent = NumericAngle.angleDifference(startAngle, endAngle)
-					* 180 / Math.PI;
-			svgGenerator.draw(new Arc2D.Double(centre.getX() - radius,
-					height - centre.getY() - radius, 2 * radius, 2 * radius,
-					start, extent, Arc2D.OPEN));
-		}
-		else
+			double extent = NumericAngle.angleDifference(startAngle, endAngle) * 180 / Math.PI;
+			svgGenerator.draw(new Arc2D.Double(centre.getX() - radius, height - centre.getY() - radius, 2 * radius,
+					2 * radius, start, extent, Arc2D.OPEN));
+		} else
 		{
 
-			svgGenerator.draw(new Ellipse2D.Double(centre.getX() - radius,
-					height - centre.getY() - radius, 2 * radius, 2 * radius));
+			svgGenerator.draw(new Ellipse2D.Double(centre.getX() - radius, height - centre.getY() - radius, 2 * radius,
+					2 * radius));
 		}
 
 	}
@@ -181,6 +182,12 @@ public class SVGcanvas implements GeoCanvas
 
 	}
 
+	/**
+	 * draws all subobjects.
+	 * 
+	 * @param geoObject
+	 *            a composite GeoObject
+	 */
 	private void draw(CompositeGeoObject geoObject)
 	{
 		for (GeoObject geo : geoObject.getSubObjects())
@@ -221,12 +228,17 @@ public class SVGcanvas implements GeoCanvas
 	private void draw(Line line)
 	{
 
-		svgGenerator.draw(new Line2D.Double(line.getStartPoint().getX(),
-				height - line.getStartPoint().getY(), line.getEndPoint().getX(),
-				height - line.getEndPoint().getY()));
+		svgGenerator.draw(new Line2D.Double(line.getStartPoint().getX(), height - line.getStartPoint().getY(),
+				line.getEndPoint().getX(), height - line.getEndPoint().getY()));
 
 	}
 
+	/**
+	 * Draws a triangle.
+	 * 
+	 * @param triangle
+	 *            a triangle
+	 */
 	private void draw(Triangle triangle)
 	{
 		draw(new Line(triangle.getPointA(), triangle.getPointB(), 0, 1));
@@ -242,8 +254,8 @@ public class SVGcanvas implements GeoCanvas
 	private void draw(XYpoint point)
 	{
 
-		svgGenerator.fill(new Ellipse2D.Double(point.getX() - width / 200,
-				height - point.getY() - width / 200, width / 100, width / 100));
+		svgGenerator.fill(new Ellipse2D.Double(point.getX() - width / 200, height - point.getY() - width / 200,
+				width / 100, width / 100));
 
 	}
 
@@ -288,6 +300,12 @@ public class SVGcanvas implements GeoCanvas
 
 	}
 
+	/**
+	 * 
+	 * @param fittedHolder
+	 *            a GeoHolder
+	 * @return the quality of the drawing (high = good)
+	 */
 	private double drawGeoObjects(GeoHolder fittedHolder)
 	{
 		Set<GeoObject> visibleObjects = new HashSet<GeoObject>();
@@ -304,16 +322,14 @@ public class SVGcanvas implements GeoCanvas
 			}
 		}
 
-		double minimalPositiveDistance = fittedHolder.getWidth()
-				+ fittedHolder.getHeight();
+		double minimalPositiveDistance = fittedHolder.getWidth() + fittedHolder.getHeight();
 
 		for (GeoObject geo1 : visibleObjects)
 			for (GeoObject geo2 : visibleObjects)
 			{
 				double dist = geo1.distanceTo(geo2);
 
-				if (geo1.intersectWith(geo2).isEmpty()
-						&& dist < minimalPositiveDistance)
+				if (geo1.intersectWith(geo2).isEmpty() && dist < minimalPositiveDistance)
 				{
 					minimalPositiveDistance = dist;
 				}
@@ -324,8 +340,18 @@ public class SVGcanvas implements GeoCanvas
 
 	}
 
-	private double drawName(GeoHolder fittedHolder, GeoObject geo,
-			GeoName geoName)
+	/**
+	 * 
+	 * @param fittedHolder
+	 *            a geoHolder
+	 * @param geo
+	 *            a geoObject
+	 * @param geoName
+	 *            a geoName
+	 * @return the quality of the name placement (depending on the distance from
+	 *         the point)
+	 */
+	private double drawName(GeoHolder fittedHolder, GeoObject geo, GeoName geoName)
 	{
 		// Random rand = new Random();
 		// Color color = new Color(rand.nextInt(200) + rand.nextInt(200) * 256
@@ -344,8 +370,7 @@ public class SVGcanvas implements GeoCanvas
 
 			for (Angle angle : nameDrawingAngles)
 			{
-				boolean localSuccess = nameTry(fittedHolder, geoName, angle,
-						factor);
+				boolean localSuccess = nameTry(fittedHolder, geoName, angle, factor);
 
 				if (localSuccess)
 				{
@@ -375,40 +400,56 @@ public class SVGcanvas implements GeoCanvas
 
 	/**
 	 * 
-	 * @param s
-	 *            Ein String, der dort angezeigt werden sollen
-	 * @return Die bounding box des Strings im dem aktuellen Graphics2D
+	 * @param geoName
+	 *            A geoName
+	 * @return the bounding box as vector
 	 */
 	private XYvector getBoundingBox(GeoName geoName)
 	{
 
 		AttributedString attString = convertToAttributedString(geoName);
 
-		TextLayout textLayout = new TextLayout(attString.getIterator(),
-				svgGenerator.getFontRenderContext());
-		Rectangle2D.Float textBounds = (Rectangle2D.Float) textLayout
-				.getBounds();
+		TextLayout textLayout = new TextLayout(attString.getIterator(), svgGenerator.getFontRenderContext());
+		Rectangle2D.Float textBounds = (Rectangle2D.Float) textLayout.getBounds();
 
 		return new XYvector(textBounds.getWidth(), textBounds.getHeight());
 
 	}
 
-	private GeoObject getRectangle(double left, double bottom, double width,
-			double height)
+	/**
+	 * 
+	 * @param left
+	 *            left boundary
+	 * @param bottom
+	 *            bottom boundary
+	 * @param width
+	 *            width
+	 * @param height
+	 *            height
+	 * @return a rectangle as GeoObject
+	 */
+	private GeoObject getRectangle(double left, double bottom, double width, double height)
 	{
 		double right = left + width;
 		double top = bottom + height;
-		Triangle triangle1 = new Triangle(new XYpoint(left, bottom),
-				new XYpoint(right, bottom), new XYpoint(right, top));
-		Triangle triangle2 = new Triangle(new XYpoint(right, top),
-				new XYpoint(left, top), new XYpoint(left, bottom));
+		Triangle triangle1 = new Triangle(new XYpoint(left, bottom), new XYpoint(right, bottom),
+				new XYpoint(right, top));
+		Triangle triangle2 = new Triangle(new XYpoint(right, top), new XYpoint(left, top), new XYpoint(left, bottom));
 
 		return new CompositeGeoObject(triangle1, triangle2);
 
 	}
 
-	private boolean intersectsWithVisibleObject(GeoHolder geoHolder,
-			GeoObject other)
+	/**
+	 * 
+	 * @param geoHolder
+	 *            a geoHolder
+	 * @param other
+	 *            a GeoObject
+	 * @return if other intersects with a visible object in geoHolder, a already
+	 *         drawn name or the forbidden area outside the image
+	 */
+	private boolean intersectsWithVisibleObject(GeoHolder geoHolder, GeoObject other)
 	{
 		for (CompName compName : geoHolder.getCompNames())
 		{
@@ -444,12 +485,11 @@ public class SVGcanvas implements GeoCanvas
 	 *            a geoName
 	 * @param angle
 	 *            the angle to draw in
-	 * @param offset
-	 *            an offset to the angle boundary
+	 * @param factor
+	 *            the scaling factor of the placing vector
 	 * @return if the addition of the geoName succeeded
 	 */
-	private boolean nameTry(GeoHolder fittedHolder, GeoName geoName,
-			Angle angle, double factor)
+	private boolean nameTry(GeoHolder fittedHolder, GeoName geoName, Angle angle, double factor)
 	{
 		XYvector boundingBox = getBoundingBox(geoName);
 
@@ -459,29 +499,24 @@ public class SVGcanvas implements GeoCanvas
 		// double boundingWidth = boundingBox.getxMove();
 		// double boundingHeight = boundingBox.getyMove();
 
-		double epsilon = (fittedHolder.getWidth() + fittedHolder.getHeight())
-				/ 200;
+		double epsilon = (fittedHolder.getWidth() + fittedHolder.getHeight()) / 400;
 
 		int rectangleWidth = (int) (boundingBox.getxMove() + 2 * epsilon);
 		int rectangleHeight = (int) (boundingBox.getyMove() + 2 * epsilon);
 
 		LOG.debug("Fitting " + geoName + " with factor " + factor);
 
-		XYvector midVector = NamePlacing.getMidVector(direction1, direction2,
-				rectangleWidth, rectangleHeight);
+		XYvector midVector = NamePlacing.getMidVector(direction1, direction2, rectangleWidth, rectangleHeight);
 
 		midVector = midVector.multiplyBy(factor);
 
-		double startX = angle.getVertex().getX() + midVector.getxMove()
-				- boundingBox.getxMove() / 2;
-		double startY = angle.getVertex().getY() + midVector.getyMove()
-				- boundingBox.getyMove() / 2;
+		double startX = angle.getVertex().getX() + midVector.getxMove() - boundingBox.getxMove() / 2;
+		double startY = angle.getVertex().getY() + midVector.getyMove() - boundingBox.getyMove() / 2;
 
 		int rectangleX = (int) (startX - epsilon);
 		int rectangleY = (int) (startY - epsilon);
 
-		GeoObject rectangle = getRectangle(rectangleX, rectangleY,
-				rectangleWidth, rectangleHeight);
+		GeoObject rectangle = getRectangle(rectangleX, rectangleY, rectangleWidth, rectangleHeight);
 
 		// svgGenerator.drawRect(rectangleX, height - rectangleY -
 		// rectangleHeight,
@@ -492,16 +527,15 @@ public class SVGcanvas implements GeoCanvas
 
 		fittedHolder.addBlockedArea(rectangle);
 
-		svgGenerator.drawString(
-				convertToAttributedString(geoName).getIterator(),
-				(float) startX, height - (float) startY);
+		svgGenerator.drawString(convertToAttributedString(geoName).getIterator(), (float) startX,
+				height - (float) startY);
 
 		return true;
 
 	}
 
 	/**
-	 * Writes the output to a file
+	 * Writes the output to a file.
 	 * 
 	 * @param svgFile
 	 *            The file
@@ -512,12 +546,9 @@ public class SVGcanvas implements GeoCanvas
 
 		try
 		{
-			Writer out = new OutputStreamWriter(new FileOutputStream(svgFile),
-					"UTF-8");
+			Writer out = new OutputStreamWriter(new FileOutputStream(svgFile), "UTF-8");
 			svgGenerator.stream(out, useCSS);
-		}
-		catch (UnsupportedEncodingException | FileNotFoundException
-				| SVGGraphics2DIOException e)
+		} catch (UnsupportedEncodingException | FileNotFoundException | SVGGraphics2DIOException e)
 		{
 			LOG.error("Writing on " + svgFile + " failed.", e);
 		}

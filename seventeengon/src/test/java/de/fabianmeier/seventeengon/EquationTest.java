@@ -9,9 +9,18 @@ import org.junit.Test;
 import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.EquationSolver;
 
+/**
+ * tests Equation
+ * 
+ * @author jfabi
+ *
+ */
 public class EquationTest
 {
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testSolveQuadraticEquation()
 	{
@@ -25,6 +34,9 @@ public class EquationTest
 		}
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testSolveLinearSystem()
 	{
@@ -45,6 +57,9 @@ public class EquationTest
 		assertTrue(DMan.same(result[1], 5));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testSolveLinearSystem2()
 	{
@@ -65,6 +80,9 @@ public class EquationTest
 		assertTrue(DMan.same(result[1], 3));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testDet()
 	{

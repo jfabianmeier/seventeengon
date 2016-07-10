@@ -9,14 +9,17 @@ package de.fabianmeier.seventeengon.shapes;
  */
 public class DifferenceObject
 {
-	// TODO: sollte wahrscheinlich nicht GeoObject implementieren, weil viele
-	// Teile sinnlos.
-
+	/**
+	 * the whole area from which the cutOut is excluded.
+	 */
 	private GeoObject area;
+	/**
+	 * the inner part that is excluded.
+	 */
 	private GeoObject cutOut;
 
 	/**
-	 * Forms a difference object
+	 * Forms a difference object.
 	 * 
 	 * @param area
 	 *            outer object
@@ -54,34 +57,31 @@ public class DifferenceObject
 
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.shapes.GeoObject#intersectWith(de.fabianmeier
-	 * .seventeengon.shapes.GeoObject)
+	 * @param other
+	 *            a geoObject
+	 * @return the intersection of both as DifferenceObject
 	 */
 	public DifferenceObject intersectWith(GeoObject other)
 	{
 		return new DifferenceObject(area.intersectWith(other), cutOut);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see de.fabianmeier.seventeengon.shapes.GeoObject#getDimension()
+	 * @return the dimension of the defining area
 	 */
 	public int getDimension()
 	{
 		return area.getDimension();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.shapes.GeoObject#containsPoint(de.fabianmeier
-	 * .seventeengon.shapes.XYpoint)
+	 * @param point
+	 *            a point
+	 * @return if this point is contained in the difference object
 	 */
 	public boolean containsPoint(XYpoint point)
 	{

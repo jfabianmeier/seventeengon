@@ -15,7 +15,7 @@ public class Measurement
 {
 	/**
 	 * Determines if the point lies above the (infinite) line that is described
-	 * by line
+	 * by line.
 	 * 
 	 * @param point
 	 *            a point
@@ -69,8 +69,7 @@ public class Measurement
 	 */
 	public static double orientedDistance(XYpoint point, Line line)
 	{
-		XYvector lineVector = new XYvector(line.getStartPoint(),
-				line.getEndPoint());
+		XYvector lineVector = new XYvector(line.getStartPoint(), line.getEndPoint());
 		XYvector pointVector = new XYvector(line.getStartPoint(), point);
 
 		double angle = lineVector.getAngleDifference(pointVector);

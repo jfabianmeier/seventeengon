@@ -12,6 +12,12 @@ import de.fabianmeier.seventeengon.intersection.DMan;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.NumericAngle;
 
+/**
+ * An arc or one-dimensional circle (without the inner part).
+ * 
+ * @author jfabi
+ *
+ */
 public class Arc extends AtomicGeoObject
 {
 
@@ -32,8 +38,7 @@ public class Arc extends AtomicGeoObject
 	 * @param endAngle
 	 *            End Angle
 	 */
-	public Arc(XYpoint centre, double radius, NumericAngle startAngle,
-			NumericAngle endAngle)
+	public Arc(XYpoint centre, double radius, NumericAngle startAngle, NumericAngle endAngle)
 	{
 		this.centre = centre;
 		this.radius = radius;
@@ -43,7 +48,7 @@ public class Arc extends AtomicGeoObject
 	}
 
 	/**
-	 * Complete arc (circle)
+	 * Complete arc (circle).
 	 * 
 	 * @param centre
 	 *            Centre
@@ -52,8 +57,7 @@ public class Arc extends AtomicGeoObject
 	 */
 	public Arc(XYpoint centre, double radius)
 	{
-		this(centre, radius, new NumericAngle(0),
-				new NumericAngle(2 * Math.PI));
+		this(centre, radius, new NumericAngle(0), new NumericAngle(2 * Math.PI));
 	}
 
 	/**
@@ -82,45 +86,57 @@ public class Arc extends AtomicGeoObject
 		{
 			if (other.centre != null)
 				return false;
-		}
-		else if (!centre.equals(other.centre))
+		} else if (!centre.equals(other.centre))
 			return false;
 		if (DMan.doubleHash(radius) != DMan.doubleHash(other.radius))
 			return false;
 
-		if (startAngle.equals(endAngle)
-				&& other.getStartAngle().equals(other.getEndAngle()))
+		if (startAngle.equals(endAngle) && other.getStartAngle().equals(other.getEndAngle()))
 			return true;
 		if (endAngle == null)
 		{
 			if (other.endAngle != null)
 				return false;
-		}
-		else if (!endAngle.equals(other.endAngle))
+		} else if (!endAngle.equals(other.endAngle))
 			return false;
 
 		if (startAngle == null)
 		{
 			if (other.startAngle != null)
 				return false;
-		}
-		else if (!startAngle.equals(other.startAngle))
+		} else if (!startAngle.equals(other.startAngle))
 			return false;
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param point
+	 *            a point on the arc
+	 * @return the angle of it in the arc
+	 */
 	public NumericAngle getAngle(XYpoint point)
 	{
 		XYvector vector = new XYvector(centre, point);
 		return vector.getAngle();
 	}
 
+	/**
+	 * 
+	 * @param angle
+	 *            an absolute angle
+	 * @return the point on the circle corresponding to the angle
+	 */
 	public XYpoint getAnglePoint(NumericAngle angle)
 	{
 		XYvector vector = new XYvector(radius, angle);
 		return vector.shift(centre);
 	}
 
+	/**
+	 * 
+	 * @return the centre of the circle
+	 */
 	public XYpoint getCentre()
 	{
 		return centre;
@@ -132,28 +148,43 @@ public class Arc extends AtomicGeoObject
 		return 1;
 	}
 
+	/**
+	 * 
+	 * @return the end angle (for full arc, equals the start angle)
+	 */
 	public NumericAngle getEndAngle()
 	{
 		return endAngle;
 	}
 
+	/**
+	 * 
+	 * @return the end point
+	 */
 	public XYpoint getEndPoint()
 	{
 		return getAnglePoint(endAngle);
 	}
 
+	/**
+	 * 
+	 * @param nextDouble
+	 *            a double
+	 * @return the point on the arc corresponding to it
+	 */
 	private XYpoint getPoint(double nextDouble)
 	{
-		NumericAngle angle = startAngle
-				.addtoAngle(NumericAngle.angleDifference(startAngle, endAngle)
-						* nextDouble);
+		NumericAngle angle = startAngle.addtoAngle(NumericAngle.angleDifference(startAngle, endAngle) * nextDouble);
 
-		XYvector radVector = (new XYvector(angle.cos(), angle.sin()))
-				.multiplyBy(radius);
+		XYvector radVector = (new XYvector(angle.cos(), angle.sin())).multiplyBy(radius);
 
 		return radVector.shift(centre);
 	}
 
+	/**
+	 * 
+	 * @return the radius
+	 */
 	public double getRadius()
 	{
 		return radius;
@@ -166,11 +197,19 @@ public class Arc extends AtomicGeoObject
 		return getPoint(rand.nextDouble());
 	}
 
+	/**
+	 * 
+	 * @return the start angle (for full arc, equals the end angle)
+	 */
 	public NumericAngle getStartAngle()
 	{
 		return startAngle;
 	}
 
+	/**
+	 * 
+	 * @return the start point
+	 */
 	public XYpoint getStartPoint()
 	{
 		return getAnglePoint(startAngle);
@@ -182,8 +221,7 @@ public class Arc extends AtomicGeoObject
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((centre == null) ? 0 : centre.hashCode());
-		result = prime * result + (int) DMan
-				.doubleHash(NumericAngle.angleDifference(startAngle, endAngle));
+		result = prime * result + (int) DMan.doubleHash(NumericAngle.angleDifference(startAngle, endAngle));
 		long temp;
 		temp = DMan.doubleHash(radius);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -224,8 +262,7 @@ public class Arc extends AtomicGeoObject
 	{
 		String localLabel = "Arc";
 
-		String back = localLabel + ": " + centre.toString() + " >> "
-				+ showValue(radius);
+		String back = localLabel + ": " + centre.toString() + " >> " + showValue(radius);
 
 		if (!startAngle.equals(endAngle))
 		{
@@ -254,8 +291,7 @@ public class Arc extends AtomicGeoObject
 	@Override
 	public GeoObject getFilledObject()
 	{
-		return new Circle(getCentre(), getRadius(), getStartAngle(),
-				getEndAngle());
+		return new Circle(getCentre(), getRadius(), getStartAngle(), getEndAngle());
 	}
 
 	/*
@@ -294,8 +330,7 @@ public class Arc extends AtomicGeoObject
 	@Override
 	public List<Angle> getNameDrawingAngles()
 	{
-		double angleDifference = NumericAngle.angleDifference(startAngle,
-				endAngle);
+		double angleDifference = NumericAngle.angleDifference(startAngle, endAngle);
 
 		double stepSize = angleDifference / 8;
 
@@ -320,10 +355,8 @@ public class Arc extends AtomicGeoObject
 		for (int i = 0; i < 8; i++)
 		{
 			XYpoint xy = namingPoints.get(i);
-			NumericAngle startAngle = drawNumAngles.get(i)
-					.addtoAngle(-Math.PI / 2);
-			NumericAngle endAngle = drawNumAngles.get(i)
-					.addtoAngle(Math.PI / 2);
+			NumericAngle startAngle = drawNumAngles.get(i).addtoAngle(-Math.PI / 2);
+			NumericAngle endAngle = drawNumAngles.get(i).addtoAngle(Math.PI / 2);
 
 			back.add(new Angle(xy, startAngle, endAngle));
 		}

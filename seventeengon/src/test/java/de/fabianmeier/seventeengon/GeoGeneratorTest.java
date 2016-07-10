@@ -23,6 +23,9 @@ import de.fabianmeier.seventeengon.naming.Sentence;
 public class GeoGeneratorTest
 {
 
+	/**
+	 * 
+	 */
 	@Before
 	public void init()
 	{
@@ -40,8 +43,7 @@ public class GeoGeneratorTest
 	@Test
 	public void testGetString() throws IOException
 	{
-		GeoGenerator local = GeoGeneratorLookup
-				.get(new Sentence("Sei A ein Punkt"));
+		GeoGenerator local = GeoGeneratorLookup.get(new Sentence("Sei A ein Punkt"));
 		TextualCanvas textCanvas = new TextualCanvas();
 
 		GeoHolder geoHolder = new GeoHolder(2000, 1000, 20);
@@ -68,8 +70,7 @@ public class GeoGeneratorTest
 
 		replacement.add(new Sentence("Sei A ein Punkt"));
 		replacement.add(new Sentence("Sei B ein Punkt"));
-		GeoGeneratorLookup.add(new Sentence("Seien A und B Punkte"),
-				replacement);
+		GeoGeneratorLookup.add(new Sentence("Seien A und B Punkte"), replacement);
 
 		Sentence sentence = new Sentence("Seien X und Y Punkte");
 		GeoGenerator local = GeoGeneratorLookup.get(sentence);

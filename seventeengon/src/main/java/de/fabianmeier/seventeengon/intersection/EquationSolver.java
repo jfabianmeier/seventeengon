@@ -6,13 +6,18 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Solves equations
+ * 
+ * @author jfabi
+ *
+ */
 public class EquationSolver
 {
-	private static final Logger LOG = LogManager
-			.getLogger(EquationSolver.class);
+	private static final Logger LOG = LogManager.getLogger(EquationSolver.class);
 
 	/**
-	 * Solves a quadratic equation for the midnight formula ax^2+bx+c=0
+	 * Solves a quadratic equation for the midnight formula ax^2+bx+c=0.
 	 * 
 	 * @param a
 	 *            x^2
@@ -22,24 +27,20 @@ public class EquationSolver
 	 *            constant
 	 * @return set of solutions (maybe empty)
 	 */
-	public static Set<Double> solveQuadraticEquation(double a, double b,
-			double c)
+	public static Set<Double> solveQuadraticEquation(double a, double b, double c)
 	{
 		if (DMan.same(a, 0))
 		{
 			if (DMan.same(b, 0))
 			{
-				throw new IllegalArgumentException("Gleichung " + a + "x²+" + b
-						+ "x+" + c + " nicht lösbar.");
-			}
-			else
+				throw new IllegalArgumentException("Gleichung " + a + "x²+" + b + "x+" + c + " nicht lösbar.");
+			} else
 			{
 				Set<Double> result = new HashSet<Double>();
 				result.add(-c / b);
 				return result;
 			}
-		}
-		else
+		} else
 		{
 			double discriminant = b * b - 4 * a * c;
 
@@ -66,8 +67,7 @@ public class EquationSolver
 	 * @return a solution vector or null if the coefficient matrix is not
 	 *         invertible
 	 */
-	public static double[] solveLinearSystem(double[][] coefficients,
-			double[] rhs)
+	public static double[] solveLinearSystem(double[][] coefficients, double[] rhs)
 	{
 		double detA = det(coefficients);
 
@@ -88,8 +88,7 @@ public class EquationSolver
 					if (column == i)
 					{
 						cramerMatrix[row][column] = rhs[row];
-					}
-					else
+					} else
 					{
 						cramerMatrix[row][column] = coefficients[row][column];
 					}
@@ -103,13 +102,22 @@ public class EquationSolver
 		if (checkResult(coefficients, rhs, back))
 			return back;
 		else
-			throw new IllegalStateException("Mismatch" + back.toString() + " * "
-					+ coefficients.toString() + " = " + rhs.toString());
+			throw new IllegalStateException(
+					"Mismatch" + back.toString() + " * " + coefficients.toString() + " = " + rhs.toString());
 
 	}
 
-	private static boolean checkResult(double[][] coefficients, double[] rhs,
-			double[] lambda)
+	/**
+	 * 
+	 * @param coefficients
+	 *            coefficient matrix
+	 * @param rhs
+	 *            the right hand side vector
+	 * @param lambda
+	 *            the solution of coeff* lambda = rhs
+	 * @return if the result is valid
+	 */
+	private static boolean checkResult(double[][] coefficients, double[] rhs, double[] lambda)
 	{
 		int n = coefficients.length;
 
@@ -147,8 +155,7 @@ public class EquationSolver
 		if (n == 1)
 		{
 			return m[0][0];
-		}
-		else
+		} else
 		{
 			double det = 0;
 			for (int j = 0; j < n; j++)
@@ -161,7 +168,7 @@ public class EquationSolver
 
 	/**
 	 * Computing the minor of the matrix m without the i-th row and the j-th
-	 * column
+	 * column.
 	 * 
 	 * @param m
 	 *            input matrix
@@ -171,8 +178,7 @@ public class EquationSolver
 	 *            removing the j-th column of m
 	 * @return minor of m
 	 */
-	private static double[][] minor(final double[][] m, final int i,
-			final int j)
+	private static double[][] minor(final double[][] m, final int i, final int j)
 	{
 		int n = m.length;
 		double[][] minor = new double[n - 1][n - 1];

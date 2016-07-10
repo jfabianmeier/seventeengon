@@ -25,6 +25,9 @@ import de.fabianmeier.seventeengon.shapes.XYpoint;
 public class RectangleFitTest
 {
 
+	/**
+	 * 
+	 */
 	@Test
 	public void test()
 	{
@@ -53,6 +56,9 @@ public class RectangleFitTest
 
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void test2()
 	{
@@ -81,16 +87,17 @@ public class RectangleFitTest
 
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testCutRectangle()
 	{
-		Line AB = new Line(new XYpoint(-100, -100), new XYpoint(100, 100), 0,
-				1);
+		Line AB = new Line(new XYpoint(-100, -100), new XYpoint(100, 100), 0, 1);
 
 		GeoObject geoObject = GeoHolder.cutToRectangle(AB, 50, 100);
 
-		assertEquals(new Line(new XYpoint(0, 0), new XYpoint(50, 50), 0, 1),
-				geoObject);
+		assertEquals(new Line(new XYpoint(0, 0), new XYpoint(50, 50), 0, 1), geoObject);
 
 	}
 

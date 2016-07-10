@@ -14,14 +14,31 @@ import de.fabianmeier.seventeengon.shapes.Line;
 import de.fabianmeier.seventeengon.shapes.Triangle;
 import de.fabianmeier.seventeengon.shapes.XYpoint;
 
+/**
+ * 
+ * @author jfabi
+ *
+ */
 public class IntersectionTest
 {
-
+	/**
+	 * 
+	 * @param geo
+	 *            a geoObject
+	 * @param x
+	 *            x of a point
+	 * @param y
+	 *            y of a point
+	 * @return if the respective point is contained in the geoObject
+	 */
 	private static boolean pointAssert(GeoObject geo, double x, double y)
 	{
 		return (geo.containsPoint(new XYpoint(x, y)));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectXYpointXYpoint()
 	{
@@ -33,6 +50,9 @@ public class IntersectionTest
 		assertNotEquals(point1, point2);
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectXYpointLine()
 	{
@@ -50,6 +70,9 @@ public class IntersectionTest
 		assertTrue(back.isEmpty());
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectXYpointCircle()
 	{
@@ -61,20 +84,25 @@ public class IntersectionTest
 		assertTrue(circle.intersectWith(point2).isEmpty());
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectXYpointTriangle()
 	{
 		XYpoint point = new XYpoint(10, 10);
 		XYpoint point2 = new XYpoint(0, 10);
 		XYpoint point3 = new XYpoint(5, 5);
-		Triangle triangle = new Triangle(new XYpoint(0, 10), new XYpoint(0, 0),
-				new XYpoint(10, 0));
+		Triangle triangle = new Triangle(new XYpoint(0, 10), new XYpoint(0, 0), new XYpoint(10, 0));
 		assertTrue(triangle.intersectWith(point).isEmpty());
 		assertFalse(triangle.intersectWith(point2).isEmpty());
 		assertFalse(triangle.intersectWith(point3).isEmpty());
 
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectXYpointFilledCircle()
 	{
@@ -89,6 +117,9 @@ public class IntersectionTest
 		assertTrue(point3.intersectWith(fcirc).isEmpty());
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectLineXYpoint()
 	{
@@ -100,6 +131,9 @@ public class IntersectionTest
 		assertTrue(point2.intersectWith(line).isEmpty());
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectLineLine()
 	{
@@ -109,8 +143,7 @@ public class IntersectionTest
 		GeoObject cut = line.intersectWith(line2);
 		assertTrue(cut.containsPoint(new XYpoint(0, 0)));
 
-		Line line3 = new Line(new XYpoint(0, 43), new XYpoint(0, 40), -100,
-				100);
+		Line line3 = new Line(new XYpoint(0, 43), new XYpoint(0, 40), -100, 100);
 
 		cut = line.intersectWith(line3);
 
@@ -120,6 +153,9 @@ public class IntersectionTest
 
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectLineCircle()
 	{
@@ -132,12 +168,14 @@ public class IntersectionTest
 		assertTrue(cut.containsPoint(new XYpoint(10, 20)));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectLineTriangle()
 	{
 		Line line = new Line(new XYpoint(0, 10), new XYpoint(0, 20), -12, 20);
-		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10),
-				new XYpoint(10, 0));
+		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10), new XYpoint(10, 0));
 
 		GeoObject cut = line.intersectWith(triangle);
 
@@ -145,6 +183,9 @@ public class IntersectionTest
 		assertFalse(cut.containsPoint(new XYpoint(0, 15)));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectLineFilledCircle()
 	{
@@ -160,6 +201,9 @@ public class IntersectionTest
 
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectCircleXYpoint()
 	{
@@ -169,6 +213,9 @@ public class IntersectionTest
 		assertFalse(point.intersectWith(circle).isEmpty());
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectCircleLine()
 	{
@@ -179,6 +226,9 @@ public class IntersectionTest
 		assertTrue(pointAssert(cut, 10, 0));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectCircleCircle()
 	{
@@ -191,11 +241,13 @@ public class IntersectionTest
 		assertTrue(pointAssert(cut, -3, 4));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectCircleTriangle()
 	{
-		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10),
-				new XYpoint(10, 0));
+		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10), new XYpoint(10, 0));
 		Arc circle = new Arc(new XYpoint(0, 0), 10);
 
 		GeoObject cut = triangle.intersectWith(circle);
@@ -204,6 +256,9 @@ public class IntersectionTest
 		assertTrue(pointAssert(cut, 10, 0));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectCircleFilledCircle()
 	{
@@ -216,6 +271,9 @@ public class IntersectionTest
 		assertTrue(pointAssert(cut, 5, 0));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectCircleFilledCircle2()
 	{
@@ -228,59 +286,68 @@ public class IntersectionTest
 		assertTrue(pointAssert(cut, 5, 0));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectTriangleXYpoint()
 	{
-		Triangle triangle = new Triangle(new XYpoint(-1, -1),
-				new XYpoint(-1, 10), new XYpoint(10, -1));
+		Triangle triangle = new Triangle(new XYpoint(-1, -1), new XYpoint(-1, 10), new XYpoint(10, -1));
 		XYpoint point = new XYpoint(0, 0);
 
 		GeoObject cut = point.intersectWith(triangle);
 		assertTrue(pointAssert(cut, 0, 0));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectTriangleLine()
 	{
 		Line line = new Line(new XYpoint(0, 0), new XYpoint(10, 0), -100, 1000);
-		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(10, 10),
-				new XYpoint(0, 10));
+		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(10, 10), new XYpoint(0, 10));
 
 		GeoObject cut = line.intersectWith(triangle);
 
 		assertTrue(pointAssert(cut, 0, 0));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectTriangleCircle()
 	{
 		Arc circle = new Arc(new XYpoint(0, 0), 5);
-		Triangle triangle = new Triangle(new XYpoint(10, 10),
-				new XYpoint(10, 20), new XYpoint(20, 20));
+		Triangle triangle = new Triangle(new XYpoint(10, 10), new XYpoint(10, 20), new XYpoint(20, 20));
 
 		GeoObject cut = triangle.intersectWith(circle);
 
 		assertTrue(cut.isEmpty());
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectTriangleTriangle()
 	{
-		Triangle triangle1 = new Triangle(new XYpoint(0, 0), new XYpoint(10, 0),
-				new XYpoint(0, 10));
-		Triangle triangle2 = new Triangle(new XYpoint(0, 0),
-				new XYpoint(-10, 0), new XYpoint(0, -10));
+		Triangle triangle1 = new Triangle(new XYpoint(0, 0), new XYpoint(10, 0), new XYpoint(0, 10));
+		Triangle triangle2 = new Triangle(new XYpoint(0, 0), new XYpoint(-10, 0), new XYpoint(0, -10));
 
 		GeoObject cut = triangle1.intersectWith(triangle2);
 
 		assertTrue(pointAssert(cut, 0, 0));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectTriangleFilledCircle()
 	{
-		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10),
-				new XYpoint(10, 0));
+		Triangle triangle = new Triangle(new XYpoint(0, 0), new XYpoint(0, 10), new XYpoint(10, 0));
 		Circle fcirc = new Circle(new XYpoint(0, 0), 5);
 
 		GeoObject cut = triangle.intersectWith(fcirc);
@@ -289,6 +356,9 @@ public class IntersectionTest
 
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectFilledCircleXYpoint()
 	{
@@ -300,6 +370,9 @@ public class IntersectionTest
 		assertFalse(cut.isEmpty());
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectFilledCircleLine()
 	{
@@ -312,6 +385,9 @@ public class IntersectionTest
 		assertTrue(pointAssert(cut, 2, 1));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectFilledCircleCircle()
 	{
@@ -323,12 +399,14 @@ public class IntersectionTest
 		assertTrue(pointAssert(cut, 6, 1));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectFilledCircleTriangle()
 	{
 		Circle fcirc = new Circle(new XYpoint(0, 0), 10);
-		Triangle triangle = new Triangle(new XYpoint(-1, -1),
-				new XYpoint(1, -1), new XYpoint(1, 1));
+		Triangle triangle = new Triangle(new XYpoint(-1, -1), new XYpoint(1, -1), new XYpoint(1, 1));
 
 		GeoObject cut = fcirc.intersectWith(triangle);
 
@@ -336,6 +414,9 @@ public class IntersectionTest
 
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testIntersectFilledCircleFilledCircle()
 	{

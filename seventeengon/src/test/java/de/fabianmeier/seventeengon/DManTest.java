@@ -10,9 +10,18 @@ import org.junit.Test;
 
 import de.fabianmeier.seventeengon.intersection.DMan;
 
+/**
+ * Tests DMan
+ * 
+ * @author jfabi
+ *
+ */
 public class DManTest
 {
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testSame()
 	{
@@ -24,6 +33,9 @@ public class DManTest
 		assertFalse(DMan.same(a, c));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testDoubleHash()
 	{
@@ -32,6 +44,9 @@ public class DManTest
 		assertEquals(DMan.doubleHash(a), DMan.doubleHash(b));
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testSquareRoot()
 	{
@@ -49,6 +64,9 @@ public class DManTest
 		assertTrue(back.isEmpty());
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testLessOrEqual()
 	{

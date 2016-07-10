@@ -17,7 +17,9 @@ import de.fabianmeier.seventeengon.naming.SentencePattern;
  */
 public class CompositeNameTest
 {
-
+	/**
+	 * 
+	 */
 	@Test
 	public void test()
 	{
@@ -31,6 +33,9 @@ public class CompositeNameTest
 		System.out.println(geoNames.get(3).toString());
 	}
 
+	/**
+	 * 
+	 */
 	@Test
 	public void test2()
 	{

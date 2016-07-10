@@ -9,6 +9,12 @@ import java.util.Set;
 import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
 import de.fabianmeier.seventeengon.util.NumericAngle;
 
+/**
+ * Represents an angle in the plane
+ * 
+ * @author jfabi
+ *
+ */
 public class Angle extends AtomicGeoObject
 {
 
@@ -19,7 +25,7 @@ public class Angle extends AtomicGeoObject
 	// private final Triangle reprTriangle;
 
 	/**
-	 * Generates a triangle
+	 * Generates a triangle.
 	 * 
 	 * @param onRay1
 	 *            first point
@@ -41,7 +47,7 @@ public class Angle extends AtomicGeoObject
 	}
 
 	/**
-	 * Generates a triangle
+	 * Generates a triangle.
 	 * 
 	 * @param vertex
 	 *            second point
@@ -50,8 +56,7 @@ public class Angle extends AtomicGeoObject
 	 * @param secondAngle
 	 *            second Angle
 	 */
-	public Angle(XYpoint vertex, NumericAngle firstAngle,
-			NumericAngle secondAngle)
+	public Angle(XYpoint vertex, NumericAngle firstAngle, NumericAngle secondAngle)
 	{
 		this.vertex = vertex;
 
@@ -77,22 +82,19 @@ public class Angle extends AtomicGeoObject
 		{
 			if (other.direction1 != null)
 				return false;
-		}
-		else if (!direction1.equals(other.direction1))
+		} else if (!direction1.equals(other.direction1))
 			return false;
 		if (direction2 == null)
 		{
 			if (other.direction2 != null)
 				return false;
-		}
-		else if (!direction2.equals(other.direction2))
+		} else if (!direction2.equals(other.direction2))
 			return false;
 		if (vertex == null)
 		{
 			if (other.vertex != null)
 				return false;
-		}
-		else if (!vertex.equals(other.vertex))
+		} else if (!vertex.equals(other.vertex))
 			return false;
 		return true;
 	}
@@ -103,6 +105,14 @@ public class Angle extends AtomicGeoObject
 		return 2;
 	}
 
+	/**
+	 * 
+	 * @param factor1
+	 *            factor1
+	 * @param factor2
+	 *            factor2
+	 * @return the point corresponding to the coefficients
+	 */
 	private XYpoint getPoint(double factor1, double factor2)
 	{
 
@@ -113,16 +123,28 @@ public class Angle extends AtomicGeoObject
 
 	}
 
+	/**
+	 * 
+	 * @return the first direction of the angle
+	 */
 	public XYvector getDirection1()
 	{
 		return direction1;
 	}
 
+	/**
+	 * 
+	 * @return the vertex of the angle
+	 */
 	public XYpoint getVertex()
 	{
 		return vertex;
 	}
 
+	/**
+	 * 
+	 * @return the second direction of the angle
+	 */
 	public XYvector getDirection2()
 	{
 		return direction2;
@@ -140,10 +162,8 @@ public class Angle extends AtomicGeoObject
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((direction1 == null) ? 0 : direction1.hashCode());
-		result = prime * result
-				+ ((direction2 == null) ? 0 : direction2.hashCode());
+		result = prime * result + ((direction1 == null) ? 0 : direction1.hashCode());
+		result = prime * result + ((direction2 == null) ? 0 : direction2.hashCode());
 		result = prime * result + ((vertex == null) ? 0 : vertex.hashCode());
 		return result;
 	}
@@ -157,40 +177,12 @@ public class Angle extends AtomicGeoObject
 		else
 			return CompositeGeoObject.getEmptyObject();
 
-		// if (geoObject instanceof XYpoint)
-		// {
-		// return IntersectionManager.intersect(reprTriangle,
-		// (XYpoint) geoObject);
-		// }
-		// if (geoObject instanceof Line)
-		// {
-		// return IntersectionManager.intersect(reprTriangle,
-		// (Line) geoObject);
-		// }
-		// if (geoObject instanceof Arc)
-		// {
-		// return IntersectionManager.intersect(reprTriangle, (Arc) geoObject);
-		// }
-		// if (geoObject instanceof Triangle)
-		// {
-		// return IntersectionManager.intersect(reprTriangle,
-		// (Triangle) geoObject);
-		// }
-		// if (geoObject instanceof Circle)
-		// {
-		// return IntersectionManager.intersect(reprTriangle,
-		// (Circle) geoObject);
-		// }
-		//
-		// return geoObject.intersectWith(this);
-
 	}
 
 	@Override
 	public String toString()
 	{
-		return "<" + direction1.multiplyBy(100).shift(vertex) + vertex
-				+ direction2.multiplyBy(100).shift(vertex);
+		return "<" + direction1.multiplyBy(100).shift(vertex) + vertex + direction2.multiplyBy(100).shift(vertex);
 	}
 
 	/*

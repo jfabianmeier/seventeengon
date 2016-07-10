@@ -11,6 +11,12 @@ import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
 import de.fabianmeier.seventeengon.intersection.IntersectionManager;
 import de.fabianmeier.seventeengon.util.NumericAngle;
 
+/**
+ * A filled circle (or the convex hull of an arc)
+ * 
+ * @author jfabi
+ *
+ */
 public class Circle extends AtomicGeoObject
 {
 
@@ -21,7 +27,7 @@ public class Circle extends AtomicGeoObject
 	private final NumericAngle startAngle;
 
 	/**
-	 * Creates a full circle part (convex hull of the respective arc)
+	 * Creates a full circle part (convex hull of the respective arc).
 	 * 
 	 * @param centre
 	 *            Centre
@@ -32,8 +38,7 @@ public class Circle extends AtomicGeoObject
 	 * @param endAngle
 	 *            end Angle
 	 */
-	public Circle(XYpoint centre, double radius, NumericAngle startAngle,
-			NumericAngle endAngle)
+	public Circle(XYpoint centre, double radius, NumericAngle startAngle, NumericAngle endAngle)
 	{
 		this.centre = centre;
 		this.radius = radius;
@@ -42,7 +47,7 @@ public class Circle extends AtomicGeoObject
 	}
 
 	/**
-	 * Creates a full circle
+	 * Creates a full circle.
 	 * 
 	 * @param centre
 	 *            Centre
@@ -52,31 +57,25 @@ public class Circle extends AtomicGeoObject
 	 */
 	public Circle(XYpoint centre, double radius)
 	{
-		this(centre, radius, new NumericAngle(0),
-				new NumericAngle(2 * Math.PI));
+		this(centre, radius, new NumericAngle(0), new NumericAngle(2 * Math.PI));
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
-	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
+	 * @param angle
+	 *            an absolute angle
+	 * @return the point on the circle corresponding to that angle
 	 */
-	// @Override
-	// public void draw(GeoCanvas canvas, GeoVisible visi)
-	// {
-	// canvas.drawArc(getCentre(), getStartAngle(), getEndAngle(), radius,
-	// visi);
-	//
-	// }
-
 	public XYpoint getAnglePoint(NumericAngle angle)
 	{
 		XYvector vector = new XYvector(radius, angle);
 		return vector.shift(centre);
 	}
 
+	/**
+	 * 
+	 * @return the centre of the circle
+	 */
 	public XYpoint getCentre()
 	{
 		return centre;
@@ -88,26 +87,39 @@ public class Circle extends AtomicGeoObject
 		return 2;
 	}
 
+	/**
+	 * 
+	 * @return the end angle of the arc (equals startAngle for a full circle)
+	 */
 	public NumericAngle getEndAngle()
 	{
 		return endAngle;
 	}
 
+	/**
+	 * 
+	 * @return the end point of the arc (for full circle, it equals the start
+	 *         point)
+	 */
 	public XYpoint getEndPoint()
 	{
 		return getAnglePoint(endAngle);
 	}
 
+	/**
+	 * 
+	 * @param rand
+	 *            Random object
+	 * @return a random point from the circle
+	 */
 	private XYpoint getPoint(Random rand)
 	{
 		while (true)
 		{
-			NumericAngle angle = startAngle.addtoAngle(
-					NumericAngle.angleDifference(startAngle, endAngle)
-							* rand.nextDouble());
+			NumericAngle angle = startAngle
+					.addtoAngle(NumericAngle.angleDifference(startAngle, endAngle) * rand.nextDouble());
 
-			XYvector radVector = (new XYvector(angle.cos(), angle.sin()))
-					.multiplyBy(radius * rand.nextDouble());
+			XYvector radVector = (new XYvector(angle.cos(), angle.sin())).multiplyBy(radius * rand.nextDouble());
 
 			XYpoint candidate = radVector.shift(centre);
 			if (!this.intersectWith(candidate).isEmpty())
@@ -116,6 +128,10 @@ public class Circle extends AtomicGeoObject
 
 	}
 
+	/**
+	 * 
+	 * @return the radius
+	 */
 	public double getRadius()
 	{
 		return radius;
@@ -128,11 +144,19 @@ public class Circle extends AtomicGeoObject
 		return getPoint(rand);
 	}
 
+	/**
+	 * 
+	 * @return the absolute start angle (for full circle equal to end angle)
+	 */
 	public NumericAngle getStartAngle()
 	{
 		return startAngle;
 	}
 
+	/**
+	 * 
+	 * @return the start point (for full circle equal to end point)
+	 */
 	public XYpoint getStartPoint()
 	{
 		return getAnglePoint(startAngle);
@@ -166,36 +190,12 @@ public class Circle extends AtomicGeoObject
 
 	}
 
-	// @Override
-	// public void paint(Graphics2D g2d)
-	// {
-	// // setColourAndStroke(g2d);
-	//
-	// if (!startAngle.equals(endAngle))
-	// {
-	//
-	// g2d.draw(new Arc2D.Double(centre.getX() - radius,
-	// centre.getY() - radius, 2 * radius, 2 * radius,
-	// startAngle.asDouble() * 180 / Math.PI,
-	// NumericAngle.angleDifference(startAngle, endAngle) * 180 / Math.PI,
-	// Arc2D.CHORD));
-	// }
-	// else
-	// {
-	//
-	// g2d.draw(new Ellipse2D.Double(centre.getX() - radius,
-	// centre.getY() - radius, 2 * radius, 2 * radius));
-	// }
-	//
-	// }
-
 	@Override
 	public String toString()
 	{
 		String localLabel = "Fcirc";
 
-		String back = localLabel + ": " + centre.toString() + " >> "
-				+ showValue(radius);
+		String back = localLabel + ": " + centre.toString() + " >> " + showValue(radius);
 
 		if (!startAngle.equals(endAngle))
 		{
@@ -257,16 +257,6 @@ public class Circle extends AtomicGeoObject
 		return new Circle(centreNew, radiusNew, startAngle, endAngle);
 	}
 
-	// @Override
-	// public Circle rotate(XYpoint around, double rotationAngle)
-	// {
-	// XYpoint centreNew = centre.rotate(around, rotationAngle);
-	// double radiusNew = radius;
-	//
-	// return new Circle(centreNew, radiusNew, startAngle, endAngle);
-	//
-	// }
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -275,8 +265,7 @@ public class Circle extends AtomicGeoObject
 	@Override
 	public List<Angle> getNameDrawingAngles()
 	{
-		double angleDifference = NumericAngle.angleDifference(startAngle,
-				endAngle);
+		double angleDifference = NumericAngle.angleDifference(startAngle, endAngle);
 
 		double stepSize = angleDifference / 8;
 
@@ -301,10 +290,8 @@ public class Circle extends AtomicGeoObject
 		for (int i = 0; i < 8; i++)
 		{
 			XYpoint xy = namingPoints.get(i);
-			NumericAngle startAngle = drawNumAngles.get(i)
-					.addtoAngle(-Math.PI / 2);
-			NumericAngle endAngle = drawNumAngles.get(i)
-					.addtoAngle(Math.PI / 2);
+			NumericAngle startAngle = drawNumAngles.get(i).addtoAngle(-Math.PI / 2);
+			NumericAngle endAngle = drawNumAngles.get(i).addtoAngle(Math.PI / 2);
 
 			back.add(new Angle(xy, startAngle, endAngle));
 		}

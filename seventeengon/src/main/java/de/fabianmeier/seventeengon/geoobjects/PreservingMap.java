@@ -16,6 +16,11 @@ public class PreservingMap
 	private final XYvector move;
 	private final double turnAngle;
 	private final double scale;
+
+	/**
+	 * 
+	 * @return scale
+	 */
 	public double getScale()
 	{
 		return scale;
@@ -29,32 +34,30 @@ public class PreservingMap
 	 * Defines a map that preserves angles and ratios of lengths. It is defined
 	 * by two points and their respective images.
 	 * 
-	 * @param A
+	 * @param pointA
 	 *            first point
-	 * @param B
+	 * @param pointB
 	 *            second point
 	 * @param imageA
 	 *            image of first point
 	 * @param imageB
 	 *            image of second point
 	 */
-	public PreservingMap(XYpoint A, XYpoint B, XYpoint imageA, XYpoint imageB)
+	public PreservingMap(XYpoint pointA, XYpoint pointB, XYpoint imageA, XYpoint imageB)
 	{
-		this.move = new XYvector(A, imageA);
+		this.move = new XYvector(pointA, imageA);
 		this.turningCentre = imageA;
 
-		XYpoint B1 = move.shift(B);
+		XYpoint B1 = move.shift(pointB);
 
 		XYvector aToB1 = new XYvector(imageA, B1);
 		XYvector imageAtoImageB = new XYvector(imageA, imageB);
-		turnAngle = NumericAngle.angleDifference(aToB1.getAngle(),
-				imageAtoImageB.getAngle());
+		turnAngle = NumericAngle.angleDifference(aToB1.getAngle(), imageAtoImageB.getAngle());
 
 		scale = imageAtoImageB.getLength() / aToB1.getLength();
 
-		to = A + " -> " + imageA + ", " + B + " -> " + imageB + " move: " + move
-				+ " turningCentre: " + turningCentre + " turningAngle "
-				+ turnAngle;
+		to = pointA + " -> " + imageA + ", " + pointB + " -> " + imageB + " move: " + move + " turningCentre: "
+				+ turningCentre + " turningAngle " + turnAngle;
 
 	}
 
@@ -89,8 +92,7 @@ public class PreservingMap
 	 *            the point to be moved
 	 * @return The mapped point
 	 */
-	public static XYpoint scaleFrom(XYpoint scalingCentre, double scale,
-			XYpoint point)
+	public static XYpoint scaleFrom(XYpoint scalingCentre, double scale, XYpoint point)
 	{
 		XYvector shiftVector = new XYvector(scalingCentre, point);
 
@@ -110,8 +112,7 @@ public class PreservingMap
 	 *            the point to be mapped
 	 * @return the mapped point
 	 */
-	public static XYpoint turnAround(XYpoint turningCentre, double turnAngle,
-			XYpoint point)
+	public static XYpoint turnAround(XYpoint turningCentre, double turnAngle, XYpoint point)
 	{
 		if (turningCentre.equals(point))
 			return point;

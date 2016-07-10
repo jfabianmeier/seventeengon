@@ -14,6 +14,10 @@ public class CompNamePattern
 {
 	private final List<String> separation = new ArrayList<String>();
 
+	/**
+	 * 
+	 * @return the separation values as list of strings which can be null
+	 */
 	public List<String> getSeparation()
 	{
 		return separation;
@@ -43,8 +47,7 @@ public class CompNamePattern
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((separation == null) ? 0 : separation.hashCode());
+		result = prime * result + ((separation == null) ? 0 : separation.hashCode());
 		return result;
 	}
 
@@ -62,8 +65,7 @@ public class CompNamePattern
 		{
 			if (other.separation != null)
 				return false;
-		}
-		else if (!separation.equals(other.separation))
+		} else if (!separation.equals(other.separation))
 			return false;
 		return true;
 	}

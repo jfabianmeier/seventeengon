@@ -5,26 +5,23 @@ import java.util.Set;
 
 import de.fabianmeier.seventeengon.geoobjects.PreservingMap;
 
+/**
+ * A drawable object in the plane, which can consist of combinations of atomic
+ * objects. It has no drawable name by itself.
+ * 
+ * @author jfabi
+ *
+ */
 public interface GeoObject
 {
 	/**
-	 * Determines whether a given point lies inside the object
+	 * Determines whether a given point lies inside the object.
 	 * 
 	 * @param point
 	 *            An XYpoint
 	 * @return if the point lies in the object
 	 */
 	boolean containsPoint(XYpoint point);
-
-	// /**
-	// * Draws the object
-	// *
-	// * @param canvas
-	// * A canvas object to draw on
-	// * @param visi
-	// * A degree of visibility
-	// */
-	// void draw(GeoCanvas canvas, GeoVisible visi);
 
 	/**
 	 * 
@@ -83,6 +80,12 @@ public interface GeoObject
 	 */
 	Set<XYpoint> getZeroDimensionalPart();
 
+	/**
+	 * 
+	 * @param preMap
+	 *            a map of the plane
+	 * @return the object changed by the given map
+	 */
 	GeoObject preservingMap(PreservingMap preMap);
 
 	/**
@@ -100,8 +103,9 @@ public interface GeoObject
 	GeoObject normalize();
 
 	/**
-	 * @param geo2
-	 * @return
+	 * @param geo
+	 *            a GeoObject
+	 * @return the distance to this object
 	 */
 	double distanceTo(GeoObject geo);
 

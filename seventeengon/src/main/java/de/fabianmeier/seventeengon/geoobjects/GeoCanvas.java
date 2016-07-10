@@ -1,8 +1,11 @@
 package de.fabianmeier.seventeengon.geoobjects;
 
-// TODO: Should think about moving labels from string to GeoName. CompNames are
-// no good labels (who labels a line from A to B with AB?)
-
+/**
+ * Represents a way of drawing the abstract geoObjects to a concrete canvas.
+ * 
+ * @author jfabi
+ *
+ */
 public interface GeoCanvas
 {
 
@@ -11,6 +14,7 @@ public interface GeoCanvas
 	 *            A geoHolder
 	 * @param turnAndFit
 	 *            If the result should be fitted into the rectangle.
+	 * @return the quality of the drawing (high = good)
 	 */
 	double drawAll(GeoHolder geoHolder, boolean turnAndFit);
 

@@ -28,7 +28,7 @@ public class Line extends AtomicGeoObject
 	private final double startLambda;
 
 	/**
-	 * Creates a line fulfilling the equation xFactor*x + yFactor*y = constant
+	 * Creates a line fulfilling the equation xFactor*x + yFactor*y = constant.
 	 * 
 	 * @param xFactor
 	 *            coefficient of x
@@ -44,8 +44,7 @@ public class Line extends AtomicGeoObject
 		{
 			pointA = new XYpoint(0, constant / yFactor);
 			firstB = new XYpoint(1, constant / yFactor);
-		}
-		else
+		} else
 		{
 			pointA = new XYpoint(constant / xFactor, 0);
 			if (DMan.same(yFactor, 0))
@@ -64,31 +63,8 @@ public class Line extends AtomicGeoObject
 	}
 
 	/**
-	 * An infinite line through the points
-	 * 
-	 * @param pointA
-	 *            first point
-	 * @param pointB
-	 *            second point
-	 */
-	// public Line(XYpoint pointA, XYpoint pointB)
-	// {
-	//
-	// if (pointA.equals(pointB))
-	// throw new IllegalArgumentException(
-	// "Zwei gleiche Punkte " + pointA.toString());
-	//
-	// this.pointA = pointA;
-	// this.pointB = pointB;
-	// this.startLambda = -10000000;
-	// this.endLambda = 10000000;
-	// normedDirection = new XYvector(pointA, pointB).normed();
-	//
-	// }
-
-	/**
 	 * A finite line, parametrised by pointA and pointB which equal 0 and 1 on
-	 * the lambda scale
+	 * the lambda scale.
 	 * 
 	 * @param pointA
 	 *            point A
@@ -99,19 +75,16 @@ public class Line extends AtomicGeoObject
 	 * @param endLambda
 	 *            end Lambda
 	 */
-	public Line(XYpoint pointA, XYpoint pointB, double startLambda,
-			double endLambda)
+	public Line(XYpoint pointA, XYpoint pointB, double startLambda, double endLambda)
 	{
 
 		if (startLambda > endLambda)
 		{
-			throw new IllegalArgumentException("startLambda " + startLambda
-					+ " greater than endLambda " + endLambda);
+			throw new IllegalArgumentException("startLambda " + startLambda + " greater than endLambda " + endLambda);
 		}
 
 		if (pointA.equals(pointB))
-			throw new IllegalArgumentException(
-					"Zwei gleiche Punkte " + pointA.toString());
+			throw new IllegalArgumentException("Zwei gleiche Punkte " + pointA.toString());
 
 		this.pointA = pointA;
 		this.pointB = pointB;
@@ -120,20 +93,6 @@ public class Line extends AtomicGeoObject
 		normedDirection = new XYvector(pointA, pointB).normed();
 
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.fabianmeier.seventeengon.geoobjects.GeoObject#draw(de.fabianmeier.
-	 * seventeengon.geoobjects.GeoCanvas, java.lang.String)
-	 */
-	// @Override
-	// public void draw(GeoCanvas canvas, GeoVisible visi)
-	// {
-	// canvas.drawLine(getStartPoint(), getEndPoint(), visi);
-	//
-	// }
 
 	@Override
 	public boolean equals(Object obj)
@@ -156,46 +115,39 @@ public class Line extends AtomicGeoObject
 
 		Line leftLine = new Line(1, 0, -10000);
 
-		boolean leftLineMatch = leftLine.intersectWith(this)
-				.equals(leftLine.intersectWith(other));
+		boolean leftLineMatch = leftLine.intersectWith(this).equals(leftLine.intersectWith(other));
 
 		if (!leftLineMatch)
 			return false;
 
 		Line rightLine = new Line(1, 0, 10000);
 
-		boolean rightLineMatch = rightLine.intersectWith(this)
-				.equals(rightLine.intersectWith(other));
+		boolean rightLineMatch = rightLine.intersectWith(this).equals(rightLine.intersectWith(other));
 
 		if (!rightLineMatch)
 			return false;
 
-		if (leftLineMatch && rightLineMatch
-				&& !leftLine.intersectWith(this).isEmpty()
+		if (leftLineMatch && rightLineMatch && !leftLine.intersectWith(this).isEmpty()
 				&& !rightLine.intersectWith(this).isEmpty())
 			return true;
 
 		Line topLine = new Line(0, 1, 10000);
 
-		boolean topLineMatch = topLine.intersectWith(this)
-				.equals(topLine.intersectWith(other));
+		boolean topLineMatch = topLine.intersectWith(this).equals(topLine.intersectWith(other));
 
 		if (!topLineMatch)
 			return false;
 		Line bottomLine = new Line(1, 0, -10000);
 
-		boolean bottomLineMatch = bottomLine.intersectWith(this)
-				.equals(bottomLine.intersectWith(other));
+		boolean bottomLineMatch = bottomLine.intersectWith(this).equals(bottomLine.intersectWith(other));
 		if (!bottomLineMatch)
 			return false;
 
-		if (topLineMatch && bottomLineMatch
-				&& !topLine.intersectWith(this).isEmpty()
+		if (topLineMatch && bottomLineMatch && !topLine.intersectWith(this).isEmpty()
 				&& !bottomLine.intersectWith(this).isEmpty())
 			return true;
 
-		return (getStartPoint().equals(other.getStartPoint())
-				&& getEndPoint().equals(other.getEndPoint()));
+		return (getStartPoint().equals(other.getStartPoint()) && getEndPoint().equals(other.getEndPoint()));
 
 	}
 
@@ -216,11 +168,19 @@ public class Line extends AtomicGeoObject
 		return 1;
 	}
 
+	/**
+	 * 
+	 * @return the endpoint as lambda value
+	 */
 	public double getEndLambda()
 	{
 		return endLambda;
 	}
 
+	/**
+	 * 
+	 * @return the end point
+	 */
 	public XYpoint getEndPoint()
 	{
 		return getPointByLambda(endLambda);
@@ -251,16 +211,19 @@ public class Line extends AtomicGeoObject
 
 		if (DMan.same(pointA.getX(), pointB.getX()))
 		{
-			return (point.getY() - pointA.getY())
-					/ (pointB.getY() - pointA.getY());
-		}
-		else
+			return (point.getY() - pointA.getY()) / (pointB.getY() - pointA.getY());
+		} else
 		{
-			return (point.getX() - pointA.getX())
-					/ (pointB.getX() - pointA.getX());
+			return (point.getX() - pointA.getX()) / (pointB.getX() - pointA.getX());
 		}
 	}
 
+	/**
+	 * 
+	 * @param nextDouble
+	 *            a double value
+	 * @return the scaled point on the line
+	 */
 	private XYpoint getPoint(double nextDouble)
 	{
 		double lambda = startLambda + nextDouble * (endLambda - startLambda);
@@ -268,16 +231,30 @@ public class Line extends AtomicGeoObject
 
 	}
 
+	/**
+	 * 
+	 * @return the point representing lambda=0
+	 */
 	public XYpoint getPointA()
 	{
 		return pointA;
 	}
 
+	/**
+	 * 
+	 * @return the point representing lambda=1
+	 */
 	public XYpoint getPointB()
 	{
 		return pointB;
 	}
 
+	/**
+	 * 
+	 * @param lambda
+	 *            a lambda
+	 * @return the corresponding point
+	 */
 	public XYpoint getPointByLambda(double lambda)
 	{
 		XYvector vector = new XYvector(pointA, pointB);
@@ -291,11 +268,19 @@ public class Line extends AtomicGeoObject
 		return getPoint(rand.nextDouble());
 	}
 
+	/**
+	 * 
+	 * @return the lambda value of the start point
+	 */
 	public double getStartLambda()
 	{
 		return startLambda;
 	}
 
+	/**
+	 * 
+	 * @return the lambda value of the end point
+	 */
 	public XYpoint getStartPoint()
 	{
 		return getPointByLambda(startLambda);
@@ -336,19 +321,8 @@ public class Line extends AtomicGeoObject
 
 	}
 
-	// @Override
-	// public void paint(Graphics2D g2d)
-	// {
-	// // setColourAndStroke(g2d);
-	//
-	// g2d.draw(new Line2D.Double(getStartPoint().getX(),
-	// getStartPoint().getY(), getEndPoint().getX(),
-	// getEndPoint().getY()));
-	//
-	// }
-
 	/**
-	 * Sub segment of the line
+	 * Sub segment of the line.
 	 * 
 	 * @param startPoint
 	 *            point on the line
@@ -363,19 +337,6 @@ public class Line extends AtomicGeoObject
 		GeoObject geo = this.intersectWith(otherLine);
 
 		return geo;
-
-		// if (geo instanceof Line)
-		// return (Line) geo;
-		// else
-		// throw new IllegalArgumentException("Points " + startPoint + " or "
-		// + endPoint + " not on line " + this);
-		// double startL = getLambda(startPoint);
-		// double endL = getLambda(endPoint);
-		//
-		// startL = Math.max(startL, startLambda);
-		// endL = Math.min(endL, endLambda);
-		//
-		// return new Line(pointA, pointB, startL, endL);
 
 	}
 
@@ -414,10 +375,19 @@ public class Line extends AtomicGeoObject
 
 	}
 
+	/**
+	 * 
+	 * @param a
+	 *            the first point
+	 * @param b
+	 *            the second point
+	 * @param lambda
+	 *            a lambda
+	 * @return the convex combination with a is lambda=0
+	 */
 	private XYpoint convexCombination(XYpoint a, XYpoint b, double lambda)
 	{
-		return new XYpoint(a.getX() * lambda + b.getX() * (1 - lambda),
-				a.getY() * lambda + a.getY() * (1 - lambda));
+		return new XYpoint(a.getX() * lambda + b.getX() * (1 - lambda), a.getY() * lambda + a.getY() * (1 - lambda));
 	}
 
 	/*

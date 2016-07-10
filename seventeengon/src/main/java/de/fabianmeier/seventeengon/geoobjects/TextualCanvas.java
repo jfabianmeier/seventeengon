@@ -17,7 +17,7 @@ import de.fabianmeier.seventeengon.util.GeoVisible;
 public class TextualCanvas implements GeoCanvas
 {
 
-	List<String> writings = new ArrayList<String>();
+	private List<String> writings = new ArrayList<String>();
 
 	@Override
 	public String toString()
@@ -53,8 +53,7 @@ public class TextualCanvas implements GeoCanvas
 			GeoObject geo = fittedHolder.get(compName);
 			GeoVisible visibility = fittedHolder.getVisibility(compName);
 
-			writings.add(compName + " : " + geo.toString() + " Visibility: "
-					+ visibility);
+			writings.add(compName + " : " + geo.toString() + " Visibility: " + visibility);
 
 		}
 

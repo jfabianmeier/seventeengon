@@ -3,22 +3,38 @@ package de.fabianmeier.seventeengon.naming;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Describes the pattern of a sentence (the words and where compObjects are
+ * placed).
+ * 
+ * @author jfabi
+ *
+ */
 public class SentencePattern
 {
 	private final List<String> words;
 
+	/**
+	 * 
+	 * @return the list of words
+	 */
 	public List<String> getWords()
 	{
 		return words;
 	}
 
+	/**
+	 * 
+	 * @param sentence
+	 *            a sentence as a string
+	 */
 	public SentencePattern(String sentence)
 	{
 		this(new Sentence(sentence));
 	}
 
 	/**
-	 * Creates a pattern from a sentence
+	 * Creates a pattern from a sentence.
 	 * 
 	 * @param sentence
 	 *            Sentence
@@ -36,25 +52,22 @@ public class SentencePattern
 		}
 	}
 
-	// private static boolean isSentenceWord(String part)
-	// {
-	// return !BasicName.isBasicName(part) && part.matches("[A-Z]?[a-z]+,?");
-	// }
-
 	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
+
+		int objectCount = 1;
 
 		for (String word : words)
 		{
 			if (word != null)
 			{
 				builder.append(word + " ");
-			}
-			else
+			} else
 			{
-				builder.append("X" + " ");
+				builder.append("[Object " + objectCount + "]" + " ");
+				objectCount++;
 			}
 		}
 
@@ -84,8 +97,7 @@ public class SentencePattern
 		{
 			if (other.words != null)
 				return false;
-		}
-		else if (!words.equals(other.words))
+		} else if (!words.equals(other.words))
 			return false;
 		return true;
 	}
