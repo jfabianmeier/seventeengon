@@ -7,7 +7,7 @@ package de.fabianmeier.seventeengon.util;
  * @author JFM
  *
  */
-public class GeoVisible
+public final class GeoVisible
 {
 
 	public static GeoVisible getStandard()

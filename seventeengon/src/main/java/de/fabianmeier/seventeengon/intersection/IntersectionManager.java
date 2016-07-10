@@ -36,11 +36,11 @@ public class IntersectionManager
 			Set<XYpoint> pointsOnCircle, GeoObject GeoObject1,
 			GeoObject GeoObject2)
 	{
-		Set<GeoObject> GeoObjectSet = new HashSet<GeoObject>();
-		GeoObjectSet.add(GeoObject1);
-		GeoObjectSet.add(GeoObject2);
+		Set<GeoObject> geoObjectSet = new HashSet<GeoObject>();
+		geoObjectSet.add(GeoObject1);
+		geoObjectSet.add(GeoObject2);
 
-		return circlePieces(circle, pointsOnCircle, GeoObjectSet);
+		return circlePieces(circle, pointsOnCircle, geoObjectSet);
 	}
 
 	/**
@@ -675,11 +675,11 @@ public class IntersectionManager
 
 		GeoObject preCircles = circlePieces(circle, onCircle, fcirc, triangle);
 
-		for (GeoObject GeoObject : preCircles.getSubObjects())
+		for (GeoObject geoObject : preCircles.getSubObjects())
 		{
-			if (GeoObject instanceof Arc)
+			if (geoObject instanceof Arc)
 			{
-				Arc preCircle = (Arc) GeoObject;
+				Arc preCircle = (Arc) geoObject;
 				back.add(new Circle(preCircle.getCentre(),
 						preCircle.getRadius(), preCircle.getStartAngle(),
 						preCircle.getEndAngle()));

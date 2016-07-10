@@ -49,9 +49,9 @@ public class CompositeGenerator implements GeoGenerator
 		{
 			List<CompName> compNames = sentence.getCompositeNames();
 			CompName a = compNames.get(0);
-			CompName AB = compNames.get(1);
+			CompName compAB = compNames.get(1);
 
-			geoHolder.add(a, geoHolder.get(AB));
+			geoHolder.add(a, geoHolder.get(compAB));
 			return true;
 
 		}

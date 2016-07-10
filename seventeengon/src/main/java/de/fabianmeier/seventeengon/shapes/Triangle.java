@@ -91,9 +91,7 @@ public class Triangle extends AtomicGeoObject
 
 	private XYpoint getPoint(double factor1, double factor2)
 	{
-		factor1 = Math.round(factor1 * 1000) * 0.001;
-		factor2 = Math.round(factor2 * 1000) * 0.001;
-
+	
 		XYvector vectorAB = new XYvector(pointA, pointB);
 		XYvector vectorAC = new XYvector(pointA, pointC);
 
