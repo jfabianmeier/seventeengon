@@ -15,7 +15,7 @@ import de.fabianmeier.seventeengon.naming.Sentence;
 public interface GeoGenerator
 {
 	/**
-	 * 
+	 *  
 	 * @param geoHolder
 	 *            a geoHolder
 	 * @param sentence
